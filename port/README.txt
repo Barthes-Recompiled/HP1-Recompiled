@@ -23,15 +23,11 @@ Windows "N" editions also need Microsoft's Media Feature Pack.
 INSTALLING
 ----------
 
-1. Put the port's files in a folder of your choice:
+1. Put the games files or in a folder of your choice:
        hpps_launcher.exe
        hpps.exe
-       shadercache\base_shaders.bin
        README.txt
-2. Copy the game files from your disc into a folder named "game" inside it,
-   so that this file exists:
-       game\default.xbe
-   (beside it: the cut, movies and resource folders)
+2. Copy the game files from your disc or the .xiso file into a folder named "game" in the same folder with the executables.
 
 The port creates these itself on the first run:
     hpps.toml      your settings (the launcher and F10 change them)
@@ -50,11 +46,6 @@ The launcher sets the aspect ratio (4:3 or 16:9), display, graphics and
 controls, then starts the game with Play. If you turn its page off, the
 launcher starts the game straight away; hold Shift while opening it to see
 the page again.
-
-Only one copy of the game runs at a time: starting it again brings the
-running game to the front.
-
-Quitting: "Quit To Desktop" in the main menu or the pause menu, or Alt+F4.
 
 Keys that always work
   F10          Options (see below)
