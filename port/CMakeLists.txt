@@ -269,6 +269,7 @@ endif()
 if(WIN32)
     add_executable(hpps_launcher WIN32
         src/launcher/launcher.cpp
+        src/launcher/xiso.c  # unpacks a disc image in game\ before the first start
         ${CMAKE_CURRENT_BINARY_DIR}/launcher_res.rc
         ${IMGUI_DIR}/imgui.cpp ${IMGUI_DIR}/imgui_draw.cpp ${IMGUI_DIR}/imgui_tables.cpp
         ${IMGUI_DIR}/imgui_widgets.cpp ${IMGUI_DIR}/backends/imgui_impl_win32.cpp

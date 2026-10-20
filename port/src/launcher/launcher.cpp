@@ -1,7 +1,8 @@
 // hpps_launcher.exe: picks 4:3 or 16:9 and the graphics settings, writes them to hpps.toml beside it and starts
 // hpps.exe with the environment it needs (StartGame). A main menu picture made from the title's textures
 // (launcher_bg.png beside the exe, or built in from src/launcher/launcher_bg.png; not in the repository) is drawn
-// behind the page when there is one. Dear ImGui over Direct3D 11.
+// behind the page when there is one. Dear ImGui over Direct3D 11. A disc image in game\ (game\*.iso / *.xiso, no
+// game\default.xbe) is unpacked there first, with a progress page (xiso.c).
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
@@ -28,6 +29,7 @@
 #include <backends/imgui_impl_win32.h>
 
 #include "../single_instance.h"
+#include "xiso.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND, UINT, WPARAM, LPARAM);
 
@@ -246,6 +248,62 @@ bool StartGame() {
     CloseHandle(pi.hThread);
     CloseHandle(pi.hProcess);
     return true;
+}
+
+// ── Disc image ──────────────────────────────────────────────────────────────────────────────────────────────────────
+// game\ holds a disc image rather than its files: unpacked into game\ on a thread of its own before the game can
+// start. Stopped or failed, the next start carries on where it stopped (files already whole are kept).
+
+struct Unpack {
+    XisoProgress p{};
+    HANDLE thread = nullptr;
+    bool ok = false;
+    std::wstring image, dir;
+    std::string name;  // the image's file name, for the page
+};
+Unpack g_unpack;
+
+DWORD WINAPI UnpackThread(void*) {
+    g_unpack.ok = xiso_Extract(g_unpack.image.c_str(), g_unpack.dir.c_str(), &g_unpack.p);
+    return 0;
+}
+
+bool StartUnpack() {
+    WCHAR image[MAX_PATH];
+    g_unpack.dir = ExeDir() + L"game";
+    if (!xiso_Find(g_unpack.dir.c_str(), image)) return false;
+    g_unpack.image = image;
+    g_unpack.name = Narrow(g_unpack.image.substr(g_unpack.image.find_last_of(L"\\/") + 1));
+    g_unpack.thread = CreateThread(nullptr, 0, UnpackThread, nullptr, 0, nullptr);
+    return g_unpack.thread != nullptr;
+}
+
+void DrawUnpack() {
+    ImGuiIO& io = ImGui::GetIO();
+    float sc = io.FontGlobalScale;
+    float pw = 560 * sc;
+    ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.97f), ImGuiCond_Always, ImVec2(0.5f, 1.0f));
+    ImGui::SetNextWindowSize(ImVec2(pw, 0), ImGuiCond_Always);
+    ImGui::SetNextWindowBgAlpha(0.72f);
+    ImGui::Begin("##unpack", nullptr,
+                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                     ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings);
+    ImGui::TextUnformatted("Unpacking the game files");
+    ImGui::TextWrapped("From %s into the game folder. This happens once; the disc image is left as it is and can "
+                       "be deleted afterwards.", g_unpack.name.c_str());
+    ImGui::Spacing();
+    double done = double(g_unpack.p.done), total = double(g_unpack.p.total);
+    char text[64];
+    std::snprintf(text, sizeof text, "%.2f of %.2f GB", done / 1e9, total / 1e9);
+    ImGui::ProgressBar(total > 0 ? float(done / total) : 0.0f, ImVec2(-FLT_MIN, 28 * sc), text);
+    ImGui::Spacing();
+    bool cancelling = g_unpack.p.cancel != 0;
+    if (cancelling) ImGui::BeginDisabled();
+    if (ImGui::Button("Cancel", ImVec2(160 * sc, 36 * sc))) InterlockedExchange(&g_unpack.p.cancel, 1);
+    if (cancelling) ImGui::EndDisabled();
+    ImGui::SameLine();
+    ImGui::TextDisabled("The next start carries on where it stopped.");
+    ImGui::End();
 }
 
 // ── Direct3D 11 ─────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -505,8 +563,11 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE, LPSTR, int show) {
         return 0;
     }
     CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+    // xboxrecomp: a disc image to unpack first shows its progress page even with the settings page turned off
+    bool unpacking = StartUnpack();
     // the page was turned off: straight to the game with the saved settings, unless Shift is held
-    if (!Load().show && !(GetAsyncKeyState(VK_SHIFT) & 0x8000) && StartGame()) {
+    bool shift = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
+    if (!unpacking && !Load().show && !shift && StartGame()) {
         CoUninitialize();
         return 0;
     }
@@ -568,8 +629,23 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE, LPSTR, int show) {
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
         DrawBackground();
-        if (DrawPage(s, error)) {
-            if (StartGame()) started = true;
+        if (unpacking) {
+            DrawUnpack();
+            if (WaitForSingleObject(g_unpack.thread, 0) == WAIT_OBJECT_0) {
+                CloseHandle(g_unpack.thread);
+                g_unpack.thread = nullptr;
+                unpacking = false;
+                if (!g_unpack.ok)
+                    error = Narrow(g_unpack.p.error) + " The game can't start until it is unpacked; open the launcher "
+                            "again to carry on.";
+                else if (!s.show && !shift && StartGame())  // the page was turned off: on to the game as before
+                    started = true;
+            }
+        } else if (DrawPage(s, error)) {
+            WCHAR image[MAX_PATH];
+            if (xiso_Find((ExeDir() + L"game").c_str(), image))  // stopped part-way: not playable yet
+                error = "The game files are not unpacked yet. Open the launcher again to carry on.";
+            else if (StartGame()) started = true;
             else error = "hpps.exe could not be started (it must sit beside the launcher).";
         }
         ImGui::Render();
@@ -580,6 +656,12 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE, LPSTR, int show) {
         g_swap->Present(1, 0);
     }
 done:
+    // closed while unpacking: stop it (the file being written is removed; the next start carries on)
+    if (g_unpack.thread) {
+        InterlockedExchange(&g_unpack.p.cancel, 1);
+        WaitForSingleObject(g_unpack.thread, INFINITE);
+        CloseHandle(g_unpack.thread);
+    }
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
