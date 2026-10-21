@@ -34,6 +34,16 @@ mkdir -p "$dist"
 cp -f build-release/hpps.exe build-release/hpps_launcher.exe "$dist/"
 # players' readme: requirements, installing, controls, the F10 options
 cp -f README.txt "$dist/"
+# licence texts: the LGPL code from xemu (src/apu, src/nv2a/nv2a_regs.h) is linked into hpps.exe, and the LGPL
+# requires a copy of the licence with every binary; README.txt points to the source
+mkdir -p "$dist/licenses"
+cp -f "$port/../LICENSE" "$dist/licenses/LICENSE.txt"
+cp -f "$port/../NOTICE" "$dist/licenses/NOTICE.txt"
+cp -f "$port/../LICENSES/xboxrecomp-MIT.txt" "$dist/licenses/xboxrecomp-MIT.txt"
+cp -f "$port/../LICENSES/LGPL-2.1.txt" "$dist/licenses/LGPL-2.1.txt"
+# the MIT code built into the executables keeps its notices too: SCDA's renderer and Dear ImGui
+cp -f "$port/src/scda/LICENSE.SCDA" "$dist/licenses/SCDA-XBERecomp.txt"
+cp -f "$port/third_party/imgui/LICENSE.txt" "$dist/licenses/DearImGui.txt"
 
 # res/base_shaders.bin ships as shadercache\base_shaders.bin: a player's first visit to a level then needs no shader
 # compiler, only pipelines; one their driver refuses is compiled on their PC instead. Shader keys are the generated

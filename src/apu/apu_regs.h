@@ -5,6 +5,10 @@
  * Copyright (c) 2018-2019 Jannik Vogel
  * Copyright (c) 2019-2021 Matt Borgerson
  *
+ * Modified for xboxrecomp, 2026-03-10: extracted from xemu to run
+ * standalone outside QEMU, and changed since by the xboxrecomp contributors
+ * (see CONTRIBUTORS.md; the git history records each change).
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either

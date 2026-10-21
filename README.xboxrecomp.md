@@ -494,7 +494,7 @@ A: C is portable, debuggable, and the compiler optimizes it for you. You can rea
 
 ## License
 
-**MIT** — see [LICENSE](LICENSE). Third-party components keep their original
+**MIT** — see [LICENSES/xboxrecomp-MIT.txt](LICENSES/xboxrecomp-MIT.txt). Third-party components keep their original
 licence:
 
 | Component | Licence | Copyright |

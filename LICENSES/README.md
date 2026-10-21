@@ -10,3 +10,7 @@ and remaining the copyright of espes, Jannik Vogel and Matt Borgerson.
 
 Shipping the verbatim text alongside those files is an LGPL requirement, not
 a courtesy.
+
+`xboxrecomp-MIT.txt` is the MIT licence of the xboxrecomp toolkit (© 2026 sp00nz): the runtime, kernel layer
+and recompilation pipeline this port is built on (everything outside `port/` that is not listed in NOTICE).
+The port's own code is under the top-level `LICENSE`.

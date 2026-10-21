@@ -27,6 +27,7 @@ INSTALLING
        hpps_launcher.exe
        hpps.exe
        README.txt
+       licenses\
 2. Copy the game files from your disc or the .xiso file into a folder named "game" in the same folder with the executables.
 
 The port creates these itself on the first run:
@@ -165,3 +166,19 @@ The game will not start / closes at once
 A short pause the first time you enter an area
     Shaders are being prepared for your graphics card; the loading picture
     stays up meanwhile. It happens once per area.
+
+
+LICENCES AND SOURCE CODE
+------------------------
+
+The port's own code is under the MIT licence. It also contains code from the
+xemu project (the Xbox audio processor emulation), which stays under the GNU
+Lesser General Public License, version 2.1 or later. The licence texts and the
+list of third-party code are in the licenses folder beside this file.
+
+The complete source code, including that code and any changes made to it, is
+available at:
+    https://github.com/MiddleDucky/HP-PS-Xbox-Recomp
+
+The Harry Potter game itself is not included and is not covered by these
+licences.
