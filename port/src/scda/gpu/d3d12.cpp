@@ -570,6 +570,15 @@ struct PsoKey {
 };
 static_assert(sizeof(PsoKey) == 184);
 
+// xboxrecomp: a pipeline as pipelines_list.bin keeps it: the key, and the source checks its shaders are found by in
+// the shader cache (FindShader), so a PC that never ran the game makes it before the title asks
+struct PipelineRecord {
+    PsoKey k;
+    uint64_t vs_check;
+    uint64_t ps_check;
+};
+static_assert(sizeof(PipelineRecord) == 200);
+
 // Blit's settings past the source and its rectangle
 struct BlitOptions {
     bool gamma = false;       // through the gamma lookup
@@ -828,8 +837,11 @@ private:
     void KeyDepthStencil(const State& s, const Assembled& a, PsoKey& k);
     ID3D12PipelineState* EnsurePipeline(const PsoKey& k, bool wait = false);
     void TakeBuilt();
-    ComPtr<ID3D12PipelineState> CreatePipeline(const PsoKey& k, uint64_t h, ID3DBlob* vs, ID3DBlob* ps, bool compile,
-                                               bool& pending);
+    void RecordPipelineKey(const PsoKey& k);
+    void StartPrebuild();
+    bool prebuild_started_ = false;
+    ComPtr<ID3D12PipelineState> CreatePipeline(const PsoKey& k, uint64_t h, ID3DBlob* vs, ID3DBlob* ps, ID3DBlob* gs,
+                                               bool compile, bool& pending);
     void FillPipelineDesc(const PsoKey& k, ID3DBlob* vs, ID3DBlob* ps, D3D12_GRAPHICS_PIPELINE_STATE_DESC& d) const;
     void UploadConstants(const State& s, const DrawShaders& sh, const PsoKey& k, const DrawTextures& stages,
                          GuestSize size, DrawConstants& c);
@@ -986,6 +998,7 @@ private:
         std::string entry;
         std::string profile;
         ComPtr<ID3DBlob> code;
+        uint64_t check = 0;  // xboxrecomp: the source's second hash, kept for pipelines_list.bin
         uint8_t state = 0;  // 0 source only, 1 compiling, 2 done (no code: it failed)
         // xboxrecomp: code from base_shaders.bin (built under Wine); the text stays for when the driver refuses it
         bool base = false;
@@ -998,6 +1011,7 @@ private:
     std::mutex shader_lock_;
     std::condition_variable shader_done_;
     std::unordered_map<uint64_t, uint64_t> shader_src_;  // vertex and pixel program keys to source hash
+    std::unordered_map<uint64_t, uint64_t> line_gs_;     // a vertex shader's LineGsHlsl, for line draws
     std::unordered_map<uint64_t, ComPtr<ID3D12PipelineState>> psos_;
     // async shaders: a pipeline that needs a compiler is built on the build threads, its draws skipped until it is back
     bool async_ = false;
@@ -1213,6 +1227,7 @@ bool D3D12Backend::CreateRootSignature() {
     ranges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER;
     ranges[1].NumDescriptors = 4;
     D3D12_ROOT_PARAMETER params[4] = {};
+
     params[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
     params[0].Descriptor.ShaderRegister = 0;
     params[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -1225,6 +1240,7 @@ bool D3D12Backend::CreateRootSignature() {
     }
     D3D12_ROOT_SIGNATURE_DESC rsd{};
     rsd.NumParameters = 4;
+
     rsd.pParameters = params;
     rsd.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
     ComPtr<ID3DBlob> rs;
@@ -1722,6 +1738,7 @@ uint64_t D3D12Backend::Register(std::string src, const char* entry, const char* 
     std::lock_guard lock(shader_lock_);
     auto [it, fresh] = shaders_.try_emplace(hash);
     if (fresh) {
+        it->second.check = Hash(src.data(), src.size(), kSourceCheck);
         it->second.text = std::move(src);
         it->second.entry = entry;
         it->second.profile = profile;
@@ -2281,17 +2298,21 @@ ID3D12PipelineState* D3D12Backend::EnsurePipeline(const PsoKey& k, bool wait) {
     bool pending = false;
     ID3DBlob* vs = EnsureShaderCode(k.vs, !async, pending);
     ID3DBlob* ps = EnsureShaderCode(k.ps, !async, pending);
+    auto git = k.topo == uint32_t(Topology::Lines) ? line_gs_.find(k.vs) : line_gs_.end();
+    uint64_t gh = git != line_gs_.end() ? git->second : 0;
+    ID3DBlob* gs = gh ? EnsureShaderCode(gh, !async, pending) : nullptr;
     ComPtr<ID3D12PipelineState> pso;
-    if (!pending && vs && ps) pso = CreatePipeline(k, h, vs, ps, !async, pending);
+    if (!pending && vs && ps && (gs || !gh)) pso = CreatePipeline(k, h, vs, ps, gs, !async, pending);
     if (pending) {
         building_.insert(h);
         skipped_frame_ = true;
-        cache::Post([this, k, h] {
+        cache::Post([this, k, h, gh] {
             bool unused = false;
             ID3DBlob* vs = EnsureShaderCode(k.vs, true, unused);
             ID3DBlob* ps = EnsureShaderCode(k.ps, true, unused);
+            ID3DBlob* gs = gh ? EnsureShaderCode(gh, true, unused) : nullptr;
             ComPtr<ID3D12PipelineState> pso;
-            if (vs && ps) pso = CreatePipeline(k, h, vs, ps, true, unused);
+            if (vs && ps && (gs || !gh)) pso = CreatePipeline(k, h, vs, ps, gs, true, unused);
             std::lock_guard lock(built_lock_);
             built_.emplace_back(h, std::move(pso));
             built_ready_.store(true, std::memory_order_release);
@@ -2368,17 +2389,19 @@ void D3D12Backend::FillPipelineDesc(const PsoKey& k, ID3DBlob* vs, ID3DBlob* ps,
 
 // from the library, else from the driver when compile is set (any thread)
 ComPtr<ID3D12PipelineState> D3D12Backend::CreatePipeline(const PsoKey& k, uint64_t h, ID3DBlob* vs, ID3DBlob* ps,
-                                                         bool compile, bool& pending) {
+                                                         ID3DBlob* gs, bool compile, bool& pending) {
     D3D12_INPUT_ELEMENT_DESC el[16];
     uint32_t n = FillInputLayout(k, el);
     D3D12_GRAPHICS_PIPELINE_STATE_DESC d{};
     d.InputLayout = {el, n};
     FillPipelineDesc(k, vs, ps, d);
+    if (gs) d.GS = {gs->GetBufferPointer(), gs->GetBufferSize()};
     // the bytecode's own checksum: another compiler's output for the same source is another pipeline
     auto sum = [](ID3DBlob* b) { return Hash(static_cast<const uint8_t*>(b->GetBufferPointer()) + 4, 16); };
-    uint64_t name = Hash(&h, sizeof(h), sum(vs) ^ sum(ps) * 3);
+    uint64_t name = Hash(&h, sizeof(h), sum(vs) ^ sum(ps) * 3 ^ (gs ? sum(gs) * 5 : 0));
     ComPtr<ID3D12PipelineState> pso = cache::LoadPipeline(name, d);
     if (pso) {
+        RecordPipelineKey(k);
         return pso;
     }
     if (!compile) {
@@ -2393,13 +2416,80 @@ ComPtr<ID3D12PipelineState> D3D12Backend::CreatePipeline(const PsoKey& k, uint64
             bool unused = false;
             ID3DBlob* vs2 = EnsureShaderCode(k.vs, true, unused);
             ID3DBlob* ps2 = EnsureShaderCode(k.ps, true, unused);
-            if (vs2 && ps2) return CreatePipeline(k, h, vs2, ps2, compile, pending);
+            if (vs2 && ps2) return CreatePipeline(k, h, vs2, ps2, gs, compile, pending);
         }
         LOGE("d3d12: pipeline creation failed");
         return nullptr;
     }
     cache::StorePipeline(name, pso.Get());
+    RecordPipelineKey(k);
     return pso;
+}
+
+// xboxrecomp: the pipeline into pipelines_list.bin once (any thread)
+void D3D12Backend::RecordPipelineKey(const PsoKey& k) {
+    PipelineRecord r{k, 0, 0};
+    {
+        std::lock_guard lock(shader_lock_);
+        auto v = shaders_.find(k.vs), p = shaders_.find(k.ps);
+        if (v == shaders_.end() || p == shaders_.end()) return;
+        r.vs_check = v->second.check;
+        r.ps_check = p->second.check;
+    }
+    cache::RecordPipeline(Hash(&k, sizeof(k)), &r);
+    gpu::g_pipelines_recorded = uint32_t(cache::RecordedPipelineCount());
+}
+
+// RECOMP_LINE_GS=0: lines drawn by D3D12 itself (one host pixel, centres at .5), for comparison
+static bool LineGsOn() {
+    static const bool on = [] { const char* e = std::getenv("RECOMP_LINE_GS"); return !(e && *e == '0'); }();
+    return on;
+}
+
+// xboxrecomp: every recorded pipeline made on the build threads behind whatever the title asks for, from the shader
+// cache's bytecode (shaders.bin, base_shaders.bin), and kept in the pipeline library: the first time a level shows an
+// effect it is ready instead of compiled then (the stutter, the held frames). Records for another anti-aliasing
+// sample count than this one are left; a record whose shaders are not in the cache is skipped. RECOMP_PREBUILD=0: off
+void D3D12Backend::StartPrebuild() {
+    cache::OpenPipelineList(sizeof(PipelineRecord));
+    gpu::g_pipelines_recorded = uint32_t(cache::RecordedPipelineCount());
+    if (const char* e = std::getenv("RECOMP_PREBUILD"); e && *e == '0') return;
+    uint32_t msaa = app::Get().msaa;
+    std::vector<PipelineRecord> list;
+    for (const auto& bytes : cache::RecordedPipelines()) {
+        PipelineRecord r;
+        std::memcpy(&r, bytes.data(), sizeof(r));
+        if (r.k.msaa && r.k.msaa != msaa) continue;
+        // a line pipeline carries LineGsHlsl, which the record has no code for: made when first drawn (and left out
+        // of the count, or the startup note waited for it forever)
+        if (LineGsOn() && r.k.topo == uint32_t(Topology::Lines)) continue;
+        list.push_back(r);
+    }
+    if (list.empty()) return;
+    gpu::g_prebuild_total = uint32_t(list.size());
+    auto t0 = std::make_shared<std::chrono::steady_clock::time_point>(std::chrono::steady_clock::now());
+    LOGI("[PIPELINES] making %zu recorded pipelines ahead of need", list.size());
+    for (const PipelineRecord& r : list) {
+        cache::PostLow([this, r, t0] {
+            uint64_t h = Hash(&r.k, sizeof(r.k));
+            ComPtr<ID3DBlob> vs = cache::FindShader(r.k.vs, r.vs_check), ps = cache::FindShader(r.k.ps, r.ps_check);
+            ComPtr<ID3D12PipelineState> pso;
+            bool unused = false;
+            if (vs && ps) pso = CreatePipeline(r.k, h, vs.Get(), ps.Get(), nullptr, true, unused);
+            if (pso) {
+                std::lock_guard lock(built_lock_);
+                built_.emplace_back(h, std::move(pso));
+                built_ready_.store(true, std::memory_order_release);
+            } else {
+                gpu::g_prebuild_failed++;  // shaders not in this cache, or the driver refused it: made on demand
+            }
+            if (++gpu::g_prebuild_done == gpu::g_prebuild_total)
+                LOGI("[PIPELINES] %u made ahead in %.1f s, %u could not be (left to be made on demand)",
+                     gpu::g_prebuild_total.load() - gpu::g_prebuild_failed.load(),
+                     std::chrono::duration<double>(std::chrono::steady_clock::now() - *t0).count(),
+                     gpu::g_prebuild_failed.load());
+        });
+    }
 }
 
 TexKind TextureKind(const TextureDesc& d) {
@@ -2787,10 +2877,19 @@ std::string VertexHlsl(const State& s, const Assembled& a, const DrawShaders& sh
 
 uint64_t D3D12Backend::EnsureVertexShader(const State& s, const Assembled& a, const DrawShaders& sh) {
     auto vit = shader_src_.find(sh.vkey);
-    if (vit != shader_src_.end()) return vit->second;
-    std::string src = VertexHlsl(s, a, sh);
-    uint64_t vh = Register(sh.quad ? QuadHlsl(std::move(src)) : src, "main", "vs_5_0");
-    shader_src_[sh.vkey] = vh;
+    uint64_t vh;
+    if (vit != shader_src_.end()) {
+        vh = vit->second;
+    } else {
+        std::string src = VertexHlsl(s, a, sh);
+        vh = Register(sh.quad ? QuadHlsl(std::move(src)) : src, "main", "vs_5_0");
+        shader_src_[sh.vkey] = vh;
+    }
+    // the vertex shader's text is gone once compiled: the line shader is made from a fresh copy
+    if (a.topology == Topology::Lines && LineGsOn() && !line_gs_.count(vh)) {
+        std::string src = VertexHlsl(s, a, sh);
+        line_gs_[vh] = Register(LineGsHlsl(sh.quad ? QuadHlsl(std::move(src)) : src), "gsline", "gs_5_0");
+    }
     return vh;
 }
 
@@ -3902,6 +4001,7 @@ void D3D12Backend::Draw(const State& s, uint32_t prim, uint32_t start, uint32_t 
     CountDrop(-1);
     cl_->SetPipelineState(pso);
 
+
     // constants
     GuestSize size;
     SurfaceSize(bound_rt_ ? s.rt : s.zs, size.w, size.h);
@@ -4426,6 +4526,10 @@ void D3D12Backend::CountFps() {
 }
 
 void D3D12Backend::Present(const Surface& front, bool pillarbox) {
+    if (!prebuild_started_) {  // xboxrecomp: the settings are read by now (the sample count)
+        prebuild_started_ = true;
+        StartPrebuild();
+    }
     static const bool dbg_keys = GetEnvironmentVariableW(L"RECOMP_DEBUG_KEYS", nullptr, 0) != 0;
     if (dbg_keys && (GetAsyncKeyState(VK_F8) & 1)) {
         g_dbg_logall = g_dbg_logall == 1 ? 0 : 1;

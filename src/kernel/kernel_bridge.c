@@ -224,7 +224,7 @@ static void kernel_data_init(void)
 
     /* KeTickCount (ordinal 156) - initialized to current tick count.
      * A background thread in main.c updates this every ~1ms. */
-    BRIDGE_MEM32(XBOX_KERNEL_DATA_BASE + KDATA_TICK_COUNT) = GetTickCount();
+    BRIDGE_MEM32(XBOX_KERNEL_DATA_BASE + KDATA_TICK_COUNT) = xbox_TickCountMs();
 
     /* LaunchDataPage (ordinal 164).
      *
@@ -3944,10 +3944,20 @@ static void bridge_NtDeviceIoControlFile(void)
 }
 
 /* ── NtFsControlFile (ordinal 200, 10 args = 40 bytes) ──── */
+#define FSCTL_DISMOUNT_VOLUME 0x00090020u
 static void bridge_NtFsControlFile(void)
 {
     uint32_t fsctl = STACK_ARG(5);
     uint32_t ios_va = STACK_ARG(4);
+    /* XAPI's cache-partition format writes a fresh FAT through the raw
+     * partition handle, then dismounts it so the next open mounts the new
+     * volume. The host directory behind Z: has nothing cached to drop, and
+     * the title ignores the status anyway; the kernel returns success. */
+    if (fsctl == FSCTL_DISMOUNT_VOLUME) {
+        bridge_write_iostatus(ios_va, 0, 0);
+        g_eax = 0;
+        return;
+    }
     fprintf(stderr, "  [FILE] NtFsControlFile(0x%X) - stub\n", fsctl);
     bridge_write_iostatus(ios_va, 0xC00000BBu, 0);
     g_eax = 0xC00000BBu;

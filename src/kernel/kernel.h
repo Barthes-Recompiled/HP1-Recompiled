@@ -820,6 +820,9 @@ BOOLEAN __stdcall xbox_KeConnectInterrupt(PXBOX_KINTERRUPT Interrupt);
 
 /* KeTickCount - exported as a data pointer, not a function */
 extern volatile ULONG xbox_KeTickCount;
+/* the console's clock: 1 ms or finer (GetTickCount steps ~15.6 ms) */
+ULONGLONG xbox_ClockTime100ns(void);
+ULONG xbox_TickCountMs(void);
 
 /* ============================================================================
  * Xbox Identity & Stubs (kernel_xbox.c)
@@ -1046,6 +1049,7 @@ NTSTATUS __stdcall xbox_ExSaveNonVolatileSetting(ULONG ValueIndex, ULONG Type, P
 #define XC_MISC                   0x11
 #define XC_DVD_REGION             0x12
 #define XC_MAX_OS                 0xFF
+#define XC_FACTORY_GAME_REGION    0x104
 
 /* Older spellings kept so existing call sites still build. */
 #define XC_PARENTAL_CONTROL       XC_P_CONTROL_GAMES

@@ -67,6 +67,8 @@ const Entry kEntries[] = {
      "16:9: cutscenes fill the screen and keep the console's black bars over the picture (subtitles in the bottom one)"},
     {"debug_logs", "RECOMP_DEBUG_LOGS", Kind::Bool, FIELD(debug_logs), 0, 0,
      "hpps_run.log and xbox_kernel.log beside the exe, for reporting a problem; from the next start (F10 > Debug)"},
+    {"controller", nullptr, Kind::Bool, FIELD(controller), 0, 0,
+     "false: the game ignores the PC's controller (keyboard and mouse still play)"},
     {"async_shaders", "RECOMP_ASYNC_SHADERS", Kind::Bool, FIELD(async_shaders), 0, 0,
      "a draw whose pipeline is still compiling is skipped instead of waited for"},
     {"show_launcher", nullptr, Kind::Bool, FIELD(show_launcher), 0, 0,
@@ -75,12 +77,19 @@ const Entry kEntries[] = {
      "the settings page before the game starts (aspect ratio, resolution, quality)"},
     {"fps_limit", "RECOMP_FPS_LIMIT", Kind::Fps, FIELD(fps_limit), 0, 0,
      "frame rate: 0 the game's own (59.94), 30 caps it at 30 fps, 'unlocked' as fast as vsync / the PC allow (experimental: the game was made for 60)"},
+    {"speakers", "RECOMP_SPEAKERS", Kind::U32, FIELD(speakers), 2, 6,
+     "2 stereo, 6 5.1 surround (the console's speaker mix, each channel to its own speaker); takes a restart"},
     {"colorblind", nullptr, Kind::ColorBlind, FIELD(colorblind), 0, 0,
      "colour-blind correction over the finished frame: 'off', 'protanopia', 'deuteranopia' or 'tritanopia'"},
     {"colorblind_strength", nullptr, Kind::U32, FIELD(colorblind_strength), 0, 100, "0 to 100 %"},
     {"keyboard_mouse", nullptr, Kind::Bool, FIELD(kbm), 0, 0,
      "keyboard and mouse play as controller 1, alongside a pad (key names below; Mouse1-5 the mouse buttons)"},
     {"mouse_sensitivity", nullptr, Kind::U32, FIELD(mouse_sensitivity), 1, 100, "1 to 100, the camera's speed with the mouse"},
+    {"move_mode", nullptr, Kind::U32, FIELD(move_mode), 0, 2,
+     "the movement keys' pace: 0 sneak, 1 walk, 2 run; the mouse wheel steps it"},
+    {"pace_sneak", nullptr, Kind::U32, FIELD(pace_sneak), 5, 100,
+     "the keys' push sneaking (and the sneak toggle's), % of the stick's full push"},
+    {"pace_walk", nullptr, Kind::U32, FIELD(pace_walk), 5, 100, "the keys' push walking, %"},
     {"mouse_invert_y", nullptr, Kind::Bool, FIELD(mouse_invert_y), 0, 0, nullptr},
     {"deadzone_left", nullptr, Kind::U32, FIELD(deadzone_left), 0, 50,
      "controller: % of full tilt read as centred, the stick's response past it in %, the camera's axes inverted"},
@@ -455,6 +464,9 @@ std::recursive_mutex& UiLock() {
 }
 
 }  // namespace app
+
+// hle_dsound.c, when the mixer starts: output channels
+extern "C" int app_Speakers(void) { return app::Get().speakers == 6 ? 6 : 2; }
 
 // main.c, first thing: the settings read, and handed to the C side (the window, the title's widescreen camera, the
 // pushbuffer path) as the RECOMP_* variables it reads, before any thread starts

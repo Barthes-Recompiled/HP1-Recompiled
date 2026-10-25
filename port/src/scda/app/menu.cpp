@@ -123,6 +123,18 @@ void DrawControls(Settings& s) {
     int ms = int(s.mouse_sensitivity);
     if (ImGui::SliderInt("Mouse sensitivity", &ms, 1, 100)) s.mouse_sensitivity = uint32_t(ms);
     if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
+    // xboxrecomp: the movement keys' pace; the mouse wheel steps it in game (as in HP:CoS)
+    int mv = int(std::min<uint32_t>(s.move_mode, kMoveModes - 1));
+    if (ImGui::Combo("Movement keys (mouse wheel)", &mv, kMoveModeNames, int(kMoveModes))) {
+        s.move_mode = uint32_t(mv);
+        Changed();
+    }
+    ImGui::TextDisabled("Mouse wheel in game:  down  Sneak  <  Walk  <  Run  up");
+    int ps = int(s.pace_sneak), pw = int(s.pace_walk);
+    if (ImGui::SliderInt("Sneak speed %", &ps, 5, 100)) s.pace_sneak = uint32_t(ps);
+    if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
+    if (ImGui::SliderInt("Walk speed %", &pw, 5, 100)) s.pace_walk = uint32_t(pw);
+    if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
     if (ImGui::Checkbox("Invert mouse Y", &s.mouse_invert_y)) Changed();
     ImGui::BeginDisabled(!s.kbm);
     if (ImGui::TreeNode("Key bindings")) {
@@ -153,6 +165,8 @@ void DrawControls(Settings& s) {
     ImGui::EndDisabled();
 
     Row("Controller");
+    if (ImGui::Checkbox("Use controller", &s.controller)) Changed();
+    if (!s.controller) ImGui::TextDisabled("The game ignores the controller; keyboard and mouse still play.");
     int dl = int(s.deadzone_left), dr = int(s.deadzone_right), sl = int(s.sensitivity_left), sr = int(s.sensitivity_right);
     if (ImGui::SliderInt("Left stick deadzone %", &dl, 0, 50)) s.deadzone_left = uint32_t(dl);
     if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
@@ -312,6 +326,19 @@ void DrawPanel(bool start) {
     if (ImGui::Checkbox("FPS counter", &s.fps_counter)) Changed();
         ImGui::EndTabItem();
     }
+    if (tabs && ImGui::BeginTabItem("Audio")) {
+        Row("Output");
+        // xboxrecomp: the console mixes to 5.1 (Dolby Digital out of the console); stereo folds it down
+        int sp = s.speakers == 6 ? 1 : 0;
+        const char* const kSpeakerNames[] = {"Stereo", "5.1 surround"};
+        if (Combo("Speakers", &sp, kSpeakerNames, 2)) {
+            s.speakers = sp ? 6 : 2;
+            Changed();
+        }
+        ImGui::TextDisabled("Takes effect the next time the game starts.");
+        ImGui::TextDisabled("5.1 needs Windows' speaker setup set to 5.1 (or a 5.1 HDMI receiver).");
+        ImGui::EndTabItem();
+    }
     if (tabs && ImGui::BeginTabItem("Controls")) {
         DrawControls(s);
         ImGui::EndTabItem();
@@ -457,6 +484,16 @@ void DrawUi() {
     if (g_start) DrawPanel(true);
     else if (g_open) DrawPanel(false);
     if (Get().fps_counter) DrawFps();
+    // xboxrecomp: the keys' pace a moment after the mouse wheel steps it, so a turn of the wheel is seen to do something
+    if (GetTickCount64() - g_pace_note.load() < 2000 && !SneakOn()) {
+        ImDrawList* dl = ImGui::GetForegroundDrawList();
+        float sz = ImGui::GetFontSize() * 1.25f;
+        ImVec2 p(12, Get().fps_counter ? 8 + sz * 1.3f : 8);
+        char text[32];
+        std::snprintf(text, sizeof text, "Keys: %s", kMoveModeNames[std::min<uint32_t>(Get().move_mode, kMoveModes - 1)]);
+        dl->AddText(ImGui::GetFont(), sz, ImVec2(p.x + 1, p.y + 1), IM_COL32(0, 0, 0, 200), text);
+        dl->AddText(ImGui::GetFont(), sz, p, IM_COL32(255, 255, 255, 255), text);
+    }
     if (SneakOn()) {  // xboxrecomp: the sneak toggle is on: a small mark, so it is not left on unknowingly
         ImDrawList* dl = ImGui::GetForegroundDrawList();
         float sz = ImGui::GetFontSize() * 1.25f;

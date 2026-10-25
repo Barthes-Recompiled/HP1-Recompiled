@@ -73,6 +73,11 @@ inline std::atomic<bool> g_splash_next{false};
 // F3: save the next frame, every draw and target, under captures
 inline std::atomic<bool> g_capture{false};
 
+// xboxrecomp: pipelines made ahead of need at startup from shadercache\pipelines_list.bin: how many, how many done,
+// how many could not be made here (ported from HP:CoS)
+inline std::atomic<uint32_t> g_prebuild_total{0}, g_prebuild_done{0}, g_prebuild_failed{0};
+inline std::atomic<uint32_t> g_pipelines_recorded{0};
+
 // the game's shadow map, the colour surface bound beside it and the swizzled chain aliased over the map's memory
 // that blurs shadow edges on screen, by surface data as the headers hold it; blur_hi is 0 until the game made them
 struct ShadowTargets {

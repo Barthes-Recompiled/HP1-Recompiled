@@ -39,8 +39,15 @@ set(XBOXRECOMP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/.." CACHE PATH
 # to guest memory through XBOX_PTR, which neither check can see, and it is the hot path. ASLR, high-entropy VA and
 # NX/DEP are on in every build (binutils defaults). SSE4.1 everywhere (the renderer already required it).
 option(HPPS_RELEASE "Release build for players: hardening, no debug keys" OFF)
+# HPPS_FORTIFY: the release's _FORTIFY_SOURCE (bounds-checked C library calls, through the headers). A player's
+# main-menu keyboard hitch on Windows went away in a development build, which has none of the release's hardening
+# (2026-10-25): OFF builds the release without it, the stack canaries kept, to tell which part it is
+option(HPPS_FORTIFY "With HPPS_RELEASE: _FORTIFY_SOURCE=2" ON)
 if(HPPS_RELEASE AND WIN32)
-    add_compile_options(-msse4.1 -fstack-protector-strong -D_FORTIFY_SOURCE=2)
+    add_compile_options(-msse4.1 -fstack-protector-strong)
+    if(HPPS_FORTIFY)
+        add_compile_options(-D_FORTIFY_SOURCE=2)
+    endif()
     add_compile_definitions(HPPS_RELEASE)
 endif()
 

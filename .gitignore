@@ -38,3 +38,13 @@ bin/
 *.obj
 *.exe
 tools/split/output/
+
+# Build outputs and local play files
+build-*/
+port/run/
+port/logs/
+port/dist/
+*.log
+saves/
+shadercache/
+hpps.toml

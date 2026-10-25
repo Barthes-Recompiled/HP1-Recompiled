@@ -64,7 +64,8 @@ struct FixedKey {
 FixedKey MakeFixedKey(const State& s);
 std::string FixedVertexHlsl(uint16_t regs, bool pretransformed, uint64_t decode = 0, const FixedKey& f = {});
 std::string PixelHlsl(const PixelKey& k);
-std::string QuadHlsl(std::string s);
+std::string QuadHlsl(std::string s, uint32_t texels = 0);  // texels: stages with coordinates in texels
+std::string LineGsHlsl(std::string vs);  // a line draw's geometry shader, entry "gsline", over its vertex shader
 
 // the constant buffer layout both stages share, register b1
 struct DrawConstants {

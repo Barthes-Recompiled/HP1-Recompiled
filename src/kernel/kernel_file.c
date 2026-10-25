@@ -675,7 +675,9 @@ NTSTATUS __stdcall xbox_NtQueryDirectoryFile(
         WCHAR* clean_path = dir_path;
         if (wcsncmp(clean_path, L"\\\\?\\", 4) == 0)
             clean_path += 4;
-        if (FileName && FileName->Buffer) {
+        /* an empty pattern is every entry, as FATX answers it (and the POSIX backend): "dir\\" with nothing after
+         * it is no search at all to FindFirstFileW, so HP:PoA's Load Game found its own save folder empty */
+        if (FileName && FileName->Buffer && FileName->Length > 0) {
             WCHAR pattern_wide[MAX_PATH];
             MultiByteToWideChar(CP_ACP, 0, FileName->Buffer, FileName->Length,
                                 pattern_wide, MAX_PATH);
@@ -1286,6 +1288,15 @@ NTSTATUS __stdcall xbox_NtFsControlFile(
 {
     (void)FileHandle; (void)Event; (void)ApcRoutine; (void)ApcContext;
     (void)InputBuffer; (void)InputBufferLength; (void)OutputBuffer; (void)OutputBufferLength;
+    /* FSCTL_DISMOUNT_VOLUME after XAPI formats a cache partition: nothing is
+     * mounted to drop, see bridge_NtFsControlFile */
+    if (FsControlCode == 0x00090020u) {
+        if (IoStatusBlock) {
+            IoStatusBlock->Status = STATUS_SUCCESS;
+            IoStatusBlock->Information = 0;
+        }
+        return STATUS_SUCCESS;
+    }
     xbox_log(XBOX_LOG_WARN, XBOX_LOG_FILE, "NtFsControlFile(0x%X) - stub", FsControlCode);
     if (IoStatusBlock) {
         IoStatusBlock->Status = STATUS_NOT_IMPLEMENTED;

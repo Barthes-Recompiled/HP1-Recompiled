@@ -1142,10 +1142,10 @@ static DWORD WINAPI nv2a_ack_thread(LPVOID param)
          * which silently breaks every timeout that polls it: Halo's DHCP setup
          * waits on a tick deadline that never arrives and spins forever bringing
          * up XNet. A live clock is also just the truth -- KeTickCount ticks on
-         * hardware whether or not anyone is asleep. GetTickCount() shares the
-         * millisecond unit, so the rate matches. */
+         * hardware whether or not anyone is asleep. Every millisecond like the
+         * console's, not GetTickCount's ~15.6 ms steps (xbox_ClockTime100ns). */
         *(volatile uint32_t *)((uintptr_t)(XBOX_KERNEL_DATA_BASE + KDATA_TICK_COUNT)
-                               + g_memory_offset) = GetTickCount();
+                               + g_memory_offset) = xbox_TickCountMs();
 
         /* Yield; the waiter is spinning on another core. Sleep(0) returns at once when no other thread wants
          * the core, so this loop alone kept one host core at 100%. RECOMP_ACK_SLEEP_US rests that many
@@ -2966,8 +2966,12 @@ static SRWLOCK g_heap_lock = SRWLOCK_INIT;
 int xbox_HeapReclaimEnabled(void)
 {
     static int on = -1;
-    if (on < 0)
-        on = getenv("RECOMP_HEAP_RECLAIM") != NULL;
+    if (on < 0) {
+        /* on unless RECOMP_HEAP_RECLAIM=0: the console gives memory back
+         * (xboxrecomp default since 2026-10-24) */
+        const char *e = getenv("RECOMP_HEAP_RECLAIM");
+        on = !(e && *e == '0');
+    }
     return on;
 }
 

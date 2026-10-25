@@ -19,6 +19,7 @@
 #include <filesystem>
 #include <mutex>
 #include <thread>
+#include <unordered_set>
 #include <unordered_map>
 #include <vector>
 
@@ -78,7 +79,22 @@ struct Pool {
     std::mutex lock;
     std::condition_variable wake;
     std::deque<std::function<void()>> jobs;
+    std::deque<std::function<void()>> low;  // xboxrecomp: PostLow's, after every jobs entry
     bool started = false;
+};
+
+// xboxrecomp: pipelines_list.bin: ListHeader, then one record after another: id (8 bytes), the description
+constexpr uint32_t kListMagic = 0x4C504353;  // 'SCPL'
+constexpr uint32_t kListVersion = 1;         // bump when the description changes
+struct ListHeader {
+    uint32_t magic, version, record;
+};
+struct List {
+    std::mutex lock;
+    HANDLE file = INVALID_HANDLE_VALUE;
+    size_t record = 0;
+    std::unordered_set<uint64_t> ids;
+    std::vector<std::vector<uint8_t>> records;
 };
 
 // never freed: build threads may still run when the process exits
@@ -93,6 +109,10 @@ Library& L() {
 Pool& P() {
     static Pool* p = new Pool;
     return *p;
+}
+List& PL() {
+    static List* l = new List;
+    return *l;
 }
 
 int64_t NowMs() {
@@ -232,9 +252,10 @@ void Run() {
         std::function<void()> job;
         {
             std::unique_lock lock(p.lock);
-            p.wake.wait(lock, [&] { return !p.jobs.empty(); });
-            job = std::move(p.jobs.front());
-            p.jobs.pop_front();
+            p.wake.wait(lock, [&] { return !p.jobs.empty() || !p.low.empty(); });
+            auto& q = p.jobs.empty() ? p.low : p.jobs;
+            job = std::move(q.front());
+            q.pop_front();
         }
         job();
     }
@@ -304,11 +325,21 @@ void SaveWhenIdle() {
     });
 }
 
+void Post(std::function<void()> job, bool low);
+
+void PostLow(std::function<void()> job) {
+    Post(std::move(job), true);
+}
+
 void Post(std::function<void()> job) {
+    Post(std::move(job), false);
+}
+
+void Post(std::function<void()> job, bool low) {
     Pool& p = P();
     {
         std::lock_guard lock(p.lock);
-        p.jobs.push_back(std::move(job));
+        (low ? p.low : p.jobs).push_back(std::move(job));
         if (!p.started) {
             p.started = true;
             // the title's thread, the render thread and audio keep theirs
@@ -319,6 +350,73 @@ void Post(std::function<void()> job) {
         }
     }
     p.wake.notify_one();
+}
+
+// the records of a list file whole, a torn tail cut off; the file's size of good data, 0 when it is not a list of these
+size_t ReadList(HANDLE h, List& l) {
+    std::vector<uint8_t> data;
+    if (!ReadAll(h, data) || data.size() < sizeof(ListHeader)) return 0;
+    ListHeader lh;
+    std::memcpy(&lh, data.data(), sizeof(lh));
+    if (lh.magic != kListMagic || lh.version != kListVersion || lh.record != l.record) return 0;
+    size_t at = sizeof(lh), step = 8 + l.record;
+    for (; at + step <= data.size(); at += step) {
+        uint64_t id;
+        std::memcpy(&id, data.data() + at, 8);
+        if (l.ids.insert(id).second) l.records.emplace_back(data.begin() + at + 8, data.begin() + at + step);
+    }
+    return at;
+}
+
+void OpenPipelineList(size_t record) {
+    List& l = PL();
+    std::lock_guard lock(l.lock);
+    l.record = record;
+    auto dir = app::ExeDir() / "shadercache";
+    HANDLE h = CreateFileW((dir / "pipelines_list.bin").c_str(), GENERIC_READ | GENERIC_WRITE,
+                           FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (h != INVALID_HANDLE_VALUE) {
+        size_t good = ReadList(h, l);
+        if (!good) {  // new, another version or another description size: begun again
+            Truncate(h, 0);
+            ListHeader lh{kListMagic, kListVersion, uint32_t(record)};
+            Append(h, &lh, sizeof(lh));
+        } else {
+            Truncate(h, good);
+        }
+        l.file = h;
+    }
+    size_t own = l.records.size();
+    HANDLE b = CreateFileW((dir / "base_pipelines.bin").c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+                           FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (b != INVALID_HANDLE_VALUE) {
+        ReadList(b, l);
+        CloseHandle(b);
+    }
+    LOGI("[PIPELINES] list: %zu recorded on this PC, %zu more from base_pipelines.bin", own, l.records.size() - own);
+}
+
+void RecordPipeline(uint64_t id, const void* record) {
+    List& l = PL();
+    std::lock_guard lock(l.lock);
+    if (l.file == INVALID_HANDLE_VALUE || !l.ids.insert(id).second) return;
+    std::vector<uint8_t> out(8 + l.record);
+    std::memcpy(out.data(), &id, 8);
+    std::memcpy(out.data() + 8, record, l.record);
+    Append(l.file, out.data(), out.size());
+    l.records.emplace_back(out.begin() + 8, out.end());
+}
+
+std::vector<std::vector<uint8_t>> RecordedPipelines() {
+    List& l = PL();
+    std::lock_guard lock(l.lock);
+    return l.records;
+}
+
+size_t RecordedPipelineCount() {
+    List& l = PL();
+    std::lock_guard lock(l.lock);
+    return l.records.size();
 }
 
 }  // namespace gpu::cache

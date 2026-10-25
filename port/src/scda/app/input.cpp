@@ -126,6 +126,9 @@ void MouseStick(const Settings& s, float* rx, float* ry) {
 
 }  // namespace
 
+// xboxrecomp: when the mouse wheel last stepped the keys' pace (menu.cpp shows it a moment)
+std::atomic<unsigned long long> g_pace_note{0};
+
 const char* KeyName(uint32_t vk) {
     for (const auto& k : kKeyNames)
         if (k.vk == vk) return k.name;
@@ -182,6 +185,25 @@ void InputMessage(void* hwnd, unsigned msg, uintptr_t wp, intptr_t lp) {
         case WM_LBUTTONUP: case WM_RBUTTONUP: case WM_MBUTTONUP: case WM_XBUTTONUP:
             g_down[MouseVk(msg, wp)] = 0;
             break;
+        case WM_MOUSEWHEEL: {
+            // xboxrecomp: the movement keys' pace, a step a notch: up faster, down slower, held at sneak and run. Not
+            // while the panel is open (it scrolls) or keyboard and mouse are off
+            static int wheel;
+            Settings& s = Get();
+            if (!s.kbm || MenuOpen()) break;
+            wheel += GET_WHEEL_DELTA_WPARAM(wp);
+            int notches = wheel / WHEEL_DELTA;
+            if (!notches) break;
+            wheel -= notches * WHEEL_DELTA;
+            uint32_t v = uint32_t(std::clamp(int(s.move_mode) + notches, 0, int(kMoveModes) - 1));
+            std::fprintf(stderr, "[WHEEL] %d notch(es): movement keys %s\n", notches, kMoveModeNames[v]);
+            g_pace_note = GetTickCount64();  // menu.cpp shows the pace a moment
+            if (v != s.move_mode) {
+                s.move_mode = v;
+                Save();
+            }
+            break;
+        }
         case WM_INPUT: {
             RAWINPUT ri;
             UINT size = sizeof ri;
@@ -259,13 +281,9 @@ void CancelKeyCapture() { g_capture = -1; }
 // (the movement code at 0x855EA: over 0.01 sneak, over his walkstartfraction walk, over runstartfraction run;
 // the pace lands in [controller + 0x2574]), which keyboard keys,
 // always all the way, never reach and a wide deadzone makes hard. Toggled on, the stick is scaled down to the sneak
-// band: a gentle push, as a careful thumb would give the console. The game's own conversion of the stick sits in
-// between, so the scale is found from the pace the game picks (hle_input.c's hpps_HarryPace): walking or running, a
-// little less; standing while the stick is pushed, a little more.
-extern "C" int hpps_HarryPace(void);  // Harry's pace: 0 stand, 1 sneak, 2 walk, 3 run; -1 no Harry
+// band: a gentle push, as a careful thumb would give the console: pace_sneak % of it (PaceStick below).
 namespace app {
 static std::atomic<bool> g_sneak{false};
-static float g_sneak_scale = 0.35f;
 bool SneakOn() { return g_sneak.load(std::memory_order_relaxed); }
 
 static void SneakToggle(const Settings& s, const uint8_t in[kPadInputs], bool keys) {
@@ -277,22 +295,29 @@ static void SneakToggle(const Settings& s, const uint8_t in[kPadInputs], bool ke
     pad_was = pad;
 }
 
-static void SneakStick(int16_t* x, int16_t* y) {
-    float lx = float(*x), ly = float(*y);
-    if (std::sqrt(lx * lx + ly * ly) < 3000.0f) return;  // no push: nothing to tune against
-    switch (hpps_HarryPace()) {
-        case 2: case 3: g_sneak_scale = std::max(0.05f, g_sneak_scale * 0.92f); break;
-        case 0: g_sneak_scale = std::min(1.0f, g_sneak_scale * 1.04f); break;
-        default: break;  // sneaking already, or no Harry (menus, cutscenes)
-    }
-    *x = int16_t(lx * g_sneak_scale);
-    *y = int16_t(ly * g_sneak_scale);
+// The keys' push for sneaking and walking, a share of the stick's full push (F10 > Controls; hpps.toml pace_sneak /
+// pace_walk, %). Fixed: learnt from the pace the game picked (2026-10-25) it went wrong, the game easing Harry from one
+// gait to the next gave answers no threshold fits. From play: 44% is a quick sneak, 64% already runs
+static void PaceStick(int16_t* x, int16_t* y, uint32_t percent) {
+    float k = std::clamp(float(percent) / 100.0f, 0.05f, 1.0f);
+    *x = int16_t(float(*x) * k);
+    *y = int16_t(float(*y) * k);
+}
+
+static void SneakStick(int16_t* x, int16_t* y) { PaceStick(x, y, Get().pace_sneak); }
+
+// xboxrecomp: the movement keys' pace (F10 > Controls, the mouse wheel), as in HP:CoS: the keys push the stick all
+// the way, which is a run; at Sneak or Walk their push is brought down to that pace the same way as the sneak toggle
+static void KeysPace(const Settings& s, int16_t* x, int16_t* y) {
+    if (s.move_mode == kMoveSneak) SneakStick(x, y);
+    else if (s.move_mode == kMoveWalk) PaceStick(x, y, s.pace_walk);
 }
 }  // namespace app
 
 // hle_input.c: a pad read for the game, after the PC's controller filled it in
 extern "C" void app_InputPad(int port, XBOX_GAMEPAD* g) {
     const app::Settings& s = app::Get();
+    if (!s.controller) std::memset(g, 0, sizeof(*g));  // xboxrecomp: "Use controller" off: the pad at rest
     uint8_t in[app::kPadInputs], out[app::kPadInputs];
     app::Read(*g, in);
     for (uint32_t i = 0; i < app::kPadInputs; i++) out[i] = in[std::min(s.pad_map[i], app::kPadInputs - 1)];
@@ -312,6 +337,7 @@ extern "C" void app_InputPad(int port, XBOX_GAMEPAD* g) {
             float m = std::sqrt(lx * lx + ly * ly);
             g->sThumbLX = app::Clamp16(lx / m);
             g->sThumbLY = app::Clamp16(ly / m);
+            if (port == 0 && !app::SneakOn()) app::KeysPace(s, &g->sThumbLX, &g->sThumbLY);
         }
         float rx, ry;
         app::MouseStick(s, &rx, &ry);
@@ -343,7 +369,7 @@ extern "C" void app_InputPad0Present(int present) { app::g_pad0.store(present !=
 // hle_input.c: the game's rumble before it goes to the PC's controller
 extern "C" void app_InputRumble(uint16_t* left, uint16_t* right) {
     const app::Settings& s = app::Get();
-    uint32_t k = s.vibration ? std::min(s.vibration_strength, 100u) : 0;
+    uint32_t k = s.vibration && s.controller ? std::min(s.vibration_strength, 100u) : 0;
     *left = uint16_t(*left * k / 100);
     *right = uint16_t(*right * k / 100);
 }

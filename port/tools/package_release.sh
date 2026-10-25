@@ -21,7 +21,9 @@ else
     nm=nm
 fi
 # HPPS_NO_ART: no game artwork inside the exes given to others (no icon from the XBE, no launcher picture)
-cmake -S . -B build-release "${cross[@]}" -DCMAKE_BUILD_TYPE=Release -DHPPS_RELEASE=ON -DHPPS_NO_ART=ON \
+# HPPS_FORTIFY=OFF: no _FORTIFY_SOURCE (a player's main-menu keyboard hitch on Windows, gone in a build without the
+# release hardening, 2026-10-25); the stack canaries stay
+cmake -S . -B build-release "${cross[@]}" -DCMAKE_BUILD_TYPE=Release -DHPPS_RELEASE=ON -DHPPS_NO_ART=ON -DHPPS_FORTIFY=OFF \
       > logs/build-release-config.log
 nice -n 10 cmake --build build-release -j"$(nproc)" --target hpps hpps_launcher > logs/build-release.log 2>&1 ||
     { tail -30 logs/build-release.log; exit 1; }
@@ -32,8 +34,9 @@ dist="$port/dist/hpps-$(date +%Y%m%d)"
 # folder that had been moved into it for a test.)
 mkdir -p "$dist"
 cp -f build-release/hpps.exe build-release/hpps_launcher.exe "$dist/"
-# players' readme: requirements, installing, controls, the F10 options
+# players' readme: requirements, installing, controls, the F10 options; and what changed since the last release
 cp -f README.txt "$dist/"
+cp -f "$port/../CHANGES.md" "$dist/CHANGES.txt"
 # licence texts: the LGPL code from xemu (src/apu, src/nv2a/nv2a_regs.h) is linked into hpps.exe, and the LGPL
 # requires a copy of the licence with every binary; README.txt points to the source
 mkdir -p "$dist/licenses"
@@ -76,3 +79,19 @@ for exe in "$dist"/*.exe; do
 done
 
 ls -la "$dist"
+
+# the zip players download: the folder's contents at its top, as v0.1.0's (VERSION=0.2.0 tools/package_release.sh)
+if [ -n "${VERSION:-}" ]; then
+    zip="$port/dist/hpps_v${VERSION}_windows.zip"
+    rm -f "$zip"
+    python3 - "$dist" "$zip" <<'PY'
+import os, sys, zipfile
+src, out = sys.argv[1], sys.argv[2]
+with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
+    for root, _, files in os.walk(src):
+        for f in sorted(files):
+            p = os.path.join(root, f)
+            z.write(p, os.path.relpath(p, src))
+PY
+    ls -la "$zip"
+fi

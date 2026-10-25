@@ -692,6 +692,8 @@ static DWORD WINAPI fb_thread(LPVOID unused)
         /* xboxrecomp: the exe's own icon (resource 1, e.g. the title image) on the window and taskbar; NULL, the
          * system's default, when the exe has none */
         wc.hIcon         = LoadIconA(wc.hInstance, MAKEINTRESOURCEA(1));
+        /* black until the first frame (no brush: Windows shows the window white while the title boots) */
+        wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
         wc.lpszClassName = "XboxRecompFramebuffer";
         RegisterClassA(&wc);
     }

@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <functional>
+#include <vector>
 
 #include <d3d12.h>
 #include <wrl/client.h>
@@ -26,5 +27,16 @@ void SaveWhenIdle();
 
 // runs job on a build thread
 void Post(std::function<void()> job);
+// xboxrecomp: runs job on a build thread once no Post job waits (pipelines made ahead of need)
+void PostLow(std::function<void()> job);
+
+// xboxrecomp: pipelines_list.bin, every pipeline the title has made, described without anything of this PC's GPU (its
+// key and its shaders' source checks), so another PC can make them all before they are needed. base_pipelines.bin
+// beside it is the list a release ships, read only. record: the caller's fixed-size description
+void OpenPipelineList(size_t record);
+void RecordPipeline(uint64_t id, const void* record);
+// the descriptions of both files, each once
+std::vector<std::vector<uint8_t>> RecordedPipelines();
+size_t RecordedPipelineCount();
 
 }  // namespace gpu::cache

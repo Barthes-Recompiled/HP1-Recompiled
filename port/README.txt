@@ -23,12 +23,17 @@ Windows "N" editions also need Microsoft's Media Feature Pack.
 INSTALLING
 ----------
 
-1. Put the games files or in a folder of your choice:
+1. Put the port's files in a folder of your choice:
        hpps_launcher.exe
        hpps.exe
        README.txt
        licenses\
+       shadercache\base_shaders.bin
 2. Copy the game files from your disc or the .xiso file into a folder named "game" in the same folder with the executables.
+
+Updating from an earlier version: replace the files above and keep your
+hpps.toml, saves\ and shadercache\ (your settings, saved games and the
+shaders already built on your PC stay as they are).
 
 The port creates these itself on the first run:
     hpps.toml      your settings (the launcher and F10 change them)
@@ -48,6 +53,11 @@ controls, then starts the game with Play. If you turn its page off, the
 launcher starts the game straight away; hold Shift while opening it to see
 the page again.
 
+Only one copy of the game runs at a time: starting it again brings the
+running game to the front.
+
+Quitting: "Quit To Desktop" in the main menu or the pause menu, or Alt+F4.
+
 Keys that always work
   F10          Options (see below)
   Alt+Enter    switch between windowed and borderless
@@ -56,6 +66,8 @@ Keys that always work
 Controller
   An Xbox 360 / One / Series controller plays like the original Xbox pad.
   The original pad's White and Black buttons are LB and RB.
+  To play with keyboard and mouse while a controller is connected, turn
+  off "Use controller" (launcher or F10 > Controls).
 
 Keyboard and mouse (defaults; change them under F10 > Controls)
   Move                  W A S D
@@ -71,6 +83,8 @@ Keyboard and mouse (defaults; change them under F10 > Controls)
   Stick clicks          C (left), middle mouse button (right)
   Sneak (toggle)        Caps Lock: Harry keeps his sneaking pace until you
                         press it again ("Sneaking" shows in the corner)
+  Pace of the keys      mouse wheel: down Sneak < Walk < Run up (Run is the
+                        default; also F10 > Controls > Movement keys)
 
 Sneaking: on a controller, push the left stick gently. Keys always move at
 full speed, so use the sneak toggle; a controller button can toggle it too
@@ -124,9 +138,13 @@ Controls
   Keyboard and mouse
     Keyboard and mouse play as controller 1 - alongside a controller
     Mouse sensitivity, Invert mouse Y
+    Movement keys        the pace W A S D move Harry at: Sneak, Walk or Run;
+                         the mouse wheel steps it in game
     Key bindings         click a binding, then press a key or mouse button
                          (Escape clears it); "Default keys" restores them
   Controller
+    Use controller       off: the game ignores the controller (and it does
+                         not vibrate); keyboard and mouse still play
     Left / right stick deadzone %      how far a stick moves before it counts
     Left / right stick sensitivity %   the response past the deadzone
     Invert camera X / Y
@@ -135,6 +153,12 @@ Controls
     Vibration, Vibration strength %
     Button remapping     which pad button each game button reads;
                          "Default buttons" restores them
+
+Audio
+  Speakers               Stereo, or 5.1 surround: the console's own speaker
+                         mix, each channel to its own speaker. Needs Windows'
+                         speaker setup set to 5.1 (or a 5.1 HDMI receiver).
+                         Applies at the next start.
 
 Accessibility
   Colour blindness
@@ -165,7 +189,9 @@ The game will not start / closes at once
 
 A short pause the first time you enter an area
     Shaders are being prepared for your graphics card; the loading picture
-    stays up meanwhile. It happens once per area.
+    stays up meanwhile. It happens once per area. From the next start the
+    port prepares everything it has seen ahead, while you are in the menus
+    ("Preparing shaders" shows in the corner), so those areas load at once.
 
 
 LICENCES AND SOURCE CODE

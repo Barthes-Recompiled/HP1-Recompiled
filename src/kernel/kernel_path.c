@@ -186,17 +186,23 @@ static BOOL  s_initialized = FALSE;
 /*
  * The raw disk device, \Device\Harddisk0\Partition0.
  *
- * A title opens it to read the Xbox partition table at sector 4 (offset 0x800)
- * and find the cache partitions behind X:, Y: and Z: -- XAPI's utility-drive
- * mount does exactly that, and DSTEAL_JP calls HalReturnToFirmware when the
- * read fails. A directory cannot answer a 512-byte read at a file offset, so
- * the device is backed by an image file instead.
+ * XAPI's utility-drive mount reads sector 4 (offset 0x800) of it: that sector
+ * is the cache database, which records which title owns X:, Y: and Z:
+ * (signature 0x97315286, version 2, 0xAA550000 at +0x1F8, then 12-byte
+ * {title id, partition, valid} entries). DSTEAL_JP calls HalReturnToFirmware
+ * when the read fails. A directory cannot answer a 512-byte read at a file
+ * offset, so the device is backed by an image file instead.
  *
- * The table is the standard retail geometry. This is emulating a device that
- * has to be there, not fabricating anything the title owns.
+ * The partition table goes in sector 0, where a modded drive keeps it. It
+ * used to sit in sector 4, so XAPI never found its own database there: every
+ * boot it started a new one, formatted the title's cache partition and wrote
+ * the database back, and the next boot put the table over it again. The image
+ * is written once, with sector 4 zeroed (no database yet), and from then on
+ * belongs to the title.
  */
 #define XBOX_DISK_IMAGE_NAME   L"Partition0.img"
-#define XBOX_PART_TABLE_OFFSET 0x800
+#define XBOX_PART_TABLE_OFFSET 0
+#define XBOX_DISK_IMAGE_SIZE   0xA00   /* sectors 0-4: table .. cache database */
 #define XBOX_PART_IN_USE       0x80000000u
 
 static void xbox_write_partition_table(const WCHAR *path)
@@ -215,8 +221,9 @@ static void xbox_write_partition_table(const WCHAR *path)
     LARGE_INTEGER off;
     size_t i;
 
+    /* CREATE_NEW: an existing image holds the title's cache database */
     h = CreateFileW(path, GENERIC_WRITE, FILE_SHARE_READ, NULL,
-                    OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+                    CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
     if (h == INVALID_HANDLE_VALUE)
         return;
 
@@ -236,6 +243,9 @@ static void xbox_write_partition_table(const WCHAR *path)
     off.QuadPart = XBOX_PART_TABLE_OFFSET;
     if (SetFilePointerEx(h, off, NULL, FILE_BEGIN))
         WriteFile(h, sector, sizeof(sector), &written, NULL);
+    off.QuadPart = XBOX_DISK_IMAGE_SIZE;
+    if (SetFilePointerEx(h, off, NULL, FILE_BEGIN))
+        SetEndOfFile(h);
     CloseHandle(h);
 }
 
@@ -247,7 +257,8 @@ static void xbox_write_partition_table(const WCHAR *path)
  * like -- is an ordinary filesystem access and falls through to the rules
  * table, which puts it in a directory.
  *
- * Partition0 is the whole disk and carries the partition table written above.
+ * Partition0 is the whole disk: the table written above and XAPI's cache
+ * database.
  * The rest start empty, which is what an unformatted partition looks like, so
  * a title that wants a filesystem there formats one.
  */
@@ -612,14 +623,14 @@ static void mkdir_p(const char* path)
  * The raw disk device, \Device\Harddisk0\Partition0 -- POSIX port of the
  * Windows implementation above.
  *
- * A title opens it to read the Xbox partition table at sector 4 (0x800) and
- * find the cache partitions behind X:, Y: and Z:; when that read fails it
- * calls HalReturnToFirmware. Partition0 is backed by an image file in the
- * save dir carrying the standard retail table. PartitionN opened as a device
- * (nothing below it) gets an empty image file, which is what an unformatted
- * partition looks like.
+ * Sector 4 (0x800) is XAPI's cache database and the table sits in sector 0;
+ * see the Windows version for why. Partition0 is backed by an image file in
+ * the save dir, written once. PartitionN opened as a device (nothing below
+ * it) gets an empty image file, which is what an unformatted partition looks
+ * like.
  */
-#define XBOX_PART_TABLE_OFFSET 0x800
+#define XBOX_PART_TABLE_OFFSET 0
+#define XBOX_DISK_IMAGE_SIZE   0xA00   /* sectors 0-4: table .. cache database */
 #define XBOX_PART_IN_USE       0x80000000u
 
 static void xbox_write_partition_table_posix(const char *path)
@@ -659,6 +670,8 @@ static void xbox_write_partition_table_posix(const char *path)
     if (pwrite(fd, sector, sizeof(sector), XBOX_PART_TABLE_OFFSET) != (ssize_t)sizeof(sector))
         xbox_log(XBOX_LOG_WARN, XBOX_LOG_PATH, "write partition table %s: %s",
                  path, strerror(errno));
+    if (ftruncate(fd, XBOX_DISK_IMAGE_SIZE) != 0)
+        xbox_log(XBOX_LOG_WARN, XBOX_LOG_PATH, "size %s: %s", path, strerror(errno));
     close(fd);
 }
 

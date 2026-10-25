@@ -120,6 +120,7 @@ typedef struct {
     uint8_t nbins, bin[8];
     int32_t bin_mb[32];
     float gain[2][2];
+    float gain6[6][6];  /* 5.1 output (render6): source channel -> speaker */
     int has_gain;
     int fading_out;  /* Stop: one more pass ramping to silence, then stopped */
     /* 3D (DSBCAPS_CTRL3D): position relative to the listener, which this title never moves */
@@ -271,13 +272,170 @@ static void levels(Voice *v, float g[2][2])
         }
 }
 
+/* xboxrecomp: 5.1 output (F10 Speakers): the bins are the console's speakers in the order a 5.1 channel mask has them
+ * (front left, front right, centre, LFE, back left, back right), so each goes to its own speaker instead of the
+ * stereo fold-down above; a buffer of more than two channels (a title's own 5.1 mix) goes channel by channel */
+static int g_oc = 2;  /* output channels, set when the mixer starts */
+int app_Speakers(void);  /* app.cpp: 2 or 6 */
+
+static void levels6(Voice *v, float g[6][6])
+{
+    static const uint8_t front[2] = {0, 1};
+    const uint8_t *bin = v->nbins ? v->bin : front;
+    uint32_t n = v->nbins ? v->nbins : 2;
+    int speakers = 0;
+    memset(g, 0, 36 * sizeof(float));
+    /* bins 6..9 are the crosstalk speakers (front L R, back L R): those positions */
+    static const uint8_t spk[10] = {0, 1, 2, 3, 4, 5, 0, 1, 4, 5};
+    for (uint32_t s = 0; s < n; s++) speakers |= bin[s] < 10 && v->bin_mb[bin[s]] > -10000;
+    if (v->channels > 2) {
+        for (uint32_t c = 0; c < v->channels && c < 6; c++) {
+            uint32_t b = v->nbins > c ? bin[c] : c;
+            if (b < 10) g[c][spk[b]] = db(v->bin_mb[b]) * v->volume * v->headroom * atten3d(v, (uint32_t)b);
+        }
+        return;
+    }
+    {
+        uint32_t voices = (v->channels - 1) / 2 + 1, per = n / voices < 2 ? 2 : n / voices, step = v->channels == 1 ? 1 : 2;
+        for (uint32_t c = 0; c < 2; c++)
+            for (uint32_t s = c; c < v->channels && s < per && s < n; s += step) {
+                uint32_t b = bin[s];
+                float x = db(v->bin_mb[b]) * v->volume * v->headroom * atten3d(v, b);
+                if (!speakers) {
+                    /* heard only through its effect sends: on the front pair, as the stereo mix has it */
+                    g[c][0] = g[c][0] > x ? g[c][0] : x;
+                    g[c][1] = g[c][1] > x ? g[c][1] : x;
+                } else if (b < 10) {
+                    g[c][spk[b]] = g[c][spk[b]] > x ? g[c][spk[b]] : x;
+                }
+            }
+    }
+}
+
 static void deactivate(Voice *v)
 {
     if (v->active) v->active = v->paused = v->ending = 0;
 }
 
+/* xboxrecomp: 5.1 output (F10 Speakers = 5.1): render's mix with six outputs, apart from it so the stereo mix stays
+ * the code it was (2026-10-24: folded into one, stereo crackled though no sum in it had changed) */
+static void render6(float *out, uint32_t frames)
+{
+    memset(out, 0, frames * 6 * sizeof(float));
+    EnterCriticalSection(&g_lock);
+    for (int vi = 0; vi < MAX_VOICES; vi++) {
+        Voice *v = g_voices[vi];
+        float g[6][6], dg[6][6];
+        float e0[6] = {0}, e1[6] = {0};  /* 5.1: a multichannel buffer's channels past the first two */
+        int ne = 0;
+        double step;
+        if (!v || v->paused || (!v->stream && !v->playing)) continue;
+        memset(g, 0, sizeof(g));
+        levels6(v, g);
+        if (v->fading_out) memset(g, 0, sizeof(g));
+        /* xboxrecomp: a voice that starts ramps up over this pass (~5 ms) instead of starting at full level: the
+         * console's voice processor smooths level steps, and a sound starting or stopping mid waveform at once
+         * was heard as a click every time */
+        if (!v->has_gain) memset(v->gain6, 0, sizeof(v->gain6));
+        v->has_gain = 1;
+        for (int c = 0; c < 6; c++)
+            for (int side = 0; side < 6; side++) dg[c][side] = (g[c][side] - v->gain6[c][side]) / (float)frames;
+        step = (double)(v->freq ? v->freq : v->rate) / MIX_RATE;
+        for (uint32_t i = 0; i < frames; i++) {
+            uint32_t f = (uint32_t)v->pos;
+            float a, b, a1, b1, t, x0, x1;
+            if (v->stream) {
+                while (v->npackets && f >= frames_of(v, v->packets[0].size)) {
+                    Packet pk = v->packets[0];
+                    pop_packet(v);
+                    complete(v, &pk, 0, pk.size);
+                    v->pos -= frames_of(v, pk.size);
+                    f = (uint32_t)v->pos;
+                }
+                if (!v->npackets) {
+                    if (v->active && !v->ending && g_trace) {
+                        static int underruns;
+                        if (underruns++ < 20) fprintf(stderr, "[DSOUND] stream %08X ran dry\n", v->obj);
+                    }
+                    v->pos = 0;
+                    if (v->ending) deactivate(v);
+                    break;
+                }
+                a = sample(v, v->packets[0].data, f, 0);
+                b = sample(v, v->packets[0].data, f, 1);
+                if (f + 1 < frames_of(v, v->packets[0].size)) {
+                    a1 = sample(v, v->packets[0].data, f + 1, 0);
+                    b1 = sample(v, v->packets[0].data, f + 1, 1);
+                } else if (v->npackets > 1) {
+                    a1 = sample(v, v->packets[1].data, 0, 0);
+                    b1 = sample(v, v->packets[1].data, 0, 1);
+                } else {
+                    a1 = a;
+                    b1 = b;
+                }
+            } else {
+                uint32_t end = v->looping && v->loop_len ? frames_of(v, v->loop_start + v->loop_len) : frames_of(v, v->bytes);
+                uint32_t nx;
+                if (f >= end) {
+                    uint32_t start;
+                    if (!v->looping || !end) {
+                        v->playing = 0;
+                        v->pos = 0;
+                        break;
+                    }
+                    start = v->loop_len ? frames_of(v, v->loop_start) : 0;
+                    v->pos -= end - start;
+                    f = (uint32_t)v->pos;
+                }
+                if (!v->data) break;
+                nx = f + 1 < end ? f + 1 : v->looping && end ? (v->loop_len ? frames_of(v, v->loop_start) : 0) : f;
+                if (v->channels > 2) {
+                    /* 5.1: each channel to its own speaker */
+                    ne = v->channels < 6 ? v->channels : 6;
+                    a = sample(v, v->data, f, 0);
+                    b = sample(v, v->data, f, 1);
+                    a1 = sample(v, v->data, nx, 0);
+                    b1 = sample(v, v->data, nx, 1);
+                    for (int c = 2; c < ne; c++) e0[c] = sample(v, v->data, f, c), e1[c] = sample(v, v->data, nx, c);
+                } else {
+                    a = sample(v, v->data, f, 0);
+                    b = sample(v, v->data, f, 1);
+                    a1 = sample(v, v->data, nx, 0);
+                    b1 = sample(v, v->data, nx, 1);
+                }
+            }
+            t = (float)(v->pos - f);
+            x0 = a + (a1 - a) * t;
+            x1 = b + (b1 - b) * t;
+            {
+                float *o = out + i * 6, xe[6] = {x0, x1, 0, 0, 0, 0};
+                for (int c = 2; c < ne; c++) xe[c] = e0[c] + (e1[c] - e0[c]) * t;
+                for (int c = 0; c < 6; c++)
+                    for (int side = 0; side < 6; side++) v->gain6[c][side] += dg[c][side];
+                for (int k = 0; k < 6; k++) {
+                    float acc = 0;
+                    for (int c = 0; c < (ne > 2 ? ne : 2); c++) acc += xe[c] * v->gain6[c][k];
+                    o[k] += acc;
+                }
+            }
+            v->pos += step;
+        }
+        memcpy(v->gain6, g, sizeof(g));
+        if (v->fading_out) {
+            v->playing = 0;
+            v->fading_out = 0;
+            v->has_gain = 0;
+        }
+    }
+    LeaveCriticalSection(&g_lock);
+}
+
 static void render(float *out, uint32_t frames)
 {
+    if (g_oc == 6) {
+        render6(out, frames);
+        return;
+    }
     memset(out, 0, frames * 2 * sizeof(float));
     EnterCriticalSection(&g_lock);
     for (int vi = 0; vi < MAX_VOICES; vi++) {
@@ -428,12 +586,12 @@ static DWORD g_report_ms;
 
 static DWORD WINAPI mixer_thread(LPVOID unused)
 {
-    static float mix[MIX_FRAMES * 2];
-    static int16_t pcm[OUT_BUFS][MIX_FRAMES * 2];
+    static float mix[MIX_FRAMES * 6];
+    static int16_t pcm[OUT_BUFS][MIX_FRAMES * 6];
     IXAudio2 *xa2 = NULL;
     IXAudio2MasteringVoice *master = NULL;
     IXAudio2SourceVoice *src = NULL;
-    WAVEFORMATEX wfx = {0};
+    WAVEFORMATEX wfx = {0}, *wfx_out = &wfx;
     LARGE_INTEGER freq, now, next;
     int nb = 0;
     (void)unused;
@@ -443,32 +601,45 @@ static DWORD WINAPI mixer_thread(LPVOID unused)
     /* late wake ups of this thread are what empties the device queue; the CPU itself is mostly idle */
     SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
     g_report_ms = GetTickCount();
+    g_oc = app_Speakers() == 6 ? 6 : 2;
     wfx.wFormatTag = WAVE_FORMAT_PCM;
-    wfx.nChannels = 2;
+    wfx.nChannels = (WORD)g_oc;
     wfx.nSamplesPerSec = MIX_RATE;
     wfx.wBitsPerSample = 16;
-    wfx.nBlockAlign = 4;
-    wfx.nAvgBytesPerSec = MIX_RATE * 4;
+    wfx.nBlockAlign = (WORD)(2 * g_oc);
+    wfx.nAvgBytesPerSec = MIX_RATE * 2 * (DWORD)g_oc;
+    {
+        /* 5.1: the speaker positions the bins stand for (front L R, centre, LFE, back L R) */
+        static WAVEFORMATEXTENSIBLE wfe;
+        static const GUID pcm_guid = {0x00000001, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+        wfe.Format = wfx;
+        wfe.Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
+        wfe.Format.cbSize = sizeof(wfe) - sizeof(WAVEFORMATEX);
+        wfe.Samples.wValidBitsPerSample = 16;
+        wfe.dwChannelMask = 0x3F;
+        wfe.SubFormat = pcm_guid;
+        if (g_oc == 6) wfx_out = &wfe.Format;
+    }
     if (FAILED(XAudio2Create(&xa2, 0, XAUDIO2_DEFAULT_PROCESSOR)) ||
-        FAILED(IXAudio2_CreateMasteringVoice(xa2, &master, 2, MIX_RATE, 0, NULL, NULL, 0)) ||
-        FAILED(IXAudio2_CreateSourceVoice(xa2, &src, &wfx, 0, XAUDIO2_DEFAULT_FREQ_RATIO, NULL, NULL, NULL)) ||
+        FAILED(IXAudio2_CreateMasteringVoice(xa2, &master, (UINT32)g_oc, MIX_RATE, 0, NULL, NULL, 0)) ||
+        FAILED(IXAudio2_CreateSourceVoice(xa2, &src, wfx_out, 0, XAUDIO2_DEFAULT_FREQ_RATIO, NULL, NULL, NULL)) ||
         FAILED(IXAudio2SourceVoice_Start(src, 0, XAUDIO2_COMMIT_NOW))) {
         fprintf(stderr, "[DSOUND] XAudio2 unavailable: mixing on a wall clock, silently\n");
         src = NULL;
     } else {
-        fprintf(stderr, "[DSOUND] XAudio2 output, %d Hz stereo\n", MIX_RATE);
+        fprintf(stderr, "[DSOUND] XAudio2 output, %d Hz %s\n", MIX_RATE, g_oc == 6 ? "5.1" : "stereo");
     }
 
     QueryPerformanceFrequency(&freq);
     QueryPerformanceCounter(&next);
     for (;;) {
         render(mix, MIX_FRAMES);
-        for (int i = 0; i < MIX_FRAMES * 2; i++) {
+        for (int i = 0; i < MIX_FRAMES * g_oc; i++) {
             float s = mix[i] < -1.0f ? -1.0f : mix[i] > 1.0f ? 1.0f : mix[i];
             if (s != mix[i]) g_clipped++;
             pcm[nb][i] = (int16_t)(s * 32767.0f);
         }
-        wav_write(pcm[nb], MIX_FRAMES);
+        if (g_oc == 2) wav_write(pcm[nb], MIX_FRAMES);  /* RECOMP_DSOUND_WAV: stereo only */
         if (src) {
             XAUDIO2_BUFFER xb = {0};
             XAUDIO2_VOICE_STATE st;
@@ -489,7 +660,7 @@ static DWORD WINAPI mixer_thread(LPVOID unused)
                     g_report_ms = now_ms;
                 }
             }
-            xb.AudioBytes = MIX_FRAMES * 4;
+            xb.AudioBytes = MIX_FRAMES * 2 * (UINT32)g_oc;
             xb.pAudioData = (const BYTE *)pcm[nb];
             IXAudio2SourceVoice_SubmitSourceBuffer(src, &xb, NULL);
             nb = (nb + 1) % OUT_BUFS;

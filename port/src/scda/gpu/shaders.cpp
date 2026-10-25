@@ -897,7 +897,12 @@ std::string PixelHlsl(const PixelKey& k) {
     // HDR targets keep colour divided by their headroom, the console's per pass clamp stays
     body += "alphatest(outc.a);\noutc.rgb = saturate(outc.rgb) * hdr.x;\nreturn outc;\n}\n";
     s += body;
-    if (k.quad) s = QuadHlsl(std::move(s));
+    if (k.quad) {
+        uint32_t texels = 0;  // stages whose coordinates are in texels (linear textures)
+        for (int i = 0; i < 4; i++)
+            if (k.tex[i].rect) texels |= 1u << i;
+        s = QuadHlsl(std::move(s), texels);
+    }
     if (k.wbuf) {
         // xboxrecomp: D3DZB_USEW. The console stores w / far W, even precision near and far, where a Z buffer keeps
         // z / w; a title made for W (tiny near plane) z-fights everywhere on z / w. Far W would have to come from a
@@ -924,9 +929,47 @@ std::string PixelHlsl(const PixelKey& k) {
     return s;
 }
 
+// xboxrecomp: lines as the console draws them. The NV2A's pixel centres are integers: a line covers the console
+// pixels whose centres it passes along its length (start in, end out) and the one pixel across it; D3D12's centres are
+// at .5 and its lines are one host pixel wide whatever the render scale. HP:PoA ends its shadow fade mask (16x32,
+// drawn at load) with a line from x 0 to 1 at y = 31.0 meant to clear the last row: on D3D12 it filled row 30 at 1x
+// and a fifth of row 31 upscaled, the clamped lookup past the mask read that row opaque, and Harry's shadow showed on
+// the wall behind him. Each segment becomes a quad over those pixels: its ends on console pixel edges along its
+// length, one pixel across, half a pixel down or right. The shader is appended to the draw's vertex shader for VOut.
+std::string LineGsHlsl(std::string vs) {
+    return vs + R"(
+VOut lineend(VOut v, float2 px) {
+    v.pos.xy = float2(px.x * 2 / surf.x - 1, 1 - px.y * 2 / surf.y) * v.pos.w;
+    return v;
+}
+[maxvertexcount(4)]
+void gsline(line VOut v[2], inout TriangleStream<VOut> o) {
+    if (v[0].pos.w <= 0 || v[1].pos.w <= 0) return;
+    float2 a = float2(v[0].pos.x / v[0].pos.w + 1, 1 - v[0].pos.y / v[0].pos.w) * 0.5 * surf.xy;
+    float2 b = float2(v[1].pos.x / v[1].pos.w + 1, 1 - v[1].pos.y / v[1].pos.w) * 0.5 * surf.xy;
+    float2 d = b - a;
+    bool xmajor = abs(d.x) >= abs(d.y);
+    float m0 = xmajor ? a.x : a.y, m1 = xmajor ? b.x : b.y;
+    if (m0 == m1) return;
+    // the pixels covered along the line, as edges: from the first centre at or past the low end to the high end
+    float lo = ceil(min(m0, m1)), hi = ceil(max(m0, m1));
+    if (hi <= lo) return;
+    float2 pa = a + d * ((m0 < m1 ? lo : hi) - m0) / (m1 - m0);
+    float2 pb = a + d * ((m0 < m1 ? hi : lo) - m0) / (m1 - m0);
+    float2 across = xmajor ? float2(0, 0.5) : float2(0.5, 0);
+    pa += across;
+    pb += across;
+    o.Append(lineend(v[0], pa - across));
+    o.Append(lineend(v[0], pa + across));
+    o.Append(lineend(v[1], pb - across));
+    o.Append(lineend(v[1], pb + across));
+}
+)";
+}
+
 // Pulling a quad's far edges out to cover the target stretches what it carries. Its vertex shader hands on the pixel
 // position as drawn and as pulled (e), its pixel shader takes the stretch back out of the texture coordinates.
-std::string QuadHlsl(std::string s) {
+std::string QuadHlsl(std::string s, uint32_t texels) {
     auto sub = [&](const char* at, const char* before, const char* after) {
         size_t p = s.find(at);
         if (p != std::string::npos) s.replace(p, std::strlen(at), std::string(before) + at + after);
@@ -959,13 +1002,14 @@ std::string QuadHlsl(std::string s) {
 // Held to the console's range, half a console pixel in from the quad's texture rectangle r (u0 v0 u1 v1).
 // At least half a texel in too: a quad drawn larger than its texels (the 16:9 menu backdrop) has a console pixel
 // smaller than a texel, and half of one still filtered in the wrapped far edge. sz: the texture's size; coordinates
-// past 1.5 are in texels (a linear texture).
-float4 qclamp(float4 t, float4 r, float4 e, float4 sz) {
+// in texels when texels is set (a linear texture). It was guessed from coordinates past 1.5, and a scrolling layer
+// (CoS's loading screen and inventory fog) passes that over a long run: each layer clamped to one texel.
+float4 qclamp(float4 t, float4 r, float4 e, float4 sz, bool texels) {
     float2 g = float2(ddx(e.x), ddy(e.y));
     float2 tx = float2(ddx(t.x), ddy(t.x)), ty = float2(ddx(t.y), ddy(t.y));
     if (!(r.z > r.x && r.w > r.y) || g.x == 0 || g.y == 0) return t;
     float2 h = 0.5 * float2(abs(tx.x / g.x) + abs(tx.y / g.y), abs(ty.x / g.x) + abs(ty.y / g.y));
-    float2 texel = (r.z > 1.5 || r.w > 1.5) ? float2(1, 1) : 1 / max(sz.xy, 1);
+    float2 texel = texels ? float2(1, 1) : 1 / max(sz.xy, 1);
     h = max(h, 0.5 * texel);
     float2 mid = (r.xy + r.zw) * 0.5;
     t.xy = clamp(t.xy, min(r.xy + h, mid), max(r.zw - h, mid));
@@ -973,7 +1017,8 @@ float4 qclamp(float4 t, float4 r, float4 e, float4 sz) {
 }
 )", "");
     for (int i = 0; i < 4; i++)
-        sub(F("i.t%d", i).c_str(), "qclamp(unstretch(", F(", i.e), uvrect[%d], i.e, texsize[%d])", i, i).c_str());
+        sub(F("i.t%d", i).c_str(), "qclamp(unstretch(",
+            F(", i.e), uvrect[%d], i.e, texsize[%d], %s)", i, i, (texels >> i) & 1 ? "true" : "false").c_str());
 
     return s;
 }

@@ -10,7 +10,46 @@
  */
 
 #include "kernel.h"
+#include "xbox_memory_layout.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
+extern ptrdiff_t g_xbox_mem_offset;
+
+/* The console's factory game region: 1 North America, 2 Japan, 4 the rest of
+ * the world. A console only runs discs of its own region, so the honest answer
+ * is the one the title's certificate allows (+0xA0 of the certificate, whose
+ * address is at +0x118 of the XBE header mapped at 0x00010000). Several
+ * allowed regions take the lowest bit, North America first, in line with the
+ * NTSC-M answer for XC_FACTORY_AV_REGION. RECOMP_GAME_REGION overrides it.
+ *
+ * Unhandled, it came back 0, which no console has. HP: Chamber of Secrets
+ * picks US English only when the region is 1, so its NTSC release played
+ * with the PAL release's UK English. */
+static ULONG title_game_region(void)
+{
+    const char *env = getenv("RECOMP_GAME_REGION");
+    const BYTE *mem = (const BYTE *)g_xbox_mem_offset;
+    ULONG cert, allowed = 0, region = 1;
+    static int logged;
+
+    if (env && *env) {
+        region = (ULONG)strtoul(env, NULL, 0);
+    } else {
+        cert = *(const ULONG *)(mem + XBOX_BASE_ADDRESS + 0x118);
+        if (cert >= XBOX_BASE_ADDRESS && cert < XBOX_BASE_ADDRESS + 0x10000)
+            allowed = *(const ULONG *)(mem + cert + 0xA0) & 7;
+        if (allowed)
+            region = allowed & (0u - allowed);
+    }
+    if (!logged++)
+        fprintf(stderr, "  [KERNEL] game region %u (%s, certificate allows 0x%X)\n",
+                (unsigned)region, env && *env ? "RECOMP_GAME_REGION" : "certificate",
+                (unsigned)allowed);
+    return region;
+}
+
 
 /* ============================================================================
  * Exported Data Objects
@@ -125,6 +164,41 @@ NTSTATUS __stdcall xbox_XeUnloadSection(PXBE_SECTION_HEADER Section)
  *   - DVD Region: Region 1 (North America)
  * ============================================================================ */
 
+/* xboxrecomp: the host's time zone in the console's terms (see XC_TIMEZONE_BIAS below); UTC where the host has no
+ * Windows time zone API (the POSIX build) */
+typedef struct {
+    LONG bias, std_bias, dlt_bias;
+    BYTE std_date[4], dlt_date[4];  /* month, week of the month (5 the last), day of the week, hour */
+    BYTE std_name[4], dlt_name[4];
+} HostTimeZone;
+
+static void host_time_zone(HostTimeZone *z)
+{
+    memset(z, 0, sizeof(*z));
+#ifdef _WIN32
+    TIME_ZONE_INFORMATION tz;
+    memset(&tz, 0, sizeof(tz));
+    GetTimeZoneInformation(&tz);
+    z->bias = tz.Bias;
+    z->std_bias = tz.StandardBias;
+    z->dlt_bias = tz.DaylightBias;
+    {
+        const SYSTEMTIME *d[2] = {&tz.StandardDate, &tz.DaylightDate};
+        BYTE *o[2] = {z->std_date, z->dlt_date};
+        for (int k = 0; k < 2; k++) {
+            o[k][0] = (BYTE)d[k]->wMonth;  /* 0: no daylight saving in this zone */
+            o[k][1] = (BYTE)d[k]->wDay;
+            o[k][2] = (BYTE)d[k]->wDayOfWeek;
+            o[k][3] = (BYTE)d[k]->wHour;
+        }
+    }
+    for (int i = 0; i < 4 && tz.StandardName[i]; i++)  /* the first four letters of Windows' names, e.g. "GTB " */
+        z->std_name[i] = tz.StandardName[i] < 0x80 ? (BYTE)tz.StandardName[i] : (BYTE)'?';
+    for (int i = 0; i < 4 && tz.DaylightName[i]; i++)
+        z->dlt_name[i] = tz.DaylightName[i] < 0x80 ? (BYTE)tz.DaylightName[i] : (BYTE)'?';
+#endif
+}
+
 NTSTATUS __stdcall xbox_ExQueryNonVolatileSetting(
     ULONG ValueIndex, PULONG Type, PVOID Value, ULONG ValueLength, PULONG ResultLength)
 {
@@ -193,12 +267,72 @@ NTSTATUS __stdcall xbox_ExQueryNonVolatileSetting(
         }
         break;
 
+    /* The console's time zone, as its dashboard stores it - here the PC's own (Windows' time zone settings), so the
+     * title's local time (XAPI's GetLocalTime/FileTimeToLocalFileTime: the UTC clock, KeQuerySystemTime, less these
+     * biases, daylight saving by these dates) is the PC's. Was a fixed -300 for XC_TIMEZONE_BIAS, meant as US Eastern
+     * but of the wrong sign (UTC = local + bias, so -300 is UTC+5), the rest unanswered (zeros): every save was
+     * stamped in UTC+5 wherever the player was. Same units as Windows: biases in minutes; a date is month, the
+     * week of the month (5 the last), the day of the week and the hour, one byte each; names 4 characters. */
     case XC_TIMEZONE_BIAS:
-        /* UTC-5 (Eastern Time) in minutes: -300 */
-        if (ValueLength >= sizeof(LONG)) {
-            *(PLONG)Value = -300;
+    case XC_TZ_STD_NAME:
+    case XC_TZ_DLT_NAME:
+    case XC_TZ_STD_DATE:
+    case XC_TZ_DLT_DATE:
+    case XC_TZ_STD_BIAS:
+    case XC_TZ_DLT_BIAS: {
+        HostTimeZone tz;
+        BYTE out[4] = {0, 0, 0, 0};
+        host_time_zone(&tz);
+        switch (ValueIndex) {
+        case XC_TIMEZONE_BIAS: memcpy(out, &tz.bias, 4); break;
+        case XC_TZ_STD_BIAS:   memcpy(out, &tz.std_bias, 4); break;
+        case XC_TZ_DLT_BIAS:   memcpy(out, &tz.dlt_bias, 4); break;
+        case XC_TZ_STD_DATE:   memcpy(out, tz.std_date, 4); break;
+        case XC_TZ_DLT_DATE:   memcpy(out, tz.dlt_date, 4); break;
+        case XC_TZ_STD_NAME:   memcpy(out, tz.std_name, 4); break;
+        default:               memcpy(out, tz.dlt_name, 4); break;
+        }
+        memset(Value, 0, ValueLength);
+        memcpy(Value, out, ValueLength < 4 ? ValueLength : 4);
+        if (Type) *Type = ValueIndex == XC_TZ_STD_NAME || ValueIndex == XC_TZ_DLT_NAME ? 3 : 4;  /* binary / DWORD */
+        if (ResultLength) *ResultLength = 4;
+        break;
+    }
+
+    case XC_MAX_OS: {
+        /* The whole user section at once, as XAPI's GetTimeZoneInformation (HP:PS 0x18E692) reads it to make the
+         * title's local time: each field answered by its own index above, at its place in the console's layout.
+         * Unhandled before, so it came back zeros - no time zone at all for that path. */
+        static const struct { ULONG index, offset; } kUserBlock[] = {
+            {XC_TIMEZONE_BIAS, 0x00}, {XC_TZ_STD_NAME, 0x04}, {XC_TZ_DLT_NAME, 0x08}, {XC_TZ_STD_DATE, 0x14},
+            {XC_TZ_DLT_DATE, 0x18},   {XC_TZ_STD_BIAS, 0x24}, {XC_TZ_DLT_BIAS, 0x28}, {XC_LANGUAGE, 0x2C},
+            {XC_VIDEO, 0x30},         {XC_AUDIO, 0x34},       {XC_P_CONTROL_GAMES, 0x38},
+            {XC_P_CONTROL_MOVIES, 0x40}, {XC_MISC, 0x54},     {XC_DVD_REGION, 0x58},
+        };
+        const ULONG kUserBlockSize = 0x5C;
+        memset(Value, 0, ValueLength);
+        for (size_t i = 0; i < sizeof(kUserBlock) / sizeof(kUserBlock[0]); i++) {
+            ULONG field = 0, t = 0, n = 0;
+            if (kUserBlock[i].offset + 4 > ValueLength) continue;
+            xbox_ExQueryNonVolatileSetting(kUserBlock[i].index, &t, &field, sizeof(field), &n);
+            memcpy((BYTE *)Value + kUserBlock[i].offset, &field, 4);
+        }
+        /* misc bit 1: daylight saving off - a zone without it (Windows gives no daylight date) */
+        if (ValueLength >= 0x58) {
+            HostTimeZone tz;
+            host_time_zone(&tz);
+            if (!tz.dlt_date[0]) *(PULONG)((BYTE *)Value + 0x54) |= 2;
+        }
+        if (Type) *Type = 3;  /* binary */
+        if (ResultLength) *ResultLength = ValueLength < kUserBlockSize ? ValueLength : kUserBlockSize;
+        break;
+    }
+
+    case XC_FACTORY_GAME_REGION:
+        if (ValueLength >= sizeof(ULONG)) {
+            *(PULONG)Value = title_game_region();
             if (Type) *Type = 4;
-            if (ResultLength) *ResultLength = sizeof(LONG);
+            if (ResultLength) *ResultLength = sizeof(ULONG);
         }
         break;
 

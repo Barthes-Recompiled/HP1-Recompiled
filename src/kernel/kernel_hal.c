@@ -308,10 +308,48 @@ KIRQL __stdcall xbox_KeRaiseIrqlToDpcLevel(void)
 
 volatile ULONG xbox_KeTickCount = 0;
 
+/* Time since boot in 100 ns units at the performance counter's resolution, starting from GetTickCount64.
+ *
+ * The console's clock interrupt is 1 ms, so KeTickCount and the interrupt time move every millisecond. Windows'
+ * GetTickCount/GetTickCount64 (and Wine's) move in steps of ~15.6 ms whatever timeBeginPeriod asks. HP:CoS's music
+ * streamer sleeps until "last deadline + 10 ms" by GetTickCount and keeps 20 ms written ahead of the play cursor: a
+ * clock up to 15.6 ms stale made it sleep 20-30 ms a lap, the cursor ran past the refill and the old lap's samples
+ * played (crackle in gameplay music and effects, on Windows and Wine alike). */
+static INIT_ONCE s_clock_once = INIT_ONCE_STATIC_INIT;
+static LARGE_INTEGER s_clock_freq, s_clock_start;
+static ULONGLONG s_clock_base_ms;
+
+static BOOL CALLBACK clock_init(PINIT_ONCE once, PVOID param, PVOID *ctx)
+{
+    (void)once; (void)param; (void)ctx;
+    QueryPerformanceFrequency(&s_clock_freq);
+    QueryPerformanceCounter(&s_clock_start);
+    s_clock_base_ms = GetTickCount64();
+    return TRUE;
+}
+
+ULONGLONG xbox_ClockTime100ns(void)
+{
+    LARGE_INTEGER now;
+    LONGLONG d;
+    InitOnceExecuteOnce(&s_clock_once, clock_init, NULL, NULL);
+    QueryPerformanceCounter(&now);
+    d = now.QuadPart - s_clock_start.QuadPart;
+    /* whole seconds and the rest apart, so the product never overflows */
+    return s_clock_base_ms * 10000ULL + (ULONGLONG)(d / s_clock_freq.QuadPart) * 10000000ULL +
+           (ULONGLONG)(d % s_clock_freq.QuadPart) * 10000000ULL / (ULONGLONG)s_clock_freq.QuadPart;
+}
+
+/* KeTickCount: milliseconds, wrapping at 32 bits like the console's */
+ULONG xbox_TickCountMs(void)
+{
+    return (ULONG)(xbox_ClockTime100ns() / 10000ULL);
+}
+
 /* Call this periodically or on-demand to update KeTickCount */
 static void xbox_update_tick_count(void)
 {
-    xbox_KeTickCount = GetTickCount();
+    xbox_KeTickCount = xbox_TickCountMs();
 }
 
 /* ============================================================================
@@ -1002,11 +1040,10 @@ VOID __stdcall xbox_DbgBreakPoint(void)
 ULONGLONG __stdcall xbox_KeQueryInterruptTime(void)
 {
     /*
-     * Time since boot in NT 100ns units. GetTickCount64 is milliseconds, so
-     * scale by 10,000. Resolution is coarser than the real kernel's, but it is
-     * monotonic, which is the property callers actually depend on.
+     * Time since boot in NT 100ns units, moving every millisecond or finer like
+     * the console's (GetTickCount64 alone steps ~15.6 ms; see xbox_ClockTime100ns).
      */
-    return (ULONGLONG)GetTickCount64() * 10000ULL;
+    return xbox_ClockTime100ns();
 }
 
 /* ============================================================================

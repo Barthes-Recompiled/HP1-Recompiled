@@ -57,6 +57,7 @@ struct Settings {
     bool hdr_rendering = false;
     bool tone_mapping = false;
     uint32_t ambient_occlusion = 0;    // SCDA's needs a hook into the game's translucent pass; none here yet
+    bool controller = true;            // xboxrecomp: false: the PC's controller is read as at rest (keyboard and mouse stay)
     bool async_shaders = true;         // RECOMP_ASYNC_SHADERS=0: wait for every pipeline
     bool show_launcher = true;         // xboxrecomp: hpps_launcher.exe shows its page; false starts the game straight away (Shift shows it)
     bool start_menu = false;           // xboxrecomp: the settings page before the game starts (RECOMP_START_MENU); hpps_launcher.exe is the usual way
@@ -64,6 +65,7 @@ struct Settings {
     uint32_t fps_limit = 0;            // 0 the game's own rate, 30: each frame two vblanks at least, kFpsUnlocked none
     uint32_t colorblind = 0;           // ColorBlind: correction filter over the finished frame
     uint32_t colorblind_strength = 100;  // 0 to 100 %
+    uint32_t speakers = 2;             // xboxrecomp: 2 stereo, 6 5.1 surround (hle_dsound.c, at start)
     bool kbm = true;                   // keyboard and mouse drive pad 1 alongside a controller
     uint32_t mouse_sensitivity = 50;   // 1 to 100
     bool mouse_invert_y = false;
@@ -73,12 +75,19 @@ struct Settings {
     bool vibration = true;
     uint32_t vibration_strength = 100;  // %
     uint32_t pad_map[kPadInputs] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};  // game input <- pad input
+    uint32_t move_mode = 2;
+    uint32_t pace_sneak = 44, pace_walk = 54;  // xboxrecomp: the keys' push sneaking / walking, % of full  // xboxrecomp: the movement keys' pace: kMoveSneak, kMoveWalk, kMoveRun (the mouse wheel)
     uint32_t sneak_pad = kPadInputs;  // xboxrecomp: the pad input that toggles sneaking (then not the game's), kPadInputs none
     uint32_t keys[kKeyBinds] = {kDefaultKeys};  // VK codes (1 2 4 5 6 the mouse buttons), 0 unbound
 };
 
 Settings& Get();
 void Save();
+// xboxrecomp: the movement keys' paces (input.cpp tunes the keys' push to each; the mouse wheel steps them), as in
+// HP:CoS, with HP:PS's own three: sneak, walk, run
+enum MoveMode : uint32_t { kMoveSneak, kMoveWalk, kMoveRun, kMoveModes };
+extern std::atomic<unsigned long long> g_pace_note;  // GetTickCount64 when the wheel last stepped it (menu.cpp shows it)
+inline const char* const kMoveModeNames[kMoveModes] = {"Sneak", "Walk", "Run"};
 // re-reads hpps.toml when it changed on disk; the renderer calls it once a frame
 void Poll();
 // the window to the display settings, any thread
