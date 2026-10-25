@@ -95,7 +95,8 @@ OPTIONS (F10)
 -------------
 
 F10 opens the options over the game; most changes apply at once and are saved
-to hpps.toml. "Defaults" resets everything except the aspect ratio. "Show the
+to hpps.toml. "Defaults (this page)" resets the page you are on (Graphics,
+Controls, ...) and leaves the others; the aspect ratio stays. "Show the
 launcher at startup" turns the launcher's page on or off.
 
 Graphics

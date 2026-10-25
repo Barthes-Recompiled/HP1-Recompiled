@@ -6,6 +6,7 @@
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
+#include <cstring>
 #include <windows.h>
 
 #include <algorithm>
@@ -216,6 +217,58 @@ void DrawControls(Settings& s) {
     }
 }
 
+// xboxrecomp: F10's Defaults resets the page it is on, not every setting (the aspect ratio, a boot setting, stays)
+static void ResetPage(Settings& s, const char* page) {
+    const Settings d;
+    if (!std::strcmp(page, "Graphics")) {
+        std::memcpy(&s.aniso, &d.aniso, sizeof(s.aniso));
+        std::memcpy(&s.brightness, &d.brightness, sizeof(s.brightness));
+        std::memcpy(&s.contrast, &d.contrast, sizeof(s.contrast));
+        std::memcpy(&s.cutscene_bars, &d.cutscene_bars, sizeof(s.cutscene_bars));
+        std::memcpy(&s.display_mode, &d.display_mode, sizeof(s.display_mode));
+        std::memcpy(&s.fps_counter, &d.fps_counter, sizeof(s.fps_counter));
+        std::memcpy(&s.fps_limit, &d.fps_limit, sizeof(s.fps_limit));
+        std::memcpy(&s.height, &d.height, sizeof(s.height));
+        std::memcpy(&s.internal_height, &d.internal_height, sizeof(s.internal_height));
+        std::memcpy(&s.msaa, &d.msaa, sizeof(s.msaa));
+        std::memcpy(&s.render_max_height, &d.render_max_height, sizeof(s.render_max_height));
+        std::memcpy(&s.render_percent, &d.render_percent, sizeof(s.render_percent));
+        std::memcpy(&s.smaa, &d.smaa, sizeof(s.smaa));
+        std::memcpy(&s.vsync, &d.vsync, sizeof(s.vsync));
+        std::memcpy(&s.width, &d.width, sizeof(s.width));
+    }
+    if (!std::strcmp(page, "Audio")) {
+        std::memcpy(&s.speakers, &d.speakers, sizeof(s.speakers));
+    }
+    if (!std::strcmp(page, "Controls")) {
+        std::memcpy(&s.controller, &d.controller, sizeof(s.controller));
+        std::memcpy(&s.deadzone_left, &d.deadzone_left, sizeof(s.deadzone_left));
+        std::memcpy(&s.deadzone_right, &d.deadzone_right, sizeof(s.deadzone_right));
+        std::memcpy(&s.invert_x, &d.invert_x, sizeof(s.invert_x));
+        std::memcpy(&s.invert_y, &d.invert_y, sizeof(s.invert_y));
+        std::memcpy(&s.kbm, &d.kbm, sizeof(s.kbm));
+        std::memcpy(&s.keys, &d.keys, sizeof(s.keys));
+        std::memcpy(&s.mouse_invert_y, &d.mouse_invert_y, sizeof(s.mouse_invert_y));
+        std::memcpy(&s.mouse_sensitivity, &d.mouse_sensitivity, sizeof(s.mouse_sensitivity));
+        std::memcpy(&s.move_mode, &d.move_mode, sizeof(s.move_mode));
+        std::memcpy(&s.pace_sneak, &d.pace_sneak, sizeof(s.pace_sneak));
+        std::memcpy(&s.pace_walk, &d.pace_walk, sizeof(s.pace_walk));
+        std::memcpy(&s.pad_map, &d.pad_map, sizeof(s.pad_map));
+        std::memcpy(&s.sensitivity_left, &d.sensitivity_left, sizeof(s.sensitivity_left));
+        std::memcpy(&s.sensitivity_right, &d.sensitivity_right, sizeof(s.sensitivity_right));
+        std::memcpy(&s.sneak_pad, &d.sneak_pad, sizeof(s.sneak_pad));
+        std::memcpy(&s.vibration, &d.vibration, sizeof(s.vibration));
+        std::memcpy(&s.vibration_strength, &d.vibration_strength, sizeof(s.vibration_strength));
+    }
+    if (!std::strcmp(page, "Accessibility")) {
+        std::memcpy(&s.colorblind, &d.colorblind, sizeof(s.colorblind));
+        std::memcpy(&s.colorblind_strength, &d.colorblind_strength, sizeof(s.colorblind_strength));
+    }
+    if (!std::strcmp(page, "Debug")) {
+        std::memcpy(&s.debug_logs, &d.debug_logs, sizeof(s.debug_logs));
+    }
+}
+
 // start: the start menu (the aspect ratio applies at once, Start game instead of Close); otherwise F10's panel
 void DrawPanel(bool start) {
     Settings& s = Get();
@@ -233,7 +286,9 @@ void DrawPanel(bool start) {
     ImGui::PushItemWidth(260 * io.FontGlobalScale);
 
     bool tabs = ImGui::BeginTabBar("##tabs");
+    static const char* page = "Graphics";  // the open page, for Defaults
     if (tabs && ImGui::BeginTabItem("Graphics")) {
+        page = "Graphics";
     Row("Display");
     // the aspect ratio first: the sizes below follow it
     int asp = int(s.aspect);
@@ -327,6 +382,7 @@ void DrawPanel(bool start) {
         ImGui::EndTabItem();
     }
     if (tabs && ImGui::BeginTabItem("Audio")) {
+        page = "Audio";
         Row("Output");
         // xboxrecomp: the console mixes to 5.1 (Dolby Digital out of the console); stereo folds it down
         int sp = s.speakers == 6 ? 1 : 0;
@@ -340,10 +396,12 @@ void DrawPanel(bool start) {
         ImGui::EndTabItem();
     }
     if (tabs && ImGui::BeginTabItem("Controls")) {
+        page = "Controls";
         DrawControls(s);
         ImGui::EndTabItem();
     }
     if (tabs && ImGui::BeginTabItem("Accessibility")) {
+        page = "Accessibility";
         Row("Colour blindness");
         int cb = int(std::min(s.colorblind, 3u));
         const char* const kCbNames[] = {"Off", "Protanopia (red-weak)", "Deuteranopia (green-weak)",
@@ -362,6 +420,7 @@ void DrawPanel(bool start) {
     }
     // xboxrecomp: the logs are opened as the game starts (the launcher's hpps_run.log, the kernel's xbox_kernel.log)
     if (tabs && ImGui::BeginTabItem("Debug")) {
+        page = "Debug";
         Row("Logs");
         if (ImGui::Checkbox("Write debug logs", &s.debug_logs)) Changed();
         ImGui::TextDisabled("hpps_run.log and xbox_kernel.log beside the game, for reporting a problem.");
@@ -372,10 +431,8 @@ void DrawPanel(bool start) {
 
     ImGui::Spacing();
     ImGui::Separator();
-    if (ImGui::Button("Defaults")) {
-        Settings d;
-        d.aspect = s.aspect;  // a boot setting, kept
-        s = d;
+    if (ImGui::Button("Defaults (this page)")) {
+        ResetPage(s, page);
         Changed(true);
     }
     ImGui::SameLine();

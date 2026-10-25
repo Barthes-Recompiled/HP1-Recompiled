@@ -1,5 +1,10 @@
 # Changes
 
+## v0.2.1 (2026-10-25), compared with v0.2.0
+
+- **F10's Defaults resets only the page you're on.** On Graphics it resets the graphics settings, on Controls the controls, and so on; the other pages keep your settings. Before, it reset every page at once. The aspect ratio is still kept, as before.
+- **File properties:** both exes now show the product name, version, and copyright under Properties > Details.
+
 ## v0.2.0 (2026-10-25), compared with v0.1.0 (2026-10-20)
 
 ### New options
