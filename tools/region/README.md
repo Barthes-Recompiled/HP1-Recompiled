@@ -42,3 +42,30 @@ A literal that is an exclusive range end, such as the end of `.text`, shows up a
 
 The map and the reports contain only addresses, counts and hashes. Keep them, and the XBEs, out of the
 repository like other per-game tool output.
+
+## Building for another region
+
+The hand-written sources stay in the canonical XBE's addresses, so upstream merges are unaffected. Other
+supported XBEs are handled by retargeting.
+
+- **Profiles:** `port/region/<name>.json`, one per supported XBE, keyed by `sha1`. The canonical profile has
+  `"canonical": true`. Every other profile holds the segments from `xbe_align.py profile --map ...`, plus
+  `explicit` entries for addresses the segments can't give. Examples are an exclusive section end, or a function
+  whose code differs between the regions. Profiles hold only addresses and hashes.
+- **`retarget.py`:** `regen.sh` runs it first. It hashes `default.xbe` and picks the profile.
+  - Canonical: it removes `port/src/recomp/region/` and the build uses the sources as they are.
+  - Another known profile: it copies every hand-written file whose addresses change into
+    `port/src/recomp/region/`, keeping paths relative to `port/`. It rewrites `sub_`/`loc_` names and in-image hex
+    literals, keeping each literal's width and case. Files that include a rewritten header are copied too. It
+    writes a stamp, `region.cmake`, listing the copied sources.
+  - Unknown hash: it stops and lists the supported SHA-1s.
+- **Failures:** a literal in code that can't be mapped stops the run with file:line, and nothing is written.
+  Literals in comments are rewritten when they map and left alone otherwise.
+- **`port/region/retarget.json`:** lists the files to scan. Values in the image's range that look like numbers
+  (multiples of 0x100, or at most two bits set) must be listed under `numbers` (kept) or `addresses` (mapped). A
+  person decides which, because `0x40000` can be a flag as easily as an address.
+- **Wiring:** `regen.sh` passes the copies to `--seed-functions`, `--exclude-manual` and `patch_gen.py`.
+  `port/region/region.cmake` (included at the end of `port/CMakeLists.txt`) makes every target compile the
+  copies whenever the stamp exists.
+- **Self-check:** each copy is compared with its original after blanking the address literals. Any other
+  difference is an internal error.

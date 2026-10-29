@@ -305,3 +305,6 @@ if(WIN32)
     target_link_options(hpps_trainer PRIVATE -static -static-libgcc -mwindows)
     target_link_libraries(hpps_trainer PRIVATE comctl32 gdi32 user32)
 endif()
+
+# Region retargeting: compile src/recomp/region/ copies when regen.sh made them for a non-canonical XBE
+include(region/region.cmake)

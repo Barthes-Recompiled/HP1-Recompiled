@@ -4,6 +4,7 @@ Map guest addresses between two regional builds of the same XBE.
 
     py -3 tools/region/xbe_align.py map   --from eur.xbe --to usa.xbe -o map.json
     py -3 tools/region/xbe_align.py addrs --map map.json --from eur.xbe --to usa.xbe FILE...
+    py -3 tools/region/xbe_align.py profile --name NAME (--map map.json | --canonical eur.xbe) -o port/region/X.json
 
 Regional builds of one title are usually the same program with a few functions
 or data items grown, shrunk, inserted or removed. Everything after such a change
@@ -45,6 +46,7 @@ except ImportError:  # the byte scan below is the fallback
 # (entry, kernel thunk) XOR keys.
 KEYS = {"retail": (0xA8FC57AB, 0x5B6D40B6), "debug": (0x94859D4B, 0xEFB1F152)}
 SEC_EXEC = 0x4
+SEC_WRITE = 0x1
 
 W = 32          # anchor window, bytes
 MIN_RUN = 64    # an anchor run shorter than this is treated as noise
@@ -236,13 +238,14 @@ def pointer_sites(x):
                 v = struct.unpack_from("<I", buf, i)[0]
                 if x.lo <= v < x.hi:
                     sites.append((s.va + i, v))
-        else:
+        # .data and the XDK libraries' sections are flagged writable and executable; scan those as data too
+        if not s.flags & SEC_EXEC or s.flags & SEC_WRITE:
             start = (-s.va) % 4
             for i in range(start, len(buf) - 3, 4):
                 v = struct.unpack_from("<I", buf, i)[0]
                 if x.lo <= v < x.hi:
                     sites.append((s.va + i, v))
-    return sites
+    return sorted(set(sites))
 
 
 class SegTable:
@@ -495,7 +498,7 @@ def same_code(fx, tx, table, a, to, n):
             return False
     return True
 
-_ADDR = re.compile(r"\bsub_([0-9A-Fa-f]{6,8})\b|\b0x([0-9A-Fa-f]{5,8})\b")
+_ADDR = re.compile(r"\bsub_([0-9A-Fa-f]{6,8})\b|\b0x([0-9A-Fa-f]{5,8})(?=[uUlL]*\b)")
 
 
 def check_addrs(m, paths, fx=None, tx=None):
@@ -532,6 +535,13 @@ def main(argv=None):
     p.add_argument("--to", dest="dst", required=True, help="the other region's XBE")
     p.add_argument("-o", "--output", required=True, help="JSON map to write")
     p.add_argument("-q", "--quiet", action="store_true", help="omit the per-segment list")
+    p = sub.add_parser("profile", help="reduce a map to a port/region profile (or write the canonical one)")
+    p.add_argument("--name", required=True, help="e.g. ps-usa")
+    g = p.add_mutually_exclusive_group(required=True)
+    g.add_argument("--map", help="map from the canonical XBE to this profile's XBE")
+    g.add_argument("--canonical", metavar="XBE", help="the XBE the sources are written for")
+    p.add_argument("--explicit", help="JSON list of explicit {from, to, kind, name, confidence, why} entries")
+    p.add_argument("-o", "--output", required=True)
     p = sub.add_parser("addrs", help="map the guest addresses used in source files")
     p.add_argument("--map", required=True)
     p.add_argument("--from", dest="src", help="from XBE, enables the byte check")
@@ -546,6 +556,27 @@ def main(argv=None):
         with open(a.output, "w") as f:
             json.dump(m, f, indent=1)
         summarize(m, sys.stdout, not a.quiet)
+        return 0
+
+    if a.cmd == "profile":
+        if a.canonical:
+            x = Xbe(a.canonical)
+            prof = {"name": a.name, "sha1": x.sha1, "canonical": True, "image_end": "0x%08X" % x.hi}
+        else:
+            with open(a.map) as f:
+                m = json.load(f)
+            prof = {"name": a.name, "sha1": m["to_sha1"], "canonical": False,
+                    "canonical_sha1": m["from_sha1"], "image_end": "0x%08X" % m["image_end"],
+                    "segments": [{"from_start": "0x%08X" % s["from_start"], "from_end": "0x%08X" % s["from_end"],
+                                  "delta": s["delta"], "section": s["section"], "confidence": s["confidence"]}
+                                 for s in m["segments"]],
+                    "explicit": []}
+            if a.explicit:
+                with open(a.explicit) as f:
+                    prof["explicit"] = json.load(f)
+        with open(a.output, "w", newline="\n") as f:
+            json.dump(prof, f, indent=1)
+            f.write("\n")
         return 0
 
     with open(a.map) as f:
