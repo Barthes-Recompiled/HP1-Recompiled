@@ -79,6 +79,8 @@ const Entry kEntries[] = {
      "hpps_run.log and xbox_kernel.log beside the exe, for reporting a problem; from the next start (F10 > Debug)"},
     {"controller", nullptr, Kind::Bool, FIELD(controller), 0, 0,
      "false: the game ignores the PC's controller (keyboard and mouse still play)"},
+    {"background_input", nullptr, Kind::Bool, FIELD(background_pad), 0, 0,
+     "false: the controller is ignored while another window has the focus; true reads it anyway (as before)"},
     {"async_shaders", "RECOMP_ASYNC_SHADERS", Kind::Bool, FIELD(async_shaders), 0, 0,
      "a draw whose pipeline is still compiling is skipped instead of waited for"},
     {"start_menu", "RECOMP_START_MENU", Kind::Bool, FIELD(start_menu), 0, 0,
@@ -560,6 +562,7 @@ const InGameOption kControls[] = {
     {"Invert mouse Y", &app::Settings::mouse_invert_y},
     {"Movement keys pace", nullptr, &app::Settings::move_mode, kMove, kMoveNames, 3},
     {"Use controller", &app::Settings::controller},
+    {"Controller in background", &app::Settings::background_pad},
 };
 struct PageDef { const InGameOption* opts; int n; };
 const PageDef kPages[] = {{kGameplay, int(std::size(kGameplay))}, {kGraphics, int(std::size(kGraphics))},
