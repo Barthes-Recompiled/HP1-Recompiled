@@ -453,10 +453,33 @@ static void load_level_via_hub(uint32_t level);
 static uint32_t g_travel_level;
 static char g_travel_script[64];
 
+/* A hub reached by Travel starts as from a saved game at the day's last save point: the hub's Startup takes its
+ * IsSavedGame branch (no opening, Harry at that save, the SaveN script putting the day's story where that save left
+ * it, so its doors are as open as the day gets). IsSavedGame reads 0x322D50 (sub_0001C370), GetSavePosition
+ * 0x329DD0 (sub_00024A60), and a level load may refill 0x329DD0 from 0x322DAC (sub_000246D0); the title sets all three
+ * this way when a save is continued (sub_000234B0). Put back once Harry is in, so the day's own StartLevel later is
+ * a new day again. Save points per hub from the script census (Startup's SpawnScript SaveN). Found by DeepSeek. */
+#define SAVED_GAME   0x322D50u
+#define SAVE_CONT    0x322DACu
+#define SAVE_POS     0x329DD0u
+static uint32_t g_resume_pos;
+static int g_resume_set;
+static uint8_t g_resume_was_flag;
+static uint32_t g_resume_was_cont;
+
+static uint32_t last_save_point(uint32_t level)
+{
+    static const uint8_t last[HPPS_LEVEL_LAST + 1] = {
+        [6] = 6, [7] = 3, [8] = 7, [10] = 5, [11] = 5, [13] = 5, [15] = 6, [17] = 9, [19] = 4, [21] = 4, [23] = 5, [25] = 1,
+    };
+    return level <= HPPS_LEVEL_LAST ? last[level] : 0;
+}
+
 void hpps_TrainerTravel(uint32_t level, const char *script)
 {
     g_travel_level = level;
     snprintf(g_travel_script, sizeof g_travel_script, "%s", script ? script : "");
+    g_resume_pos = g_travel_script[0] ? 0 : last_save_point(level);
     fprintf(stderr, "[TRAINER] travel to level %u%s%s\n", level, *g_travel_script ? ", then " : "", g_travel_script);
     load_level_via_hub(level);
 }
@@ -470,6 +493,11 @@ static void travel_step(uint32_t level)
     }
     if (!since) since = GetTickCount64();
     if (GetTickCount64() - since < 1000) return;
+    if (g_resume_set) {  /* Harry is in: the day's own way on is a new day again */
+        MEM8(SAVED_GAME) = g_resume_was_flag;
+        MEM32(SAVE_CONT) = g_resume_was_cont;
+        g_resume_set = 0;
+    }
     if (g_travel_script[0]) start_script(g_travel_script);
     g_travel_level = 0;
     since = 0;
@@ -512,7 +540,16 @@ static void load_level(uint32_t level)
     if (level < HPPS_LEVEL_FIRST || level > HPPS_LEVEL_LAST) return;
     /* the level in play again: 5, as StartLevel (sub_00048FB0) asks for it; its own id loads it over itself and
      * the load crashes */
+    uint32_t asked = level;
     if (level == MEM32(kLevelNow)) level = 5;
+    if (g_resume_pos && asked == g_travel_level) {
+        if (!g_resume_set) g_resume_was_flag = MEM8(SAVED_GAME), g_resume_was_cont = MEM32(SAVE_CONT);
+        MEM8(SAVED_GAME) = 1;
+        MEM32(SAVE_CONT) = g_resume_pos;
+        MEM32(SAVE_POS) = g_resume_pos;
+        g_resume_set = 1;
+        fprintf(stderr, "[TRAINER] level %u as a saved game at save point %u\n", asked, g_resume_pos);
+    }
     uint32_t a[1] = {level};
     call_guest(sub_00146110, 1, a);
     fprintf(stderr, "[TRAINER] loading level %u\n", level);
