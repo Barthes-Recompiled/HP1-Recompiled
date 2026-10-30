@@ -659,10 +659,13 @@ static void autoplay(HppsTrainerShm *t, uint32_t level, uint32_t obj)
 }
 
 extern void sub_00095370_gen(void);
+extern void hpps_ApFrame(void);  /* hle_ap.c: the Archipelago bridge, once a frame Harry is updated */
+
 void sub_00095370(void)
 {
     HppsTrainerShm *t = shm();
     uint32_t ent = ARG(0);
+    if (ent && ent == MEM32(kPlayer)) hpps_ApFrame();
     if (!t || ent != MEM32(kPlayer) || !ent) {
         sub_00095370_gen();
         return;
