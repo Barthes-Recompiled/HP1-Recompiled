@@ -33,7 +33,10 @@ HUBS = [6, 7, 8, 10, 11, 13, 15, 17, 19, 21, 23, 25, 31]
 # set pieces: their own level, or a script inside a hub (level, entry script)
 DUNGEONS = collections.OrderedDict([
     ("Lumos Lesson", (9, None)), ("Spongify Lesson", (12, None)), ("Diffindo Lesson", (16, None)),
-    ("Incendio Lesson", (20, None)), ("Troll", (13, "TrollIntro")), ("Library", (17, "LibraryStealthSection")),
+    ("Incendio Lesson", (20, None)),
+    # the troll: the game's own way in (HPM16aScript loads LooRoom02, moves Harry and Ron there, plays the cutscene,
+    # then the fight); TrollIntro alone starts the fight wherever Harry stands
+    ("Troll", (13, "HPM16aScript")), ("Library", (17, "LibraryStealthSection")),
     ("Ingredients", (23, "IngredientsCheck")), ("Quidditch", (23, "HPE53Script")),
     ("Norbert", (21, "GoToHagrid01")),  # night 4's Hagrid pursuit (the Norbert night's playable part)
     ("Devil's Snare", (26, None)), ("Flying Keys", (27, None)),
@@ -51,9 +54,13 @@ ENEMIES = ("Troll", "TrollBathRoom", "Gytrash", "GytrashBoss", "Horklump", "Veno
            "Filch", "FlyingBook", "Doxy", "Ghost", "Percy", "Imp", "Bowtruckle", "ProtrudingRoot", "StaticShooter",
            "RotDev")
 SCENE_RX = re.compile(r"(?i)secret|peeve|password|fatlady|fat_lady")
+# a character spoken to (<Name>Talk) and a pursuit's stage (following Ron or Hagrid door by door, the duel chase):
+# checks once that script runs (the bridge sends scene:<level>:<script> for these as well)
+TALK_RX = re.compile(r"Talk$")
+PURSUIT_RX = re.compile(r"(?i)pursuit|throughdoor|gotohagrid|makeronrun")
 QUID_CMDS = {"SetQuidLevel", "FlyStartHoops", "SnitchChaseStart", "FlyQuizHoops", "SetQuidHoopCount"}
 PICKUPS = [("Bean", r"(?i)^(big_)?bean(?!bag)"), ("Chest", r"(?i)chest"), ("Wizard Card", r"(?i)card"),
-           ("Chocolate Frog", r"(?i)chocfrog|frog"), ("Sweet", r"(?i)cauldron|pasty|cake|liquorice"),
+           ("Chocolate Frog", r"(?i)chocfrog|frog"), ("Sweet", r"(?i)^(cauldron_?cake|pumpkin_?pasty|pasty|liquorice)"),
            ("Gnome", r"(?i)gnome"), ("Secret", r"(?i)secret|search"), ("Item", r"(?i)owltreat|dungbomb|stinkpel")]
 ORDER = [6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 19, 20, 21, 23, 25, 26, 27, 28, 29]
 
@@ -109,6 +116,10 @@ def main():
             add("scene:%d:%s" % (lv, script), "%s - %s" % (reg, script), reg, "Quidditch")
         if SCENE_RX.search(script):
             add("scene:%d:%s" % (lv, script), "%s - %s" % (reg, script), reg, "Scenes")
+        elif TALK_RX.search(script):
+            add("scene:%d:%s" % (lv, script), "%s - Talked to %s" % (reg, script[:-4]), reg, "Talks")
+        elif PURSUIT_RX.search(script):
+            add("scene:%d:%s" % (lv, script), "%s - %s" % (reg, script), reg, "Pursuits")
     for tid, (title, reg) in tasks.items():
         add("task:%s:added" % tid, "Task %s added (%s)" % (title.replace("TASK_", "").title(), reg), reg, "Tasks")
         add("task:%s:completed" % tid, "Task %s completed" % title.replace("TASK_", "").title(), reg, "Tasks")
@@ -185,7 +196,7 @@ def main():
         items[name] = {"id": nid, "kind": kind, "class": cls}; nid += 1
 
     digest = hashlib.sha256("\n".join(keys).encode() + json.dumps(list(items)).encode()).hexdigest()[:12]
-    catalog = {"version": "hpps-3-" + digest, "game": GAME, "location_base": LOCATION_BASE, "item_base": ITEM_BASE,
+    catalog = {"version": "hpps-4-" + digest, "game": GAME, "location_base": LOCATION_BASE, "item_base": ITEM_BASE,
                "regions": {"hubs": [LEVELS[l] for l in HUBS],
                            "dungeons": [d for d in DUNGEONS if d not in DROPPED_DUNGEONS]},
                "items": items, "locations": locations}
