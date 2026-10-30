@@ -445,8 +445,8 @@ void DrawPanel(bool start) {
         // xboxrecomp: changes to how the game plays that go beyond the console's (moved from Accessibility, 2026-10-30)
         page = "Enhancements";
         Row("Bertie Bott's beans");
-        if (ImGui::Checkbox("Show bean flavours on pickup", &s.bean_names)) Changed();
-        ImGui::TextDisabled("Off: beans are counted without their flavour's name on the screen or spoken.");
+        if (ImGui::Checkbox("Announce bean flavours on pickup", &s.bean_names)) Changed();
+        ImGui::TextDisabled("Off: the flavour is no longer said aloud when Harry picks up a bean.");
         ImGui::EndTabItem();
     }
     // xboxrecomp: the logs are opened as the game starts (the launcher's hpps_run.log, the kernel's xbox_kernel.log)

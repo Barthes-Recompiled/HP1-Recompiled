@@ -912,7 +912,7 @@ void hpps_TrainerInit(void)
     CloseHandle(CreateThread(NULL, 0, report_thread, t, 0, NULL));
 }
 
-/* A bean's flavour as Harry picks it up (F10 Enhancements, "Show bean flavours on pickup"). The pickup (0x41E52:
+/* A bean's flavour as Harry picks it up (F10 Enhancements, "Announce bean flavours on pickup"). The pickup (0x41E52:
  * the bean count [0x329B8A] up by one, within the bag) has sub_000116B0 pick one of 17 message names at random
  * (0x31F320 + 32 * n, copied at start from GUI_PICKUP_BEANn / SV1_PICKUP_BEANn) and hands it to sub_0004F6B0, the
  * game's message by name: the flavour's text, or Harry's line with its subtitle. Off, that one call (its return

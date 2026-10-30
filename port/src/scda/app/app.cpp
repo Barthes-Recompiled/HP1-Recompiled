@@ -89,7 +89,7 @@ const Entry kEntries[] = {
     {"bloom_strength", nullptr, Kind::U32, FIELD(bloom_strength), 0, 100, "0 to 100"},
     {"sharpen", "RECOMP_SHARPEN", Kind::U32, FIELD(sharpen), 0, 100, "0 (off) to 100: contrast adaptive sharpening"},
     {"bean_names", "RECOMP_BEAN_NAMES", Kind::Bool, FIELD(bean_names), 0, 0,
-     "a bean's flavour shown on the screen as Harry picks it up, as the game does; false: picked up without it"},
+     "a bean's flavour said aloud as Harry picks it up, as the game does; false: not spoken"},
     {"keyboard_mouse", nullptr, Kind::Bool, FIELD(kbm), 0, 0,
      "keyboard and mouse play as controller 1, alongside a pad (key names below; Mouse1-5 the mouse buttons)"},
     {"mouse_sensitivity", nullptr, Kind::U32, FIELD(mouse_sensitivity), 1, 100, "1 to 100, the camera's speed with the mouse"},

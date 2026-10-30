@@ -5,7 +5,7 @@
 ### New options
 - **Bloom and sharpening** (F10 > Graphics > Post-processing), both off by default.
 - **Field of view slider (experimental)** (F10 > Graphics), 80 to 130 % of the game's.
-- **Show bean flavours on pickup** (F10 > Enhancements, on by default). Turn it off and beans are counted without their flavour's name on the screen or spoken.
+- **Announce bean flavours on pickup** (F10 > Enhancements, on by default). Turn it off and the flavour is no longer said aloud when Harry picks up a bean.
 
 ### The launcher
 - **Checks your game files.** On the first start, after unpacking a disc image, and from "Verify game files", every file is compared with the disc's; damaged or missing ones are named, and "Repair" writes them again from a disc image in the game folder. Later starts only check the sizes.

@@ -179,9 +179,9 @@ Accessibility
 
 Enhancements
   Bertie Bott's beans
-    Show bean flavours on pickup
-                         off: beans are counted without their flavour's name
-                         on the screen or spoken (on by default)
+    Announce bean flavours on pickup
+                         off: the flavour is no longer said aloud when Harry
+                         picks up a bean (on by default)
 
 Debug
   Logs
