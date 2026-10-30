@@ -42,7 +42,7 @@
 {"cut\\night02.hog", 108462u, 0x2C8A4DC2u},
 {"cut\\night03.hog", 36611165u, 0x7F642816u},
 {"cut\\potions.hog", 7678587u, 0xE6DE9384u},
-{"default.xbe", 3264512u, 0x1C306093u},
+{"default.xbe", 3264512u, 0x3D0FF840u},
 {"disk.txt", 1u, 0x83DCEFB7u},
 {"movies\\box_dutch.xmv", 4030464u, 0xFCC6C367u},
 {"movies\\box_english.xmv", 3362816u, 0x97716BC9u},
