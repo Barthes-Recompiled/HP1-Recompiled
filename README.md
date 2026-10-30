@@ -22,6 +22,15 @@ Download the repository, build the executables and put your disc's files or the 
 See [port/DEVELOPING.md](port/DEVELOPING.md): MSYS2 (UCRT64) setup, regenerating the code from the XBE, building,
 debugging tools and how the port works.
 
+## Thank you, MiddleDucky
+
+This fork exists only because of **[MiddleDucky](https://github.com/MiddleDucky)**, who made the port itself:
+the recompilation, the renderer work, the launcher, and every fix and option in
+[HP-PS-Xbox-Recomp](https://github.com/MiddleDucky/HP-PS-Xbox-Recomp). Everything here is built on that work,
+and each upstream release (v0.3.0 most recently) is merged in with gratitude. Thank you, MiddleDucky, for
+bringing this game to the PC and for sharing it so generously. The fork only adds a few things on top (the
+NTSC-US disc, high frame-rate caps, cutscene and logo skips, Archipelago work in progress).
+
 ## Credits and licences
 
 The port's own code is MIT licensed, © 2026 MiddleDucky ([LICENSE](LICENSE)). The parts below keep their own
