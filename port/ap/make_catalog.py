@@ -90,6 +90,10 @@ def main():
         if key not in locs:
             locs[key] = (name, region, group)
 
+    # cutscenes no level script starts (hle_ap.c's sub_000CEC60 hook keys every cutscene start by name): the Forbidden
+    # Forest plays on day 5, back at Hagrid's after the Moondew (the user's account; hpm26's file names a unicorn)
+    add("cutscene:hpm26", "Day 5 - Forbidden Forest", "Day 5", "Scenes")
+
     tasks = {}
     for lv, script, _, cmd, args in rows:
         a = [clean(x) for x in args.split("|")] if args else []
