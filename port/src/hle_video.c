@@ -111,6 +111,7 @@ void sub_0019D910(void)
  * sides (Hor+). The 640x480 frame is shown 16:9 wide and d3d12.cpp's Squeeze2D
  * keeps the 2D at its 4:3 shape. */
 extern int hpps_Widescreen(void);
+extern uint32_t hpps_FovPercent(void);  /* scda/app/app.cpp: 80 to 130, 100 as the game */
 extern void sub_0016A4A0_gen(void);
 void sub_0016A4A0(void)
 {
@@ -127,8 +128,21 @@ void sub_0016A4A0(void)
             fprintf(stderr, "[CAM] cam %08X from %08X xs %g ys %g\n", cam, caller, xs, ys);
         }
     }
+    /* field of view (F10 Graphics, % of the game's): the world camera's scales divided by it, the view widened (or
+     * narrowed) the same each way; the engine culls with the same scales (read back by 0x16A480 / 0x16A492), so what
+     * comes into view is drawn. The menus' cameras (theirs below, and the 2.4 / 3.2 pairs) keep their framing. This
+     * title has no cutscene test: the slider holds in cutscenes too */
+    int menu_cam = cam && (cam == MEM32(0x34F998) || cam == MEM32(0x34F944));
+    int menu_scale = fabsf(xs - 2.4f) < 0.001f || fabsf(xs - 3.2f) < 0.001f;
+    float fov_k = (menu_cam || menu_scale || !(xs > 0.0f)) ? 1.0f : (float)hpps_FovPercent() / 100.0f;
     if (!d3d_hle() || !hpps_Widescreen() || !(xs > 0.0f) || fabsf(ys / xs - 4.0f / 3.0f) > 0.01f) {
-        sub_0016A4A0_gen();
+        if (fov_k == 1.0f || !(xs > 0.0f) || !(ys > 0.0f)) {
+            sub_0016A4A0_gen();
+            return;
+        }
+        MEMF(cam + 0xE4) = xs / fov_k;
+        MEMF(cam + 0xE8) = ys / fov_k;
+        g_esp += 4;
         return;
     }
     /* the menus' own cameras (the Remembrall inventory's, made after remember.hog loads, pointer at 0x34F998, and
@@ -140,8 +154,8 @@ void sub_0016A4A0(void)
         g_esp += 4;
         return;
     }
-    MEMF(cam + 0xE4) = xs * 0.75f;
-    MEMF(cam + 0xE8) = ys;
+    MEMF(cam + 0xE4) = xs * 0.75f / fov_k;
+    MEMF(cam + 0xE8) = ys / fov_k;
     g_esp += 4;
 }
 
