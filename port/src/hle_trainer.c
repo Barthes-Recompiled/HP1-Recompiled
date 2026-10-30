@@ -447,6 +447,33 @@ static void start_script(const char *name)
     fprintf(stderr, "[TRAINER] %s started (script %08X)\n", name, script);
 }
 
+/* the Archipelago travel window (hle_ap.c): a level to go to, through its hub, and a script of it to start once Harry has
+ * had a second there (a set piece inside a hub: TrollIntro, LibraryStealthSection, ...) */
+static uint32_t g_travel_level;
+static char g_travel_script[64];
+
+void hpps_TrainerTravel(uint32_t level, const char *script)
+{
+    g_travel_level = level;
+    snprintf(g_travel_script, sizeof g_travel_script, "%s", script ? script : "");
+    fprintf(stderr, "[TRAINER] travel to level %u%s%s\n", level, *g_travel_script ? ", then " : "", g_travel_script);
+    load_level_via_hub(level);
+}
+
+static void travel_step(uint32_t level)
+{
+    static ULONGLONG since;
+    if (!g_travel_level || level != g_travel_level || g_pending) {
+        since = 0;
+        return;
+    }
+    if (!since) since = GetTickCount64();
+    if (GetTickCount64() - since < 1000) return;
+    if (g_travel_script[0]) start_script(g_travel_script);
+    g_travel_level = 0;
+    since = 0;
+}
+
 /* in day5 with the match asked for: HPE53Script once Harry has had a second in the level (its Startup is done) */
 static void quidditch_start(uint32_t level)
 {
@@ -743,6 +770,7 @@ void sub_00095370(void)
     if (t->instakill) instakill();
     enemy_deaths();
     quidditch_start(level);
+    travel_step(level);
     autoplay(t, level, obj);
 
     if (t->god && MEMF(kHealthMax) > 0) MEMF(kHealth) = MEMF(kHealthMax);
