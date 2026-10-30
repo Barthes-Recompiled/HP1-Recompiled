@@ -420,10 +420,11 @@ void sub_0001C380(void)
 
 enum { kPPage = 0x20, kStartBtn = 0x356CB0, kLeft = 0x356CA4, kRight = 0x356C18, kStickX = 0x356C6C };
 enum { kXTravel, kXSettings, kXQuit };
-extern int hpps_ap_enabled(void);
+/* the Archipelago bridge (src/ap, hle_ap.c), weak: a build without it has no Travel row */
+extern int hpps_ap_enabled(void) __attribute__((weak));
 extern int hpps_ap_travel_entry(int i, const char **name, int *level, const char **script, int *dungeon,
-                                int *unlocked);
-extern void hpps_ApTravelRequest(int entry);
+                                int *unlocked) __attribute__((weak));
+extern void hpps_ApTravelRequest(int entry) __attribute__((weak));
 extern int app_PageOptionCount(int page);  /* scda/app/app.cpp: 0 Gameplay, 1 Graphics, 2 Controls */
 extern const char *app_PageOptionLabel(int page, int i);
 extern const char *app_PageOptionValue(int page, int i);
@@ -433,7 +434,7 @@ extern void sub_001684D0(void);
 static int extras(int kind[3])
 {
     int n = 0;
-    if (hpps_ap_enabled()) kind[n++] = kXTravel;
+    if (hpps_ap_enabled && hpps_ap_travel_entry && hpps_ApTravelRequest && hpps_ap_enabled()) kind[n++] = kXTravel;
     kind[n++] = kXSettings;
     kind[n++] = kXQuit;
     return n;
@@ -462,7 +463,7 @@ typedef struct { char text[96]; int enabled, indent; } PageRow;
 static int page_rows(int page, PageRow *rows, int max)
 {
     int n = 0;
-    if (page == kPageTravel) {
+    if (page == kPageTravel && hpps_ap_travel_entry) {
         const char *name, *script;
         int level, dungeon, unlocked;
         for (int i = 0; n < max && hpps_ap_travel_entry(i, &name, &level, &script, &dungeon, &unlocked); i++, n++) {
@@ -572,7 +573,7 @@ static void page_input(void)
     if (!a || g_pg.sel < 0 || g_pg.sel >= n || !rows[g_pg.sel].enabled) return;
     sound(kSndConfirm);
     if (g_pg.page == kPageTravel) {
-        hpps_ApTravelRequest(g_pg.sel);
+        if (hpps_ApTravelRequest) hpps_ApTravelRequest(g_pg.sel);
         g_pg.where = 0;
         pause_resume();
     } else if (g_pg.page == kPageSettings) {
