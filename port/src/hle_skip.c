@@ -36,6 +36,7 @@ extern int app_CutsceneSkip(void);           /* hpps.toml cutscene_skip (scda/ap
 #define BTN_BACK        0x0020u
 #define HOLD_MS         500u
 #define SKIP_SCALE      16
+#define RESUME_MS       2000u    /* a cutscene that starts again this soon after one ends goes on fast too */
 #define SKIP_MAX_MS     180000u  /* a cutscene is a few minutes at most: past that the bars are stuck, not a cutscene */
 
 static volatile LONG g_scale = 1;
@@ -51,12 +52,21 @@ static int cutscene(void)
 /* hle_input.c, port 0's pad as the game reads it: the hold that starts the fast-forward, and its end */
 void hpps_SkipPad(const XBOX_GAMEPAD *g)
 {
-    static DWORD held_since, ff_since;
+    static DWORD held_since, ff_since, ended;
     static int held;
     DWORD now = GetTickCount();
+    /* the next part of a cutscene that came in two (a moment of no cutscene between its shots) */
+    if (g_scale == 1 && ended && now - ended < RESUME_MS && cutscene() && app_CutsceneSkip()) {
+        ended = 0;
+        ff_since = now;
+        InterlockedExchange(&g_scale, SKIP_SCALE);
+        fprintf(stderr, "[SKIP] cutscene fast-forward goes on into the next part\n");
+        return;
+    }
     if (g_scale > 1) {
         if (!cutscene() || now - ff_since > SKIP_MAX_MS) {
             InterlockedExchange(&g_scale, 1);
+            ended = cutscene() ? 0 : now;
             fprintf(stderr, "[SKIP] cutscene fast-forward ended after %lu ms (bars state %u)\n",
                     (unsigned long)(now - ff_since), MEM32(LETTERBOX_STATE));
         }
