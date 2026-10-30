@@ -59,6 +59,8 @@ struct Settings {
     bool fps_counter = false;
     uint32_t fov = 100;                // xboxrecomp: field of view, % of the game's (hle_video.c), 80 to 130
     bool vsync = true;                 // RECOMP_VSYNC
+    bool intro_skip = true;            // xboxrecomp: the start-up logo movies are left out (hle_video.c)
+    bool cutscene_skip = true;         // xboxrecomp: holding Start/Back fast-forwards a cutscene to its end (hle_skip.c)
     bool cutscene_bars = true;         // xboxrecomp: 16:9's zoomed cutscenes keep the console's black bars over the picture
     bool debug_logs = false;           // RECOMP_DEBUG_LOGS: hpps_run.log (launcher) and xbox_kernel.log, from the next start
     uint32_t aniso = 0;                // RECOMP_ANISO, 0 as the game asks

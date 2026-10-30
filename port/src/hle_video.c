@@ -172,10 +172,25 @@ int hpps_MenuMovie(void)
     return on && g_menu_movie;
 }
 
+extern int app_IntroSkip(void);  /* hpps.toml intro_skip (scda/app/app.cpp) */
+
+/* the start-up logos (the EA logo ea_<language>, then Warner Bros.' splashwb), left out
+ * with intro_skip; the menu's background, the trailer and the Quidditch movies play as always */
+static int intro_movie(const char *n)
+{
+    return !_strnicmp(n, "movies/ea_", 10) || !_stricmp(n, "movies/splashwb.thp");
+}
+
 extern void sub_00164450_gen(void);
 void sub_00164450(void)
 {
     uint32_t name = ARG(0);
+    if (name && app_IntroSkip() && intro_movie((const char *)XBOX_PTR(name))) {
+        fprintf(stderr, "[XMV] %s left out (intro_skip)\n", (const char *)XBOX_PTR(name));
+        g_eax = 0;
+        g_esp += 4;  /* its ret: the caller (cdecl) pops the arguments */
+        return;
+    }
     int menu = name && _stricmp((const char *)XBOX_PTR(name), "movies/frontend.thp") == 0;
     if (menu) g_menu_movie = 1;
     sub_00164450_gen();

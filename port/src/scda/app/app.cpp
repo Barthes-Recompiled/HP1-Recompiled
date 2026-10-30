@@ -68,6 +68,10 @@ const Entry kEntries[] = {
     {"vsync", "RECOMP_VSYNC", Kind::Bool, FIELD(vsync), 0, 0, nullptr},
     {"fps_counter", nullptr, Kind::Bool, FIELD(fps_counter), 0, 0, nullptr},
     {"fov", "RECOMP_FOV", Kind::U32, FIELD(fov), 80, 130, "field of view, % of the game's"},
+    {"intro_skip", "RECOMP_INTRO_SKIP", Kind::Bool, FIELD(intro_skip), 0, 0,
+     "the EA and Warner Bros. logo movies at start-up are left out; false as the Xbox"},
+    {"cutscene_skip", "RECOMP_CUTSCENE_SKIP", Kind::Bool, FIELD(cutscene_skip), 0, 0,
+     "holding Start or Back for half a second fast-forwards a cutscene to its own end (muted, the picture held); false as the Xbox"},
     {"cutscene_bars", nullptr, Kind::Bool, FIELD(cutscene_bars), 0, 0,
      "16:9: cutscenes fill the screen and keep the console's black bars over the picture (subtitles in the bottom one)"},
     {"debug_logs", "RECOMP_DEBUG_LOGS", Kind::Bool, FIELD(debug_logs), 0, 0,
@@ -479,6 +483,8 @@ std::recursive_mutex& UiLock() {
 extern "C" int hpps_BeanNames(void) { return app::Get().bean_names; }
 extern "C" uint32_t hpps_FovPercent(void) { return std::clamp<uint32_t>(app::Get().fov, 80, 130); }
 extern "C" int app_Speakers(void) { return app::Get().speakers == 6 ? 6 : 2; }
+extern "C" int app_CutsceneSkip(void) { return app::Get().cutscene_skip; }
+extern "C" int app_IntroSkip(void) { return app::Get().intro_skip; }
 
 // main.c, first thing: the settings read, and handed to the C side (the window, the title's widescreen camera, the
 // pushbuffer path) as the RECOMP_* variables it reads, before any thread starts

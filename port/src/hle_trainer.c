@@ -132,6 +132,28 @@ static HppsTrainerShm *shm(void)
     return g_shm;
 }
 
+/* hle_input.c: the trainer's injected pad state, added to port 0's while it lasts (inject_seq / inject_ms) */
+void hpps_TrainerInject(XBOX_GAMEPAD *g)
+{
+    static uint32_t seen;
+    static DWORD until;
+    HppsTrainerShm *t = shm();
+    if (!t) return;
+    if (t->inject_seq != seen) {
+        seen = t->inject_seq;
+        until = GetTickCount() + t->inject_ms;
+        fprintf(stderr, "[TRAINER] input %04X analog %02X%02X%02X%02X%02X%02X%02X%02X for %u ms\n", t->inject_buttons,
+                t->inject_analog[0], t->inject_analog[1], t->inject_analog[2], t->inject_analog[3], t->inject_analog[4],
+                t->inject_analog[5], t->inject_analog[6], t->inject_analog[7], t->inject_ms);
+    }
+    if ((LONG)(GetTickCount() - until) >= 0) return;
+    g->wButtons |= t->inject_buttons;
+    for (int i = 0; i < 8; i++)
+        if (t->inject_analog[i] > g->bAnalogButtons[i]) g->bAnalogButtons[i] = t->inject_analog[i];
+    if (t->inject_stick[0] || t->inject_stick[1]) g->sThumbLX = t->inject_stick[0], g->sThumbLY = t->inject_stick[1];
+    if (t->inject_stick[2] || t->inject_stick[3]) g->sThumbRX = t->inject_stick[2], g->sThumbRY = t->inject_stick[3];
+}
+
 /* runs a recompiled function on this guest thread, the arguments pushed right to left and a return address,
  * as `call` leaves them (hle_d3d8.cpp's CallGuest) */
 static uint32_t call_guest(void (*fn)(void), int n, const uint32_t *args)
