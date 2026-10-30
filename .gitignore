@@ -39,7 +39,7 @@ bin/
 *.exe
 tools/split/output/
 
-# Build outputs and local play files
+# Local working state (2026-10-24)
 build-*/
 port/run/
 port/logs/

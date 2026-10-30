@@ -79,7 +79,7 @@ constexpr float kHeadroom = 8.0f;
 constexpr auto kHoldMax = std::chrono::milliseconds(3000);
 
 const char* kBlitHlsl = R"(
-cbuffer B : register(b1) { float4 uvrect; float4 opts; float4 cb0; float4 cb1; float4 cb2; };
+cbuffer B : register(b1) { float4 uvrect; float4 opts; float4 cb0; float4 cb1; float4 cb2; float4 grade; float4 sharp; };
 Texture2D img : register(t0);
 Texture2D lut : register(t1);
 SamplerState ls : register(s0);
@@ -99,6 +99,19 @@ float4 psmain(O i) : SV_Target {
     for (int y = 0; y < n; y++)
         for (int x = 0; x < n; x++) c += img.SampleLevel(ls, i.uv + px * ((float2(x, y) + 0.5) / n - 0.5), 0);
     c /= n * n;
+    // xboxrecomp (from hpcos): contrast adaptive sharpening (after AMD's CAS): the four neighbours a source texel or
+    // an output pixel away, whichever is wider, weighted by how much room the local contrast leaves; sharp.x the amount
+    if (sharp.x > 0) {
+        float w, h;
+        img.GetDimensions(w, h);
+        float2 d = max(px, 1 / float2(w, h));
+        float3 a = img.SampleLevel(ls, i.uv - float2(0, d.y), 0).rgb, b = img.SampleLevel(ls, i.uv - float2(d.x, 0), 0).rgb;
+        float3 e = img.SampleLevel(ls, i.uv + float2(d.x, 0), 0).rgb, f = img.SampleLevel(ls, i.uv + float2(0, d.y), 0).rgb;
+        float3 mn = min(c.rgb, min(min(a, b), min(e, f))), mx = max(c.rgb, max(max(a, b), max(e, f)));
+        float3 amp = sqrt(saturate(min(mn, 2 - mx) / max(mx, 1e-4)));
+        float3 k = amp * -lerp(0.125, 0.2, sharp.x);
+        c.rgb = saturate((c.rgb + (a + b + e + f) * k) / (1 + 4 * k));
+    }
     c.rgb *= opts.w;
     // xboxrecomp: a colour-blind correction (cb0..2 the rows of a linear RGB matrix, cb0.w on), before the ramp
     if (cb0.w > 0) {
@@ -140,6 +153,15 @@ float4 bright(O i) : SV_Target {
     float3 c = 0;
     for (int k = 0; k < 4; k++) c += src.SampleLevel(ls, i.uv + p1.xy * float2(k & 1 ? 1 : -1, k & 2 ? 1 : -1), 0).rgb;
     return float4(max(c * 0.25 * p0.x * expo.Load(int3(0, 0, 0)) - 1, 0), 1);
+}
+// xboxrecomp (from hpcos): the scene bloom's (no headroom: the console's colours end at white). p0.x the knee; what
+// passes it, rising softly from it, at a quarter size
+float4 lbright(O i) : SV_Target {
+    float3 c = 0;
+    for (int k = 0; k < 4; k++) c += src.SampleLevel(ls, i.uv + p1.xy * float2(k & 1 ? 1 : -1, k & 2 ? 1 : -1), 0).rgb;
+    c *= 0.25;
+    float l = max(c.r, max(c.g, c.b)), t = saturate((l - p0.x) / (1 - p0.x));
+    return float4(c * t * t, 1);
 }
 // p1: step; 9 gaussian taps in 5 bilinear reads
 float4 blur(O i) : SV_Target {
@@ -485,6 +507,8 @@ struct Target {
     DXGI_FORMAT fmt = kBgra;
     bool hdr = false;              // colour held over kHeadroom until resolved
     uint64_t hdr_frame = ~0ull;    // the present count it last went HDR, once a frame
+    uint64_t scene_frame = ~0ull;  // xboxrecomp: the present count it last had 3D drawn in it (SceneBloom)
+    uint64_t bloom_frame = ~0ull;  // xboxrecomp: the present count its scene was last bloomed
 };
 
 // MemSig hashes a surface up to kSigWholeMax bytes whole, a bigger one as evenly spaced samples
@@ -779,6 +803,10 @@ private:
     bool EnsureExposureTarget();
     float UpdateExposureBlend();
     void DrawBloom(const PostInputs& in, const Target& t, uint32_t bw, uint32_t bh);
+    void SceneBloom(Target& t);
+    bool BloomForScene(const State& s, const Assembled& a);
+    Surface scene_zs_;                 // xboxrecomp: the depth the frame's 3D scene was last drawn with,
+    uint64_t scene_zs_frame_ = ~0ull;  // and the present count it was drawn in
     // Smaa, then its steps in call order, each callee right after its caller
     struct SmaaLookup {
         DXGI_FORMAT fmt;
@@ -1704,10 +1732,16 @@ void D3D12Backend::Blit(ID3D12Resource* src, DXGI_FORMAT fmt, const float uvrect
     dev_->CreateShaderResourceView(lut_.Get(), &sv, Cpu(srv_heap_.Get(), slot + 1, srv_inc_));
     uint32_t si = EnsureBlitSamplers();
     Alloc cb = Upload(256, 256);
-    float c[20] = {uvrect[0], uvrect[1], uvrect[2], uvrect[3],
+    float c[28] = {uvrect[0], uvrect[1], uvrect[2], uvrect[3],
                    o.gamma ? 1.0f : 0.0f, o.alpha ? 1.0f : 0.0f, float(o.taps), o.mul};
     // xboxrecomp: the colour-blind correction on the finished frame (the pass through the gamma lookup)
-    if (o.gamma) ColorBlindMatrix(app::Get(), c + 8);
+    // xboxrecomp: the colour-blind correction and the sharpening on the finished frame (the pass through the gamma
+    // lookup)
+    if (o.gamma) {
+        const app::Settings& set = app::Get();
+        ColorBlindMatrix(set, c + 8);
+        c[24] = float(std::min(set.sharpen, 100u)) / 100.0f;
+    }
     std::memcpy(cb.cpu, c, sizeof(c));
     DrawFullScreen(EnsureBlitPipeline(o.rtv, o.over, o.samples), cb.gpu, slot, si);
 }
@@ -2008,6 +2042,38 @@ void D3D12Backend::DrawBloom(const PostInputs& in, const Target& t, uint32_t bw,
         DrawPostPass("blur", {PostRtv(kBloomRtv + to), kBloomFormat, bw, bh}, b, pp);
     }
     Transition(bloom_[0].Get(), bloom_state_[0], D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+}
+
+// xboxrecomp (from hpcos/hppoa): bloom for a console picture (0..1, no HDR target): what passes the knee in the 3D
+// scene, blurred at a quarter size twice over, added back before the HUD goes on top. Once a frame per target
+constexpr float kSceneBloomKnee = 0.7f;
+void D3D12Backend::SceneBloom(Target& t) {
+    t.bloom_frame = presents_;
+    const app::Settings& set = app::Get();
+    if (!set.bloom || !set.bloom_strength) return;
+    ID3D12Resource* fb = EnsureFeedbackCopy(t);
+    if (!fb) return;
+    uint32_t bw = std::max(1u, t.w / kBloomShrink);
+    uint32_t bh = std::max(1u, t.h / kBloomShrink);
+    if (!EnsureBloomTargets(bw, bh)) return;
+    PostInputs in{{fb, nullptr, nullptr}, {t.fmt, kBloomFormat, kExposureFormat}};
+    Transition(bloom_[0].Get(), bloom_state_[0], D3D12_RESOURCE_STATE_RENDER_TARGET);
+    float pb[8] = {kSceneBloomKnee, 0, 0, 0, 1.0f / t.w, 1.0f / t.h};
+    DrawPostPass("lbright", {PostRtv(kBloomRtv), kBloomFormat, bw, bh}, in, pb);
+    for (int pass = 0; pass < 4; pass++) {  // across, down, across, down: a wider glow
+        int from = pass & 1, to = 1 - from;
+        Transition(bloom_[from].Get(), bloom_state_[from], D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+        Transition(bloom_[to].Get(), bloom_state_[to], D3D12_RESOURCE_STATE_RENDER_TARGET);
+        PostInputs b{{bloom_[from].Get(), nullptr, nullptr}, {kBloomFormat, kBloomFormat, kBloomFormat}};
+        float pp[8] = {0, 0, 0, 0, pass & 1 ? 0 : 1.0f / bw, pass & 1 ? 1.0f / bh : 0};
+        DrawPostPass("blur", {PostRtv(kBloomRtv + to), kBloomFormat, bw, bh}, b, pp);
+    }
+    Transition(bloom_[0].Get(), bloom_state_[0], D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    in.res[1] = bloom_[0].Get();
+    Transition(t.res.Get(), t.state, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    // the HDR resolve's last pass with no headroom and no tone mapping: the frame plus the glow
+    float pt[8] = {1, 0, float(std::min(set.bloom_strength, 100u)) / 100.0f * 1.5f, 0};
+    DrawPostPass("tone", {Cpu(rtv_heap_.Get(), t.view, rtv_inc_), t.fmt, t.w, t.h, t.samples}, in, pt);
 }
 
 // the frame is read: exposure, bloom and tone mapping take the target back to 0..1
@@ -2836,6 +2902,31 @@ bool D3D12Backend::EnterHdrForScene(const State& s, const Assembled& a) {
         if (!BindTargets(s)) return false;
     }
     return true;
+}
+
+// xboxrecomp (from hpcos/hppoa): a frame's 3D scene goes into the guest sized target with depth written; the first 2D
+// draw after it there (pretransformed, or no depth test, sampling no render target) is the HUD's: the scene is
+// bloomed first
+bool D3D12Backend::BloomForScene(const State& s, const Assembled& a) {
+    Target* t = bound_rt_;
+    if (!t || t->gw != guest_w_ || t->gh != guest_h_ || t->hdr) return true;
+    bool flat = a.pretransformed || !s.rs[kRsZEnable];
+    if (!flat) {
+        if (bound_ds_ && SimpleState(s, kMZWriteEnable)) {
+            t->scene_frame = presents_;
+            scene_zs_ = s.zs;
+            scene_zs_frame_ = presents_;
+        }
+        return true;
+    }
+    if (t->scene_frame != presents_ || t->bloom_frame == presents_) return true;
+    // a view drawn into a texture laid over the scene is not the HUD
+    for (uint32_t tex : s.textures) {
+        TextureDesc d;
+        if (tex && Describe(tex, d) && targets_.count(TargetKey(d.data, Format(d.format).depth))) return true;
+    }
+    SceneBloom(*t);
+    return bound_rt_ == t || BindTargets(s);
 }
 
 constexpr uint32_t kQuadVertices = 6;  // a quad drawn as two triangles
@@ -3975,6 +4066,7 @@ void D3D12Backend::Draw(const State& s, uint32_t prim, uint32_t start, uint32_t 
     if (CurrentFrame().used > kUploadSize - kUploadReserve) Submit(true);
     if (!BindTargets(s)) return CountDrop(kDropTargets);
     if (!EnterHdrForScene(s, a)) return CountDrop(kDropHdr);
+    if (!BloomForScene(s, a)) return CountDrop(kDropTargets);
 
     // vertex shader
     DrawShaders sh = ClassifyShaders(s, a, count);
@@ -4072,6 +4164,12 @@ void D3D12Backend::Clear(const State& s, uint32_t count, const uint8_t* rects, u
         CapStep(s.rt);
         fprintf(cap_, "%04u clear rt %08X ds %08X flags %X color %08X z %.3f\n", cap_i_++, s.rt.data, s.zs.data, flags,
                 color, z);
+    }
+    // xboxrecomp: clearing the scene's depth (before the HUD) ends the scene: it is bloomed then
+    if ((flags & kClearZ) && s.zs.data == scene_zs_.data && scene_zs_frame_ == presents_ && bound_rt_ &&
+        bound_rt_->scene_frame == presents_ && bound_rt_->bloom_frame != presents_) {
+        SceneBloom(*bound_rt_);
+        bound_rt_ = bound_ds_ = nullptr;
     }
     Target* rt = (flags & kClearTarget) ? EnsureTarget(s.rt, false) : nullptr;
     Target* ds = (flags & (kClearZ | kClearStencil)) ? EnsureTarget(s.zs, true) : nullptr;
@@ -4388,7 +4486,8 @@ void D3D12Backend::BlitFrame(const Target& t, ID3D12Resource* r, bool pillarbox)
     cl_->RSSetScissorRects(1, &scissor);
     // xboxrecomp: the colour-blind filter is in the gamma pass, which a neutral ramp (CoS's own at default brightness)
     // would skip; the lookup is identity then, so only the filter changes the picture
-    if (r) Blit(r, t.fmt, uv, {.gamma = gamma_ || app::Get().colorblind != 0});
+    // (and the sharpening, xboxrecomp)
+    if (r) Blit(r, t.fmt, uv, {.gamma = gamma_ || app::Get().colorblind != 0 || app::Get().sharpen != 0});
 }
 
 // the overlay as the window holds it: a new frame goes up to ov_tex_, under the window's overlay lock
@@ -4552,6 +4651,8 @@ void D3D12Backend::Present(const Surface& front, bool pillarbox) {
     Target* t = EnsureTarget(front, false);
     if (t && LatchCpuWrite(*t)) UploadTarget(*t, front);
     if (t && t->hdr) Resolve(*t);
+    // xboxrecomp: a frame with a scene and no HUD after it is bloomed here
+    if (t && t->scene_frame == presents_ && t->bloom_frame != presents_) SceneBloom(*t);
     if (const app::Settings& s = app::Get(); ramp_dirty_ || (s.brightness << 8 | s.contrast) != ramp_set_)
         UploadGammaRamp(s.brightness, s.contrast);
     Transition(lut_.Get(), lut_state_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);

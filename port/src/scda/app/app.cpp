@@ -42,6 +42,10 @@ struct Entry {
 
 #define FIELD(m) offsetof(Settings, m)
 const Entry kEntries[] = {
+    // xboxrecomp: first in the file, where a player looks for how to get the launcher's page back
+    {"show_launcher", nullptr, Kind::Bool, FIELD(show_launcher), 0, 0,
+     "the launcher's settings page at startup: true shows it, false starts the game at once (also: hold Shift while "
+     "starting, or F10 > Show the launcher at startup)"},
     {"display_mode", "RECOMP_DISPLAY_MODE", Kind::Display, FIELD(display_mode), 0, 0,
      "'windowed', 'borderless' (covers the monitor) or 'fullscreen' (switches the monitor to width x height)"},
     {"width", nullptr, Kind::U32, FIELD(width), 0, 16384,
@@ -63,6 +67,7 @@ const Entry kEntries[] = {
     {"contrast", nullptr, Kind::U32, FIELD(contrast), 0, 100, nullptr},
     {"vsync", "RECOMP_VSYNC", Kind::Bool, FIELD(vsync), 0, 0, nullptr},
     {"fps_counter", nullptr, Kind::Bool, FIELD(fps_counter), 0, 0, nullptr},
+    {"fov", "RECOMP_FOV", Kind::U32, FIELD(fov), 80, 130, "field of view, % of the game's"},
     {"cutscene_bars", nullptr, Kind::Bool, FIELD(cutscene_bars), 0, 0,
      "16:9: cutscenes fill the screen and keep the console's black bars over the picture (subtitles in the bottom one)"},
     {"debug_logs", "RECOMP_DEBUG_LOGS", Kind::Bool, FIELD(debug_logs), 0, 0,
@@ -71,8 +76,6 @@ const Entry kEntries[] = {
      "false: the game ignores the PC's controller (keyboard and mouse still play)"},
     {"async_shaders", "RECOMP_ASYNC_SHADERS", Kind::Bool, FIELD(async_shaders), 0, 0,
      "a draw whose pipeline is still compiling is skipped instead of waited for"},
-    {"show_launcher", nullptr, Kind::Bool, FIELD(show_launcher), 0, 0,
-     "hpps_launcher.exe shows its settings page; false starts the game at once (hold Shift to see it)"},
     {"start_menu", "RECOMP_START_MENU", Kind::Bool, FIELD(start_menu), 0, 0,
      "the settings page before the game starts (aspect ratio, resolution, quality)"},
     {"fps_limit", "RECOMP_FPS_LIMIT", Kind::Fps, FIELD(fps_limit), 0, 0,
@@ -82,6 +85,11 @@ const Entry kEntries[] = {
     {"colorblind", nullptr, Kind::ColorBlind, FIELD(colorblind), 0, 0,
      "colour-blind correction over the finished frame: 'off', 'protanopia', 'deuteranopia' or 'tritanopia'"},
     {"colorblind_strength", nullptr, Kind::U32, FIELD(colorblind_strength), 0, 100, "0 to 100 %"},
+    {"bloom", "RECOMP_BLOOM", Kind::Bool, FIELD(bloom), 0, 0, "a glow round the 3D scene's bright parts, under the HUD"},
+    {"bloom_strength", nullptr, Kind::U32, FIELD(bloom_strength), 0, 100, "0 to 100"},
+    {"sharpen", "RECOMP_SHARPEN", Kind::U32, FIELD(sharpen), 0, 100, "0 (off) to 100: contrast adaptive sharpening"},
+    {"bean_names", "RECOMP_BEAN_NAMES", Kind::Bool, FIELD(bean_names), 0, 0,
+     "a bean's flavour said aloud as Harry picks it up, as the game does; false: not spoken"},
     {"keyboard_mouse", nullptr, Kind::Bool, FIELD(kbm), 0, 0,
      "keyboard and mouse play as controller 1, alongside a pad (key names below; Mouse1-5 the mouse buttons)"},
     {"mouse_sensitivity", nullptr, Kind::U32, FIELD(mouse_sensitivity), 1, 100, "1 to 100, the camera's speed with the mouse"},
@@ -468,6 +476,8 @@ std::recursive_mutex& UiLock() {
 }  // namespace app
 
 // hle_dsound.c, when the mixer starts: output channels
+extern "C" int hpps_BeanNames(void) { return app::Get().bean_names; }
+extern "C" uint32_t hpps_FovPercent(void) { return std::clamp<uint32_t>(app::Get().fov, 80, 130); }
 extern "C" int app_Speakers(void) { return app::Get().speakers == 6 ? 6 : 2; }
 
 // main.c, first thing: the settings read, and handed to the C side (the window, the title's widescreen camera, the
