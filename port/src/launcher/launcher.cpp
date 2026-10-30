@@ -37,6 +37,12 @@ namespace {
 
 // ── settings: hpps.toml, the keys the game reads (scda/app/app.cpp) ─────────────────────────────────────────────
 
+// fps_limit's choices, as the game's F10 panel offers them (scda/app/app.h kFpsChoices): 0 the game's rate,
+// 30, caps above 60, 'unlocked'
+const char* const kFpsValues[] = {"0", "30", "120", "144", "165", "240", "'unlocked'"};
+const char* const kFpsNames[] = {"Game's rate (60 fps)", "30 fps", "120 fps", "144 fps", "165 fps", "240 fps",
+                                 "Unlocked"};
+
 struct Settings {
     bool wide = false;            // aspect '16:9', otherwise '4:3'
     int display = 0;              // 'windowed', 'borderless', 'fullscreen'
@@ -45,7 +51,7 @@ struct Settings {
     uint32_t msaa = 0, aniso = 0;
     bool smaa = false, vsync = true;
     bool show = true;             // show_launcher: false starts the game without this page
-    int fps = 0;                  // fps_limit: 0 the game's, 1 30 fps, 2 'unlocked'
+    int fps = 0;                  // fps_limit: an index into kFpsValues
     int colorblind = 0;           // 'off', 'protanopia', 'deuteranopia', 'tritanopia'
     uint32_t cb_strength = 100;
     bool kbm = true;              // keyboard_mouse
@@ -136,7 +142,12 @@ Settings Load() {
     s.smaa = Value("smaa") == "true";
     s.vsync = Value("vsync") != "false";
     s.show = Value("show_launcher") != "false";
-    s.fps = Value("fps_limit") == "unlocked" ? 2 : u(Value("fps_limit"), 0) == 30 ? 1 : 0;
+    s.fps = 0;
+    for (int i = 0; i < int(std::size(kFpsValues)); i++) {
+        std::string v = kFpsValues[i];
+        if (v.front() == '\'') v = v.substr(1, v.size() - 2);
+        if (Value("fps_limit") == v) s.fps = i;
+    }
     std::string cb = Value("colorblind");
     for (int i = 0; i < 4; i++)
         if (cb == kColorBlindKeys[i]) s.colorblind = i;
@@ -163,7 +174,7 @@ void Save(const Settings& s) {
     SetValue("vsync", s.vsync ? "true" : "false");
     SetValue("show_launcher", s.show ? "true" : "false");
     SetValue("start_menu", "false");  // this page instead of the in-game one
-    SetValue("fps_limit", s.fps == 2 ? "'unlocked'" : s.fps == 1 ? "30" : "0");
+    SetValue("fps_limit", kFpsValues[s.fps]);
     SetValue("colorblind", q(kColorBlindKeys[s.colorblind]));
     SetValue("colorblind_strength", std::to_string(s.cb_strength));
     SetValue("keyboard_mouse", s.kbm ? "true" : "false");
@@ -514,8 +525,7 @@ bool DrawPage(Settings& s, std::string& error) {
     ImGui::Checkbox("SMAA", &s.smaa);
     ImGui::SameLine(0, 30 * sc);
     ImGui::Checkbox("Vsync", &s.vsync);
-    const char* const kFps[] = {"Game's rate (60 fps)", "30 fps", "Unlocked (experimental)"};
-    ImGui::Combo("Frame rate", &s.fps, kFps, 3);
+    ImGui::Combo("Frame rate", &s.fps, kFpsNames, int(std::size(kFpsNames)));
     ImGui::Combo("Colour-blind filter", &s.colorblind, kColorBlindNames, 4);
     if (s.colorblind) {
         int st = int(s.cb_strength);
