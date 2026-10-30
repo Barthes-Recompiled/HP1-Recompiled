@@ -339,14 +339,14 @@ void DrawPanel(bool start) {
             ImGui::TextDisabled("Borderless covers the monitor; the size is for windowed / fullscreen.");
     }
     if (ImGui::Checkbox("Vsync", &s.vsync)) Changed();
-    int fl = s.fps_limit == 30 ? 1 : s.fps_limit == kFpsUnlocked ? 2 : 0;
-    const char* const kFpsNames[] = {"Game's rate (60 fps)", "30 fps", "Unlocked (experimental)"};
-    if (Combo("Frame rate", &fl, kFpsNames, 3)) {
-        s.fps_limit = fl == 1 ? 30 : fl == 2 ? kFpsUnlocked : 0;
+    int fl = FpsChoice(s.fps_limit);
+    if (Combo("Frame rate", &fl, kFpsChoiceNames, int(kFpsChoiceCount))) {
+        s.fps_limit = kFpsChoices[fl];
         Changed();
     }
-    if (s.fps_limit == kFpsUnlocked)
-        ImGui::TextDisabled("Runs the game faster than the Xbox did; some timing may misbehave. Vsync caps it at the monitor.");
+    if (s.fps_limit > 60)
+        ImGui::TextDisabled("Draws more frames than the Xbox did; the game itself still steps 25 times a second. "
+                            "With vsync on, the monitor's rate caps it.");
 
     Row("Resolution");
     int ir = IndexOf(kInternalValues, s.internal_height);

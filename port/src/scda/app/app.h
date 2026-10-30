@@ -14,6 +14,18 @@ namespace app {
 enum class DisplayMode : uint32_t { Windowed, Borderless, Fullscreen };  // as xboxrecomp's XBOX_DISPLAY_*
 enum class AspectMode : uint32_t { Standard, Wide, Stretch };            // 4:3, 16:9, stretch
 constexpr uint32_t kFpsUnlocked = 1000;  // fps_limit 'unlocked' (experimental): Swap and vblank waits do not wait
+// fps_limit's choices (settings, F10 panel, launcher): 0 the game's own rate (59.94, the vblank grid), 30, caps above
+// the console's rate (paced by a high-resolution timer, hle_d3d8.cpp Pace), unlocked. The game's logic steps at a
+// fixed 25 Hz on its own clock whatever the frame rate, so a cap above 60 only draws more frames.
+inline constexpr uint32_t kFpsChoices[] = {0, 30, 120, 144, 165, 240, kFpsUnlocked};
+inline const char* const kFpsChoiceNames[] = {"Game's rate (60 fps)", "30 fps", "120 fps", "144 fps",
+                                             "165 fps", "240 fps", "Unlocked"};
+constexpr uint32_t kFpsChoiceCount = 7;
+inline int FpsChoice(uint32_t v) {
+    for (uint32_t i = 0; i < kFpsChoiceCount; i++)
+        if (kFpsChoices[i] == v) return int(i);
+    return 0;
+}
 enum ColorBlind : uint32_t { kCbOff, kCbProtanopia, kCbDeuteranopia, kCbTritanopia };
 
 // xboxrecomp: the pad's inputs in one order, the analog buttons as the Xbox's bAnalogButtons (A B X Y Black White LT
@@ -64,7 +76,7 @@ struct Settings {
     bool show_launcher = true;         // xboxrecomp: hpps_launcher.exe shows its page; false starts the game straight away (Shift shows it)
     bool start_menu = false;           // xboxrecomp: the settings page before the game starts (RECOMP_START_MENU); hpps_launcher.exe is the usual way
     // xboxrecomp: frame rate, accessibility and controls (input.cpp, the final pass)
-    uint32_t fps_limit = 0;            // 0 the game's own rate, 30: each frame two vblanks at least, kFpsUnlocked none
+    uint32_t fps_limit = 0;            // kFpsChoices: 0 the game's own rate, 30: two vblanks a frame at least, 120..240 a cap, kFpsUnlocked none
     uint32_t colorblind = 0;           // ColorBlind: correction filter over the finished frame
     uint32_t colorblind_strength = 100;  // 0 to 100 %
     uint32_t speakers = 2;             // xboxrecomp: 2 stereo, 6 5.1 surround (hle_dsound.c, at start)

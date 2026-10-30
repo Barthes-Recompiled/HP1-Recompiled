@@ -19,6 +19,7 @@ Columns: what changed, where, how to turn it off, what it could plausibly break.
 | Stick radial range compensation | input path | `RECOMP_STICK_RANGE` | walk/run thresholds, all stick input |
 | Trainer hooks (warp, items, autoplay) | `src/hle_trainer.c` over `sub_00095370` | only with the trainer / `RECOMP_AUTOPLAY` | Harry's update each frame |
 | Settings: fps, keyboard/mouse, colour-blind, controller | `src/scda/app`, launcher | per setting | timing, input |
+| Frame-rate caps above the console's 60 (120/144/165/240): Swap paced by a high-resolution waitable timer, BlockUntilVerticalBlank does not wait. The game steps its logic at a fixed 25 Hz on its own clock (dt 0.04 at 0x21B7BC is a constant), so this only draws more frames; measured: Harry 25.1 updates/s and the same walk speed at 60, 144 and 607 fps (2026-10-30) | `scda/xdk/hle_d3d8.cpp` `PaceAbove`, `scda/app`, launcher | `fps_limit = 0` (the game's rate) | anything that counts rendered frames rather than game steps |
 
 ## Camera / 16:9
 

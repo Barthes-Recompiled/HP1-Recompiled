@@ -80,7 +80,7 @@ const Entry kEntries[] = {
     {"start_menu", "RECOMP_START_MENU", Kind::Bool, FIELD(start_menu), 0, 0,
      "the settings page before the game starts (aspect ratio, resolution, quality)"},
     {"fps_limit", "RECOMP_FPS_LIMIT", Kind::Fps, FIELD(fps_limit), 0, 0,
-     "frame rate: 0 the game's own (59.94), 30 caps it at 30 fps, 'unlocked' as fast as vsync / the PC allow (experimental: the game was made for 60)"},
+     "frame rate: 0 the game's own (59.94), 30, a cap above it (120, 144, 165, 240), 'unlocked' as fast as vsync / the PC allow; the game's logic runs at 25 Hz on its own clock either way"},
     {"speakers", "RECOMP_SPEAKERS", Kind::U32, FIELD(speakers), 2, 6,
      "2 stereo, 6 5.1 surround (the console's speaker mix, each channel to its own speaker); takes a restart"},
     {"colorblind", nullptr, Kind::ColorBlind, FIELD(colorblind), 0, 0,
@@ -192,7 +192,9 @@ bool Parse(Settings& s, const Entry& e, std::string v) {
             return false;
         case Kind::Fps:
             if (!_stricmp(v.c_str(), "unlocked")) return U(s, e) = kFpsUnlocked, true;
-            if (v == "0" || v == "30") return U(s, e) = uint32_t(std::atoi(v.c_str())), true;
+            for (uint32_t c : kFpsChoices)
+                if (c != kFpsUnlocked && v == std::to_string(c)) return U(s, e) = c, true;
+            if (v == "60") return U(s, e) = 0, true;  // the game's own rate
             return false;
         case Kind::ColorBlind:
             for (uint32_t i = 0; i < 4; i++) {

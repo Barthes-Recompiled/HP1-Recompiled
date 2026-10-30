@@ -203,9 +203,37 @@ void SetComplex(uint32_t rs, uint32_t v) {
 void WaitVblank(uint32_t since, uint32_t count) {
     for (int guard = 0; xbox_Nv2aVblankCount() - since < count && guard < 200; guard++) Sleep(1);
 }
+// xboxrecomp: a cap above the console's rate (fps_limit 120..240) paces on the host clock instead of the 59.94 Hz
+// vblank grid: a high-resolution waitable timer sleeps to within half a millisecond of the frame's deadline and the
+// rest is a short spin. The deadlines advance by one period each frame, so the average holds the cap; after a stall
+// (loading) they restart from now rather than rushing to catch up. The runtime's vblank count and the title's vblank
+// callback keep their 59.94 Hz: the game steps its logic on its own clock (25 Hz, KeQuerySystemTime), not on frames.
+void PaceAbove(uint32_t fps) {
+    static HANDLE timer = CreateWaitableTimerExW(nullptr, nullptr, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION,
+                                                 TIMER_ALL_ACCESS);
+    static LARGE_INTEGER freq = [] { LARGE_INTEGER f; QueryPerformanceFrequency(&f); return f; }();
+    static int64_t next = 0;
+    LARGE_INTEGER now;
+    QueryPerformanceCounter(&now);
+    const int64_t period = freq.QuadPart / fps;
+    if (next == 0 || now.QuadPart - next > period * 4) next = now.QuadPart;
+    next += period;
+    int64_t left = next - now.QuadPart;
+    const int64_t spin = freq.QuadPart / 2000;  // the last 0.5 ms
+    if (left > spin && timer) {
+        LARGE_INTEGER due;
+        due.QuadPart = -((left - spin) * 10000000 / freq.QuadPart);  // relative, 100 ns units
+        if (SetWaitableTimer(timer, &due, 0, nullptr, nullptr, FALSE)) WaitForSingleObject(timer, INFINITE);
+    }
+    do {
+        YieldProcessor();
+        QueryPerformanceCounter(&now);
+    } while (now.QuadPart < next);
+}
 void Pace() {
     if (app::Get().fps_limit == app::kFpsUnlocked) return;  // xboxrecomp: unlocked (experimental), vsync paces
     if (hpps_FastForward() > 1) return;  // xboxrecomp: a cutscene fast-forwarding (hle_skip.c) runs flat out
+    if (app::Get().fps_limit > 60) return PaceAbove(app::Get().fps_limit);
     static uint32_t last;
     // xboxrecomp: the 30 fps limit (fps_limit) shows each frame for two vblanks at least, as a title asking for
     // D3DPRESENT_INTERVAL_TWO does
@@ -516,8 +544,8 @@ HLE(00196050, 1) {
 
 // D3DDevice_BlockUntilVerticalBlank
 HLE(00192090, 0) {
-    if (app::Get().fps_limit == app::kFpsUnlocked) return 0;  // xboxrecomp: unlocked (experimental)
-    if (hpps_FastForward() > 1) return 0;  // xboxrecomp: a cutscene fast-forwarding (hle_skip.c)
+    // xboxrecomp: unlocked and caps above 60 (Pace) do not wait for the 59.94 Hz grid, nor a cutscene fast-forwarding
+    if (app::Get().fps_limit > 60 || hpps_FastForward() > 1) return 0;
     WaitVblank(xbox_Nv2aVblankCount(), 1);  // the next vblank
     return 0;
 }
