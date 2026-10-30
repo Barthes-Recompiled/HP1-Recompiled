@@ -34,10 +34,18 @@ HUBS = [6, 7, 8, 10, 11, 13, 15, 17, 19, 21, 23, 25, 31]
 DUNGEONS = collections.OrderedDict([
     ("Lumos Lesson", (9, None)), ("Spongify Lesson", (12, None)), ("Diffindo Lesson", (16, None)),
     ("Incendio Lesson", (20, None)), ("Troll", (13, "TrollIntro")), ("Library", (17, "LibraryStealthSection")),
-    ("Ingredients", (23, "IngredientsCheck")), ("Quidditch", (23, "HPE53Script")), ("Norbert", (None, None)),
-    ("Forbidden Forest", (None, None)), ("Devil's Snare", (26, None)), ("Flying Keys", (27, None)),
+    ("Ingredients", (23, "IngredientsCheck")), ("Quidditch", (23, "HPE53Script")),
+    ("Norbert", (21, "GoToHagrid01")),  # night 4's Hagrid pursuit (the Norbert night's playable part)
+    ("Devil's Snare", (26, None)), ("Flying Keys", (27, None)),
     ("Wizard Chess", (28, None)), ("Quirrell", (29, None)),
 ])
+# No Forbidden Forest pass: night4ingredients (22) is not on the Xbox disc and no script mentions the forest (the user's
+# decision, 2026-10-30)
+DROPPED_DUNGEONS = set()
+# quest items (inventory items the scripts test with QuizInventory): progression for the set pieces that need them
+QUEST_ITEMS = {"Flobberworm Mucus": 41, "Moondew": 42, "Puffapod Spores": 43, "Potion Vial": 21, "Wiggentree Bark": 38,
+               "Dittany": 39, "Asphodel": 40, "Owl Treat": 20}
+# spells are inventory items too (QuizInventory(10) = has Incendio): the number is the item given
 SPELLS = {"Flipendo": 1, "Lumos": 2, "Diffindo": 5, "Spongify": 8, "Incendio": 10, "Alohomora": 12}
 ENEMIES = ("Troll", "TrollBathRoom", "Gytrash", "GytrashBoss", "Horklump", "VenomousTentacular", "DevilSnare",
            "Filch", "FlyingBook", "Doxy", "Ghost", "Percy", "Imp", "Bowtruckle", "ProtrudingRoot", "StaticShooter",
@@ -126,6 +134,21 @@ def main():
                     add("object:%d:%s" % (level, name), "%s - %s %s" % (reg, kind, name), reg, kind + "s")
                     break
 
+    # search spots: the castle's searchable jars, bookcases and chests, the same 176 in the day and night archives
+    # (pscensus.py ... pos: search_day1.txt, search_night0.txt); one check per spot, and per hub behind an option
+    spots = set()
+    for f in ("search_day1.txt", "search_night0.txt"):
+        p = os.path.join(census, f)
+        if os.path.exists(p):
+            for ln in open(p):
+                parts = ln.split()
+                if len(parts) == 5 and re.search(r"(?i)jar|chest|bookcase", parts[1]) and                         not re.search(r"(?i)done|dum|fade|snap|sfx", parts[1]):
+                    spots.add(parts[1].split(".", 1)[1].lower())
+    for spot in sorted(spots):
+        add("search:%s" % spot, "Search %s" % spot, "Castle", "Search Spots")
+        for lv in HUBS[1:]:
+            add("search:%d:%s" % (lv, spot), "%s - Search %s" % (LEVELS[lv], spot), LEVELS[lv], "Search Spots per Hub")
+
     for spell in SPELLS:
         add("spell:%d:first_cast" % SPELLS[spell], "First cast of %s" % spell, "Hogwarts", "Spells")
     for n in range(10, 501, 10):
@@ -146,10 +169,14 @@ def main():
     for lv in HUBS:
         items["%s Pass" % LEVELS[lv]] = {"id": nid, "kind": "pass", "level": lv, "class": "progression"}; nid += 1
     for name, (lv, script) in DUNGEONS.items():
+        if name in DROPPED_DUNGEONS:
+            continue
         items["%s Pass" % name] = {"id": nid, "kind": "dungeon", "level": lv, "script": script,
                                    "class": "progression"}; nid += 1
     for spell, n in SPELLS.items():
         items[spell] = {"id": nid, "kind": "spell", "spell": n, "class": "progression"}; nid += 1
+    for name, n in QUEST_ITEMS.items():
+        items[name] = {"id": nid, "kind": "quest", "item": n, "class": "progression"}; nid += 1
     for card in range(1, 102):
         items["Wizard Card %d" % card] = {"id": nid, "kind": "card", "card": card, "class": "useful"}; nid += 1
     for name, kind, cls in (("Health Bar", "health", "useful"), ("Big Bean Bag", "bag", "useful"),
@@ -158,8 +185,9 @@ def main():
         items[name] = {"id": nid, "kind": kind, "class": cls}; nid += 1
 
     digest = hashlib.sha256("\n".join(keys).encode() + json.dumps(list(items)).encode()).hexdigest()[:12]
-    catalog = {"version": "hpps-1-" + digest, "game": GAME, "location_base": LOCATION_BASE, "item_base": ITEM_BASE,
-               "regions": {"hubs": [LEVELS[l] for l in HUBS], "dungeons": list(DUNGEONS)},
+    catalog = {"version": "hpps-2-" + digest, "game": GAME, "location_base": LOCATION_BASE, "item_base": ITEM_BASE,
+               "regions": {"hubs": [LEVELS[l] for l in HUBS],
+                           "dungeons": [d for d in DUNGEONS if d not in DROPPED_DUNGEONS]},
                "items": items, "locations": locations}
     with open(out, "w", encoding="utf-8", newline="\n") as f:
         json.dump(catalog, f, indent=1)
