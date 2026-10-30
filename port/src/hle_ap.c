@@ -353,6 +353,7 @@ void hpps_ApFrame(void)
 {
     if (!hpps_ap_enabled()) return;
     hpps_ap_frame();
+    travel();  /* before the connection check: the entries are gated by the passes held */
     if (!hpps_ap_active()) return;
     const char *kind;
     int value;
@@ -363,7 +364,6 @@ void hpps_ApFrame(void)
         hpps_ap_item_given();
     }
     pickups();
-    travel();
     /* counters */
     static int cards_seen, beans_last = -1, beans_total;
     int owned = 0;
