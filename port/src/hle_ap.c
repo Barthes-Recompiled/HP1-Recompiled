@@ -29,6 +29,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #define RECOMP_GENERATED_CODE
 #include "recomp/gen/recomp_types.h"
@@ -169,6 +170,24 @@ void hpps_ApScript(uint32_t entry, uint32_t argv)
     }
     /* the goal: Quirrell defeated (level 29's VoldemortDeadScript, which goes on to day 6) */
     if (level == 29 && !strcmp(script, "VoldemortDeadScript")) hpps_ap_goal();
+}
+
+/* every cutscene the title starts by name passes sub_000CEC60(name): the StartCutScene command (sub_0004BC00) and the
+ * level transitions (sub_000D0C10 / sub_000D0D40), which play some cutscenes (the Forbidden Forest's among them) that
+ * no level script starts. It looks the name up in the table at [0x218888] and keeps the index at [0x33FEF4]. A check
+ * keyed cutscene:<name> (lower case), so the Forest counts when it plays. Found by DeepSeek reading the generated code. */
+extern void sub_000CEC60_gen(void);
+void sub_000CEC60(void)
+{
+    if (hpps_ap_enabled()) {
+        char name[64], key[96];
+        snprintf(name, sizeof name, "%s", guest_str(MEM32(g_esp + 4)));
+        for (char *c = name; *c; c++) *c = (char)tolower((unsigned char)*c);
+        snprintf(key, sizeof key, "cutscene:%s", name);
+        fprintf(stderr, "[AP] cutscene %s (level %u)%s\n", name, MEM32(LEVEL_NOW), hpps_ap_known(key) ? ": a check" : "");
+        hpps_ap_location(key);
+    }
+    sub_000CEC60_gen();
 }
 
 /* runs a recompiled function on this guest thread, the arguments pushed right to left and a return address */
