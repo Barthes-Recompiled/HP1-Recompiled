@@ -82,7 +82,10 @@ static int scene_script(const char *name)
     low[i] = 0;
     for (size_t k = 0; k < sizeof kWords / sizeof kWords[0]; k++)
         if (strstr(low, kWords[k])) return 1;
-    return 0;
+    /* a character spoken to (<Name>Talk) and a pursuit's stage, as make_catalog.py's TALK_RX / PURSUIT_RX */
+    size_t n = strlen(name);
+    if (n > 4 && !strcmp(name + n - 4, "Talk")) return 1;
+    return strstr(low, "pursuit") || strstr(low, "throughdoor") || strstr(low, "gotohagrid") || strstr(low, "makeronrun");
 }
 
 /* enemies the level's scripts set up (name -> type), for their defeat's key */
