@@ -9,8 +9,9 @@
  * dashboard launches do: XLaunchNewImage(NULL, NULL) (sub_00153FC4) -> HalReturnToFirmware, which ends the
  * process.
  *
- * The four rows move up a row (sub_00168D70 while the menu draws) so the five end where the four did, above the
- * copyright line. While the fifth row is chosen the title's input step does not run; down from the last row or up
+ * The four rows and the port's two share the room the four had (sub_00168D70 while the menu draws them,
+ * title_row_y): a step 0.84 of the game's, the last row a little above the game's fourth, so a lit row clears the
+ * copyright line and the first stays clear of the logo. While the fifth row is chosen the title's input step does not run; down from the last row or up
  * from the first picks it, as the title's own wrap would. Choosing it asks first: the rows (the text draw
  * sub_00169A40, a printf) give way to "Quit To Desktop?" over the game's GUI_YES / GUI_NO in the rows' style,
  * No lit; up / down picks, A or START answers, B (as the options' accept-changes screen, 0x1FB80) is No.
@@ -69,10 +70,11 @@ extern void sub_0002A9F0(void);
 extern void sub_000306C0(void);
 extern void sub_00030510(void);
 extern void sub_00153FC4(void);
+extern void sub_0015CCA0(void);
 extern void __stdcall xbox_HalReturnToFirmware(unsigned long routine);
 uint32_t xbox_HeapAlloc(uint32_t size, uint32_t alignment);
 
-static int g_in_menu;               /* the title's rows are being drawn: they move up a row */
+static int g_in_menu;               /* the title's rows are being drawn: they take their places among the six */
 static float g_col[4] = {0.2f, 0.64f, 0.99f, 0.95f}, g_scale = 1.0f;  /* the fifth row's easing colour / scale */
 static int g_ask, g_ask_yes;        /* the main menu asks; Yes is lit */
 static float g_ask_col[2][4] = {{0.2f, 0.64f, 0.99f, 0.95f}, {0.2f, 0.64f, 0.99f, 0.95f}}, g_ask_scale[2] = {1, 1};
@@ -160,6 +162,14 @@ static void quit_to_desktop(void)
 
 static int wide_mode(void) { return MEM32(kMode) == 2 || MEM32(kMode) == 11; }
 static float row_step(void) { return wide_mode() ? 33.0f : 37.0f; }
+/* the six title rows (the game's four, then Settings and Quit To Desktop) on a step a little closer than the game's,
+ * the last one a little above where the game puts its fourth: a lit row (1.4 x) clears the copyright line below and
+ * the first row stays clear of the logo above, at 4:3 and 16:9 alike */
+static float title_row_y(float i)
+{
+    float last = (wide_mode() ? 310.0f : 295.0f) + 3.0f * row_step() - 8.0f;
+    return last - (5.0f - i) * row_step() * 0.84f;
+}
 
 static uint32_t guest_text(const char *s, uint32_t *va)
 {
@@ -277,7 +287,8 @@ void sub_00168D70(void)
     float x = bf(ARG(0)), y = bf(ARG(1));
     g_last_x = x, g_last_y = y;
     /* the title's rows a row higher while the menu draws them (not the copyright line) */
-    if (g_in_menu && !(x == 320.0f && y == 423.0f)) ARG(1) = fb(y - 2.0f * row_step());  /* two rows of the port's */
+    if (g_in_menu && !(x == 320.0f && y == 423.0f))  /* the game's row i, in its place among the six */
+        ARG(1) = fb(title_row_y((y - (wide_mode() ? 310.0f : 295.0f)) / row_step()));
     /* the pause menu's "select" hint below row 10 */
     if (g_pause_draw && x == 320.0f && y == 416.0f) ARG(1) = fb(430.0f);
     sub_00168D70_gen();
@@ -356,7 +367,7 @@ static void menu_row(int i, uint32_t text, float col[4], float *scale, int lit, 
     if (*scale > top) *scale = top;
     if (*scale < 1.0f) *scale = 1.0f;
     float x = (MEM32(kMode) == 2 ? 392.0f : 400.0f) - 15.0f * i;
-    float y = (wide_mode() ? 310.0f : 295.0f) + row_step() * (i - 2);
+    float y = title_row_y((float)i);
     set_align(0, 1);  /* the rows' alignment (0x1C46D) */
     draw_text(col, *scale, x, y, text);
 }
@@ -393,7 +404,7 @@ void sub_0001C380(void)
         if (q) {
             set_align(0, 1);
             draw_text(white, 1.0f, (MEM32(kMode) == 2 ? 392.0f : 400.0f) - 15.0f * 2,
-                      (wide_mode() ? 310.0f : 295.0f), q);
+                      title_row_y(2.0f), q);
         }
         if (yes) menu_row(3, yes, g_ask_col[0], &g_ask_scale[0], g_ask_yes, 1);
         if (no) menu_row(4, no, g_ask_col[1], &g_ask_scale[1], !g_ask_yes, 1);
@@ -456,8 +467,32 @@ static float pause_step(void)
 
 /* ── pages ── */
 #define PAGE_ROWS_SHOWN 9
-#define PAGE_TOP        100.0f
+#define PAGE_TITLE_Y    52.0f   /* the page's name */
+#define PAGE_AREA_TOP   100.0f  /* the rows' tops (centred text hangs from y) keep below the name, lit rows included */
+#define PAGE_AREA_END   372.0f  /* and above the "..." and the hint at 430 */
 #define PAGE_STEP       30.0f
+#define PAGE_LIT_SCALE  1.2f    /* a lit row grows less than the menus' 1.4: long values stay clear of the edges */
+
+/* a flat rectangle in the 640 x 480 frame, drawn as the letterbox bars draw theirs (0x2A600: a state block for an
+ * untextured quad, then sub_00169F70 with a colour; the menus' 2D state is already up) */
+static void draw_rect(float x0, float y0, float x1, float y1, const float col[4])
+{
+    static uint32_t va;
+    if (!va) va = xbox_HeapAlloc(0x80, 16);
+    if (!va) return;
+    uint8_t *m = (uint8_t *)XBOX_PTR(va);
+    memset(m, 0, 0x80);
+    memcpy(m, col, 16);                   /* the colour (the bars' four floats under the block) */
+    uint32_t st = va + 0x10;              /* the state block, as the bars fill it */
+    MEM32(st + 0x18) = 3;
+    MEM32(st + 0x28) = 1;
+    MEM32(st + 0x48) = 6;
+    MEM32(st + 0x4C) = 2;
+    uint32_t a[1] = {st};
+    call_guest(sub_0015CCA0, 1, a);
+    uint32_t q[8] = {fb(x0), fb(y0), fb(x1), fb(y1), 0, 0, va, fb(1.0f)};
+    call_guest(sub_00169F70_gen, 8, q);
+}
 typedef struct { char text[96]; int enabled, indent; } PageRow;
 
 static int page_rows(int page, PageRow *rows, int max)
@@ -588,20 +623,28 @@ static void page_draw(void)
     int n = page_rows(g_pg.page, rows, 64);
     float dt = bf(MEM32(kPDt));
     if (dt == 0.0f) dt = 1.0f / 30.0f;
-    float top = call_guest(sub_0002A7C0, 0, NULL) == 11 ? 1.2f : 1.4f;
+    float top = PAGE_LIT_SCALE;
     uint32_t sh[2] = {4, 5};
     static const float title_col[4] = {1.0f, 0.86f, 0.45f, 1.0f};
     static uint32_t title_va[5];
+    /* a still, dark backdrop: over the title it covers the menu's moving background; in the pause menu it darkens the
+     * game behind */
+    static const float backdrop[4] = {0.02f, 0.025f, 0.07f, 1.0f}, dim[4] = {0.0f, 0.0f, 0.02f, 0.82f};
+    draw_rect(0.0f, 0.0f, 640.0f, 480.0f, g_pg.where == 1 ? backdrop : dim);
     set_align(1, 0);
     call_guest(sub_00168DF0, 2, sh);
-    draw_text(title_col, 1.3f, 320.0f, 60.0f, guest_text(page_title(g_pg.page), &title_va[g_pg.page]));
+    draw_text(title_col, 1.3f, 320.0f, PAGE_TITLE_Y, guest_text(page_title(g_pg.page), &title_va[g_pg.page]));
+    /* the shown rows as one block, centred between the name and the hint */
+    int shown = n < PAGE_ROWS_SHOWN ? n : PAGE_ROWS_SHOWN;
+    float row0 = (PAGE_AREA_TOP + PAGE_AREA_END) * 0.5f - PAGE_STEP * (float)(shown - 1) * 0.5f;
+    if (row0 < PAGE_AREA_TOP) row0 = PAGE_AREA_TOP;
     for (int r = 0; r < PAGE_ROWS_SHOWN && g_pg.top + r < n; r++) {
         int i = g_pg.top + r, lit = i == g_pg.sel;
         float d = (float)(i > g_pg.sel ? i - g_pg.sel : g_pg.sel - i);
         float target[4] = {0.2f - d / 60.0f, 0.64f - d * 0.05f, 0.99f - d * 0.04f, 0.95f - d * 0.05f};
-        if (g_pg.where == 1) {  /* over the title's bright art (no panel): the unlit rows light, not fading blue */
-            target[0] = 0.72f, target[1] = 0.84f, target[2] = 1.0f, target[3] = 1.0f;
-        }
+        if (d > 3.0f) d = 3.0f;  /* on the dark backdrop the far rows stay readable */
+        target[0] = 0.2f + 0.5f - d * 0.08f, target[1] = 0.64f + 0.2f - d * 0.05f, target[2] = 1.0f,
+        target[3] = 1.0f - d * 0.08f;
         if (!rows[i].enabled) target[0] = target[1] = target[2] = 0.45f, target[3] = 0.6f;
         float *col = i < 64 ? g_pg.col[i] : g_pg.col[63], *sc = i < 64 ? &g_pg.scale[i] : &g_pg.scale[63];
         for (int k = 0; k < 4; k++) col[k] = ease(col[k], lit ? 1.0f : target[k]);
@@ -619,17 +662,18 @@ static void page_draw(void)
             dst[k++] = *c;
         }
         dst[k] = 0;
-        set_align(0, 1);
+        set_align(1, 0);  /* a centred column */
         call_guest(sub_00168DF0, 2, sh);
-        draw_text(col, *sc, rows[i].indent ? 158.0f : 128.0f, PAGE_TOP + PAGE_STEP * r, row_va[r]);
+        draw_text(col, *sc, rows[i].indent ? 335.0f : 320.0f, row0 + PAGE_STEP * r, row_va[r]);
     }
     if (n > PAGE_ROWS_SHOWN) {  /* more above / below */
         static uint32_t up_va, down_va;
         static const float more[4] = {0.6f, 0.75f, 0.95f, 0.9f};
         set_align(1, 0);
-        if (g_pg.top > 0) draw_text(more, 0.9f, 540.0f, 60.0f, guest_text("...", &up_va));  /* by the title, clear of the rows */
+        if (g_pg.top > 0) draw_text(more, 0.9f, 320.0f, row0 - 20.0f, guest_text("...", &up_va));
         if (g_pg.top + PAGE_ROWS_SHOWN < n)
-            draw_text(more, 0.9f, 320.0f, PAGE_TOP + PAGE_STEP * PAGE_ROWS_SHOWN - 8.0f, guest_text("...", &down_va));
+            draw_text(more, 0.9f, 320.0f, row0 + PAGE_STEP * (float)(shown - 1) + 26.0f,
+                      guest_text("...", &down_va));
     }
     /* the hint the pause menu's rows have: the A button and "select" */
     static const float hint[4] = {0.183f, 0.596f, 0.85f, 1.0f};
