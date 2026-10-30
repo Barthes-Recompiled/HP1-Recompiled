@@ -247,6 +247,7 @@ void sub_001F5044(void)
 
 extern int hpps_MenuOpen(void);  /* scda/app/menu.cpp */
 extern void app_InputPad(int port, XBOX_GAMEPAD *g);  /* scda/app/input.cpp */
+extern int app_PadCaptureFeed(const XBOX_GAMEPAD *g);  /* the Button mapping page's wait (input.cpp) */
 
 /* Stick range compensation (RECOMP_STICK_RANGE, default 0.65; 1 = off).
  *
@@ -298,6 +299,7 @@ static void get_state_direct(void)
     } else {
         /* the F10 options panel has the pad while it is open: the game sees it at rest */
         if (hpps_MenuOpen()) memset(&s.Gamepad, 0, sizeof(s.Gamepad));
+        XBOX_GAMEPAD as_given = s.Gamepad;  /* the Button mapping page reads the pad before the remapping */
         /* the controls settings: remapping, deadzones, camera inversion, keyboard and mouse on port 0 */
         app_InputPad((int)g_h[h].port, &s.Gamepad);
         stick_compensate(&s.Gamepad.sThumbLX, &s.Gamepad.sThumbLY);
@@ -305,6 +307,8 @@ static void get_state_direct(void)
         if (g_h[h].port == 0) {
             hpps_TrainerInject(&s.Gamepad);
             hpps_SkipPad(&s.Gamepad);
+            hpps_TrainerInject(&as_given);
+            if (app_PadCaptureFeed(&as_given)) memset(&s.Gamepad, 0, sizeof(s.Gamepad));  /* waiting: at rest */
         }
         hpps_last_pad = s.Gamepad;
         /* the packet number moves only when something changed, as XAPI's does */
