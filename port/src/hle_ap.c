@@ -37,6 +37,7 @@
 #include "input/xinput_xbox.h"
 
 static void travel(void);
+static int g_day6_by_travel;  /* Travel to day 6 runs Quirrell's end script, which is not the goal then */
 
 extern void sub_0003E9A0(void);
 extern void sub_00152160(void);
@@ -169,7 +170,8 @@ void hpps_ApScript(uint32_t entry, uint32_t argv)
         if (hpps_ap_known(key)) enemy_remember(level, a[0], cmd + 5);
     }
     /* the goal: Quirrell defeated (level 29's VoldemortDeadScript, which goes on to day 6) */
-    if (level == 29 && !strcmp(script, "VoldemortDeadScript")) hpps_ap_goal();
+    if (level == 29 && !strcmp(script, "VoldemortDeadScript") && !g_day6_by_travel) hpps_ap_goal();
+    if (level == 31) g_day6_by_travel = 0;
 }
 
 /* every cutscene the title starts by name passes sub_000CEC60(name): the StartCutScene command (sub_0004BC00) and the
@@ -445,5 +447,12 @@ static void travel(void)
     int level, dungeon, unlocked;
     if (!hpps_ap_travel_entry((int)pick, &name, &level, &script, &dungeon, &unlocked) || !unlocked) return;
     fprintf(stderr, "[AP] travel: %s (level %d)\n", name, level);
+    /* day 6 loaded on its own stays black (its Startup expects Quirrell's end): the game's own way there, level 29's
+     * VoldemortDeadScript (its cutscene, then StartLevel Day6), without that counting as the goal */
+    if (level == 31 && !*script) {
+        g_day6_by_travel = 1;
+        hpps_TrainerTravel(29, "VoldemortDeadScript");
+        return;
+    }
     hpps_TrainerTravel((uint32_t)level, script);
 }
