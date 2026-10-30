@@ -520,13 +520,65 @@ int MsgHook(void* hwnd, unsigned msg, uintptr_t wp, intptr_t lp) {
 
 }  // namespace
 
-bool MenuOpen() { return g_open || g_start; }
+// xboxrecomp: the Archipelago travel window (hle_ap.c opens it: both triggers + Back)
+std::atomic<bool> g_travel{false};
+bool MenuOpen() { return g_open || g_start || g_travel; }
 
 void ToggleMenu() { g_open = !g_open; }
 
 void OpenStartMenu() { g_start = true; }
 
 bool StartMenuOpen() { return g_start; }
+
+}  // namespace app
+
+extern "C" {
+int hpps_ap_active(void);
+int hpps_ap_travel_entry(int i, const char** name, int* level, const char** script, int* dungeon, int* unlocked);
+void hpps_ApTravelRequest(int entry);
+void app_TravelToggle(void) { app::g_travel = !app::g_travel; }
+}
+
+namespace app {
+
+// the days and nights in order, each with its set pieces under it; a locked one is greyed out. A (or a click) goes
+// there, B (or Close) shuts the window
+void DrawTravel() {
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_Always,
+                            ImVec2(0.5f, 0.5f));
+    ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x * 0.42f, io.DisplaySize.y * 0.75f), ImGuiCond_Always);
+    bool open = true;
+    if (ImGui::Begin("Hogwarts Travel", &open, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
+                                                    ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings)) {
+        if (!hpps_ap_active()) {
+            ImGui::TextWrapped("Not connected to an Archipelago slot: days and set pieces open as their unlocks "
+                               "arrive.");
+        }
+        const char *name, *script;
+        int level, dungeon, unlocked;
+        for (int i = 0; hpps_ap_travel_entry(i, &name, &level, &script, &dungeon, &unlocked); i++) {
+            ImGui::PushID(i);
+            if (dungeon) ImGui::Indent(ImGui::GetFontSize() * 1.5f);
+            ImGui::BeginDisabled(!unlocked);
+            std::string label = unlocked ? std::string(name) : std::string(name) + "  (locked)";
+            if (ImGui::Selectable(label.c_str(), false, 0, ImVec2(0, 0))) {
+                hpps_ApTravelRequest(i);
+                open = false;
+            }
+            ImGui::EndDisabled();
+            if (dungeon) ImGui::Unindent(ImGui::GetFontSize() * 1.5f);
+            ImGui::PopID();
+        }
+        ImGui::Separator();
+        if (ImGui::Button("Close") || ImGui::IsKeyPressed(ImGuiKey_GamepadFaceRight)) open = false;
+        // xboxrecomp: the port everything here stands on
+        ImGui::TextDisabled("Huge thanks to MiddleDucky, whose wonderful Philosopher's Stone port makes all of this "
+                            "possible.");
+    }
+    ImGui::End();
+    if (!open) g_travel = false;
+}
 
 void InitUi() {
     std::lock_guard lock(UiLock());
@@ -553,6 +605,7 @@ void DrawUi() {
     io.MouseDrawCursor = false;
     if (g_start) DrawPanel(true);
     else if (g_open) DrawPanel(false);
+    else if (g_travel) DrawTravel();
     if (Get().fps_counter) DrawFps();
     // xboxrecomp: the keys' pace a moment after the mouse wheel steps it, so a turn of the wheel is seen to do something
     if (GetTickCount64() - g_pace_note.load() < 2000 && !SneakOn()) {

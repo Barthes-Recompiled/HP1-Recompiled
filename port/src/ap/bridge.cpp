@@ -22,6 +22,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <algorithm>
 #include <vector>
 
 #define WIN32_LEAN_AND_MEAN
@@ -334,4 +335,61 @@ extern "C" int hpps_ap_has(const char* item_name) {
   for (int64_t g : b.session.given)
     if (g == id) return 1;
   return 0;
+}
+
+namespace {
+struct TravelEntry {
+  std::string name, script, needs_a, needs_b;
+  int level = 0;
+  bool dungeon = false;
+};
+const std::vector<TravelEntry>& Travel() {
+  static std::vector<TravelEntry> list = [] {
+    std::vector<TravelEntry> hubs, dungeons, out;
+    for (auto& [name, it] : Cat().item) {
+      std::string kind = it.value("kind", "");
+      if (kind != "pass" && kind != "dungeon") continue;
+      if (!it.contains("level") || it["level"].is_null()) continue;
+      TravelEntry e;
+      e.level = it["level"].get<int>();
+      e.dungeon = kind == "dungeon";
+      std::string suffix = e.dungeon ? " Pass" : " Unlock";
+      e.name = name.substr(0, name.size() - suffix.size());
+      e.script = it.contains("script") && it["script"].is_string() ? it["script"].get<std::string>() : "";
+      e.needs_a = name;
+      (e.dungeon ? dungeons : hubs).push_back(e);
+    }
+    auto by_level = [](const TravelEntry& a, const TravelEntry& b) { return a.level < b.level; };
+    std::sort(hubs.begin(), hubs.end(), by_level);
+    std::stable_sort(dungeons.begin(), dungeons.end(), by_level);
+    for (size_t h = 0; h < hubs.size(); h++) {
+      out.push_back(hubs[h]);
+      int next = h + 1 < hubs.size() ? hubs[h + 1].level : 1 << 30;
+      for (auto d : dungeons) {
+        bool in_hub = !d.script.empty() && d.level == hubs[h].level;
+        bool own_level = d.script.empty() && d.level > hubs[h].level && d.level < next;
+        if (!in_hub && !own_level) continue;
+        if (in_hub) d.needs_b = hubs[h].needs_a;  // a set piece inside a hub needs the hub too
+        out.push_back(d);
+      }
+    }
+    return out;
+  }();
+  return list;
+}
+}  // namespace
+
+extern "C" int hpps_ap_travel_entry(int i, const char** name, int* level, const char** script, int* dungeon,
+                                    int* unlocked) {
+  const auto& list = Travel();
+  if (i < 0 || size_t(i) >= list.size()) return 0;
+  const TravelEntry& e = list[size_t(i)];
+  *name = e.name.c_str();
+  *level = e.level;
+  *script = e.script.c_str();
+  *dungeon = e.dungeon;
+  // Day 0 is where a game starts: open without its unlock (the slot is given it at the start anyway)
+  bool start = !e.dungeon && e.level == 6;
+  *unlocked = start || (hpps_ap_has(e.needs_a.c_str()) && (e.needs_b.empty() || hpps_ap_has(e.needs_b.c_str())));
+  return 1;
 }

@@ -30,6 +30,11 @@ int hpps_ap_active(void);
 int hpps_ap_cards_goal(void);
 /* 1 if the slot owns that item (a pass, by catalog name) */
 int hpps_ap_has(const char *item_name);
+/* the travel window's list: the days and nights in order, each followed by its set pieces (a set piece with a level of
+ * its own goes under the day before it). name is the day's or the set piece's, script the set piece's entry script in
+ * its hub or "", unlocked 1 when the slot owns what it takes (the day's unlock; a set piece's pass and its hub's
+ * unlock). Returns 0 past the end. */
+int hpps_ap_travel_entry(int i, const char **name, int *level, const char **script, int *dungeon, int *unlocked);
 
 #ifdef __cplusplus
 }

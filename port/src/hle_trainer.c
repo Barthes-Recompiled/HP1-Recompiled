@@ -449,6 +449,7 @@ static void start_script(const char *name)
 
 /* the Archipelago travel window (hle_ap.c): a level to go to, through its hub, and a script of it to start once Harry has
  * had a second there (a set piece inside a hub: TrollIntro, LibraryStealthSection, ...) */
+static void load_level_via_hub(uint32_t level);
 static uint32_t g_travel_level;
 static char g_travel_script[64];
 

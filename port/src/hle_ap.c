@@ -33,6 +33,9 @@
 #define RECOMP_GENERATED_CODE
 #include "recomp/gen/recomp_types.h"
 #include "ap/bridge.h"
+#include "input/xinput_xbox.h"
+
+static void travel(void);
 
 extern void sub_0003E9A0(void);
 extern void sub_00152160(void);
@@ -357,6 +360,7 @@ void hpps_ApFrame(void)
         hpps_ap_item_given();
     }
     pickups();
+    travel();
     /* counters */
     static int cards_seen, beans_last = -1, beans_total;
     int owned = 0;
@@ -378,4 +382,33 @@ void hpps_ApFrame(void)
         }
     }
     beans_last = beans;
+}
+
+/* the travel window (scda/app/menu.cpp): opened with both triggers held and Back pressed; its choice is carried out here,
+ * on the title's thread, by the trainer's warp (through the hub) and, for a set piece inside a hub, its entry script */
+extern void app_TravelToggle(void);
+extern void hpps_TrainerTravel(uint32_t level, const char *script);
+static volatile LONG g_travel_pick = -1;
+
+void hpps_ApTravelRequest(int entry) { InterlockedExchange(&g_travel_pick, entry); }
+
+void hpps_ApPad(XBOX_GAMEPAD *g)
+{
+    static int back_was;
+    if (!hpps_ap_enabled()) return;
+    int back = (g->wButtons & 0x0020) != 0, triggers = g->bAnalogButtons[6] > 128 && g->bAnalogButtons[7] > 128;
+    if (back && !back_was && triggers) app_TravelToggle();
+    back_was = back;
+    if (triggers) g->wButtons &= (uint16_t)~0x0020;  /* the combo's Back is not the Remembrall's */
+}
+
+static void travel(void)
+{
+    LONG pick = InterlockedExchange(&g_travel_pick, -1);
+    if (pick < 0) return;
+    const char *name, *script;
+    int level, dungeon, unlocked;
+    if (!hpps_ap_travel_entry((int)pick, &name, &level, &script, &dungeon, &unlocked) || !unlocked) return;
+    fprintf(stderr, "[AP] travel: %s (level %d)\n", name, level);
+    hpps_TrainerTravel((uint32_t)level, script);
 }
