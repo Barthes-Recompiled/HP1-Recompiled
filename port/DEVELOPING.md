@@ -99,8 +99,8 @@ Outputs in `port/build-win/`: `hpps.exe`, `hpps_launcher.exe`, `hpps_trainer.exe
   `tools/xbx_to_ico.py`. Without the XBE, and always in release builds (`HPPS_NO_ART`), the port's own icon
   `res/app.ico` is used instead: a wand and sparkle drawn from shapes by `tools/make_icon.py`, original artwork.
   `-DHPPS_GAME_XBE=<path>` points at another XBE.
-* The launcher shows `src/launcher/launcher_bg.png` behind its page when that file exists (not in the repo: game
-  art). One can be made from an F12 capture of the main menu (logo texture over the menu background).
+* The launcher shows no game art in any build: the title as text (Windows' Georgia) over a black backdrop. The
+  picture it used to load (`launcher_bg.png`, made from the title's textures) was removed on 2026-10-29.
 * Generated code is compiled at **-O2** on purpose: GCC 16 at -O3 hoisted the address of a thread-local array
   out of a loop, reading the TLS template instead of the thread's copy. The post-build step
   `tools/check_tls_refs.py` fails the build on any such access ("58 thread local variables, no global address

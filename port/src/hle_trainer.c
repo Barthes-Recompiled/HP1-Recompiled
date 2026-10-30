@@ -911,3 +911,19 @@ void hpps_TrainerInit(void)
     fprintf(stderr, "[TRAINER] shared block %s ready\n", HPPS_TRAINER_NAME);
     CloseHandle(CreateThread(NULL, 0, report_thread, t, 0, NULL));
 }
+
+/* A bean's flavour as Harry picks it up (F10 Enhancements, "Show bean flavours on pickup"). The pickup (0x41E52:
+ * the bean count [0x329B8A] up by one, within the bag) has sub_000116B0 pick one of 17 message names at random
+ * (0x31F320 + 32 * n, copied at start from GUI_PICKUP_BEANn / SV1_PICKUP_BEANn) and hands it to sub_0004F6B0, the
+ * game's message by name: the flavour's text, or Harry's line with its subtitle. Off, that one call (its return
+ * address 0x41E8B) returns at once; the bean is counted as before and every other message is untouched */
+extern void sub_0004F6B0_gen(void);
+extern int hpps_BeanNames(void);
+void sub_0004F6B0(void)
+{
+    if (MEM32(g_esp) == 0x00041E8Bu && !hpps_BeanNames()) {
+        g_esp += 4;  /* the return address the call pushed; the caller takes its two arguments off */
+        return;
+    }
+    sub_0004F6B0_gen();
+}

@@ -20,10 +20,10 @@ else
     objdump=objdump
     nm=nm
 fi
-# HPPS_NO_ART: no game artwork inside the exes given to others (no icon from the XBE, no launcher picture)
+# HPPS_NO_ART: no game artwork inside the exes given to others (now the case in every build)
 # HPPS_FORTIFY=OFF: no _FORTIFY_SOURCE (a player's main-menu keyboard hitch on Windows, gone in a build without the
 # release hardening, 2026-10-25); the stack canaries stay
-cmake -S . -B build-release "${cross[@]}" -DCMAKE_BUILD_TYPE=Release -DHPPS_RELEASE=ON -DHPPS_NO_ART=ON -DHPPS_FORTIFY=OFF -DHPPS_VERSION="${VERSION:-0.2.1}" \
+cmake -S . -B build-release "${cross[@]}" -DCMAKE_BUILD_TYPE=Release -DHPPS_RELEASE=ON -DHPPS_NO_ART=ON -DHPPS_FORTIFY=OFF -DHPPS_VERSION="${VERSION:-0.3.0}" \
       > logs/build-release-config.log
 nice -n 10 cmake --build build-release -j"$(nproc)" --target hpps hpps_launcher > logs/build-release.log 2>&1 ||
     { tail -30 logs/build-release.log; exit 1; }
@@ -47,6 +47,8 @@ cp -f "$port/../LICENSES/LGPL-2.1.txt" "$dist/licenses/LGPL-2.1.txt"
 # the MIT code built into the executables keeps its notices too: SCDA's renderer and Dear ImGui
 cp -f "$port/src/scda/LICENSE.SCDA" "$dist/licenses/SCDA-XBERecomp.txt"
 cp -f "$port/third_party/imgui/LICENSE.txt" "$dist/licenses/DearImGui.txt"
+# the launcher title's font, Magic School One (FontMesa): its own terms, from its download
+cp -f "$port/src/launcher/font/MagicSchool-licensing.txt" "$dist/licenses/MagicSchool-font.txt"
 
 # res/base_shaders.bin ships as shadercache\base_shaders.bin: a player's first visit to a level then needs no shader
 # compiler, only pipelines; one their driver refuses is compiled on their PC instead. Shader keys are the generated

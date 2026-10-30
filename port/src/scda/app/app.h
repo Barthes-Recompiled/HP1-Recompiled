@@ -45,6 +45,7 @@ struct Settings {
     uint32_t brightness = 50;          // 0 to 100, 50 each leaves the picture alone
     uint32_t contrast = 50;
     bool fps_counter = false;
+    uint32_t fov = 100;                // xboxrecomp: field of view, % of the game's (hle_video.c), 80 to 130
     bool vsync = true;                 // RECOMP_VSYNC
     bool cutscene_bars = true;         // xboxrecomp: 16:9's zoomed cutscenes keep the console's black bars over the picture
     bool debug_logs = false;           // RECOMP_DEBUG_LOGS: hpps_run.log (launcher) and xbox_kernel.log, from the next start
@@ -65,6 +66,12 @@ struct Settings {
     uint32_t fps_limit = 0;            // 0 the game's own rate, 30: each frame two vblanks at least, kFpsUnlocked none
     uint32_t colorblind = 0;           // ColorBlind: correction filter over the finished frame
     uint32_t colorblind_strength = 100;  // 0 to 100 %
+    // xboxrecomp (from hpcos): post-processing (d3d12.cpp): bloom over the 3D scene before the HUD, sharpening over
+    // the finished frame. Off by default: the console's picture
+    bool bloom = false;
+    uint32_t bloom_strength = 40;      // 0 to 100
+    uint32_t sharpen = 0;              // 0 (off) to 100
+    bool bean_names = true;            // xboxrecomp: a bean's flavour shown on the screen as Harry picks it up (hle_trainer.c)
     uint32_t speakers = 2;             // xboxrecomp: 2 stereo, 6 5.1 surround (hle_dsound.c, at start)
     bool kbm = true;                   // keyboard and mouse drive pad 1 alongside a controller
     uint32_t mouse_sensitivity = 50;   // 1 to 100
