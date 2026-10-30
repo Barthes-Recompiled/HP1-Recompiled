@@ -1,6 +1,7 @@
 // Host test of the Archipelago bridge without the game (src/ap/bridge.cpp + client.cpp against a local AP server).
 //   test_bridge <phase>   with RECOMP_AP_SERVER / RECOMP_AP_SLOT set, run from a folder with saves\ beside the exe
 // phase 1: connect, send two checks by key, take every received item ("give" it), report the counts
+// send <key>...: make those checks as this slot (another slot's items, for a game test)
 // phase 2: a new run of the same slot: the session must come back (checks made, items given) and give nothing twice
 #include "bridge.h"
 
@@ -27,6 +28,13 @@ static int pump(int seconds, int* given) {
 }
 
 int main(int argc, char** argv) {
+  if (argc > 2 && !std::strcmp(argv[1], "send")) {  // test_bridge send <key>...: make these checks as this slot
+    int given = 0;
+    pump(4, &given);
+    for (int i = 2; i < argc; i++) hpps_ap_location(argv[i]);
+    pump(3, &given);
+    return hpps_ap_active() ? 0 : 1;
+  }
   int phase = argc > 1 ? std::atoi(argv[1]) : 1;
   int given = 0;
   if (!hpps_ap_enabled()) {
