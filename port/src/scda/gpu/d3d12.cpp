@@ -3617,6 +3617,7 @@ bool RegisterFirst(const Assembled& a, int r, float out[2]) {
 // overscan above and below it (black lines on a PC), and as much off the sides to keep the shape.
 static std::unordered_set<uint32_t> spun;  // textures seen as turned quads (the aiming circle)
 extern "C" int hpps_MenuMovie(void);  // hle_video.c: the main menu's background movie is playing
+extern "C" int hpps_FastForward(void);  // hle_skip.c: a cutscene fast-forwarding (1 when not)
 extern "C" int hpps_LoadingScreen(void);  // hle_video.c: the loading screen's thread is drawing
 extern "C" int hpps_LoadingCount(void);   // hle_video.c: loading screens so far
 extern "C" int hpps_TextIcon(uint32_t tex);
@@ -4560,6 +4561,8 @@ void D3D12Backend::Present(const Surface& front, bool pillarbox) {
     // effect's intermediate passes flash on screen
     auto now_t = std::chrono::steady_clock::now();
     bool hold = skipped_frame_ && shown_ && now_t - shown_t_ < kHoldMax;
+    // xboxrecomp: a cutscene fast-forwarding (hle_skip.c) shows a frame every quarter of a second, no more
+    const bool ff_hold = hpps_FastForward() > 1 && shown_ && now_t - shown_t_ < std::chrono::milliseconds(250);
     skipped_frame_ = false;
     {   // xboxrecomp: each hold in the log as it ends (the title animates on meanwhile: a long one looks like a jump)
         static uint32_t held;
@@ -4592,9 +4595,9 @@ void D3D12Backend::Present(const Surface& front, bool pillarbox) {
         wf_ = next;
     }
     uint32_t bi = swap_->GetCurrentBackBufferIndex();
-    if (!hold) DrawFrame(t, pillarbox, bi);
+    if (!hold && !ff_hold) DrawFrame(t, pillarbox, bi);
     Submit(false);
-    if (!hold) {
+    if (!hold && !ff_hold) {
         bool vsync = app::Get().vsync;
         HRESULT phr = swap_->Present(vsync ? 1 : 0, !vsync && tearing_ ? DXGI_PRESENT_ALLOW_TEARING : 0);
         if (phr == DXGI_ERROR_DEVICE_REMOVED || phr == DXGI_ERROR_DEVICE_RESET || phr == DXGI_ERROR_DEVICE_HUNG)

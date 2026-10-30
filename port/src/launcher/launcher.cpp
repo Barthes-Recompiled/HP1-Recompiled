@@ -52,6 +52,7 @@ struct Settings {
     uint32_t mouse_sens = 50;
     bool vibration = true, invert_x = false, invert_y = false;
     bool controller = true;  // the in-game F10 option of the same name
+    bool cutscene_skip = true;  // cutscene_skip
 };
 
 const char* const kColorBlindKeys[] = {"off", "protanopia", "deuteranopia", "tritanopia"};
@@ -145,6 +146,7 @@ Settings Load() {
     s.mouse_sens = std::clamp(u(Value("mouse_sensitivity"), 50), 1u, 100u);
     s.vibration = Value("vibration") != "false";
     s.controller = Value("controller") != "false";
+    s.cutscene_skip = Value("cutscene_skip") != "false";
     s.invert_x = Value("invert_camera_x") == "true";
     s.invert_y = Value("invert_camera_y") == "true";
     return s;
@@ -170,6 +172,7 @@ void Save(const Settings& s) {
     SetValue("mouse_sensitivity", std::to_string(s.mouse_sens));
     SetValue("vibration", s.vibration ? "true" : "false");
     SetValue("controller", s.controller ? "true" : "false");
+    SetValue("cutscene_skip", s.cutscene_skip ? "true" : "false");
     SetValue("invert_camera_x", s.invert_x ? "true" : "false");
     SetValue("invert_camera_y", s.invert_y ? "true" : "false");
     std::ofstream f(TomlPath(), std::ios::trunc);
@@ -536,6 +539,7 @@ bool DrawPage(Settings& s, std::string& error) {
     ImGui::SameLine(0, 30 * sc);
     ImGui::Checkbox("Invert camera Y", &s.invert_y);
     ImGui::TextDisabled("Key bindings, button remapping and stick settings: F10 > Controls in the game.");
+    ImGui::Checkbox("Hold Start or Back to fast-forward cutscenes", &s.cutscene_skip);
     ImGui::PopItemWidth();
 
     ImGui::Spacing();

@@ -45,6 +45,7 @@ typedef void (*recomp_func_t)(void);
 recomp_func_t recomp_lookup(uint32_t xbox_va);
 void xbox_SetVblankHook(void (*fn)(void));  // kernel_bridge.c
 uint32_t xbox_Nv2aVblankCount(void);
+int hpps_FastForward(void);  // hle_skip.c: a cutscene fast-forwarding (1 when not)
 }
 
 using namespace kernel;
@@ -204,6 +205,7 @@ void WaitVblank(uint32_t since, uint32_t count) {
 }
 void Pace() {
     if (app::Get().fps_limit == app::kFpsUnlocked) return;  // xboxrecomp: unlocked (experimental), vsync paces
+    if (hpps_FastForward() > 1) return;  // xboxrecomp: a cutscene fast-forwarding (hle_skip.c) runs flat out
     static uint32_t last;
     // xboxrecomp: the 30 fps limit (fps_limit) shows each frame for two vblanks at least, as a title asking for
     // D3DPRESENT_INTERVAL_TWO does
@@ -515,6 +517,7 @@ HLE(00196050, 1) {
 // D3DDevice_BlockUntilVerticalBlank
 HLE(00192090, 0) {
     if (app::Get().fps_limit == app::kFpsUnlocked) return 0;  // xboxrecomp: unlocked (experimental)
+    if (hpps_FastForward() > 1) return 0;  // xboxrecomp: a cutscene fast-forwarding (hle_skip.c)
     WaitVblank(xbox_Nv2aVblankCount(), 1);  // the next vblank
     return 0;
 }

@@ -46,6 +46,7 @@ struct Settings {
     uint32_t contrast = 50;
     bool fps_counter = false;
     bool vsync = true;                 // RECOMP_VSYNC
+    bool cutscene_skip = true;         // xboxrecomp: holding Start/Back fast-forwards a cutscene to its end (hle_skip.c)
     bool cutscene_bars = true;         // xboxrecomp: 16:9's zoomed cutscenes keep the console's black bars over the picture
     bool debug_logs = false;           // RECOMP_DEBUG_LOGS: hpps_run.log (launcher) and xbox_kernel.log, from the next start
     uint32_t aniso = 0;                // RECOMP_ANISO, 0 as the game asks
