@@ -45,6 +45,7 @@ typedef void (*recomp_func_t)(void);
 recomp_func_t recomp_lookup(uint32_t xbox_va);
 void xbox_SetVblankHook(void (*fn)(void));  // kernel_bridge.c
 uint32_t xbox_Nv2aVblankCount(void);
+int hpps_FastForward(void);  // hle_skip.c: a cutscene fast-forwarding (1 when not)
 }
 
 using namespace kernel;
@@ -231,6 +232,7 @@ void PaceAbove(uint32_t fps) {
 }
 void Pace() {
     if (app::Get().fps_limit == app::kFpsUnlocked) return;  // xboxrecomp: unlocked (experimental), vsync paces
+    if (hpps_FastForward() > 1) return;  // xboxrecomp: a cutscene fast-forwarding (hle_skip.c) runs flat out
     if (app::Get().fps_limit > 60) return PaceAbove(app::Get().fps_limit);
     static uint32_t last;
     // xboxrecomp: the 30 fps limit (fps_limit) shows each frame for two vblanks at least, as a title asking for
@@ -542,8 +544,8 @@ HLE(00196050, 1) {
 
 // D3DDevice_BlockUntilVerticalBlank
 HLE(00192090, 0) {
-    // xboxrecomp: unlocked and caps above 60 (Pace) do not wait for the 59.94 Hz grid
-    if (app::Get().fps_limit > 60) return 0;
+    // xboxrecomp: unlocked and caps above 60 (Pace) do not wait for the 59.94 Hz grid, nor a cutscene fast-forwarding
+    if (app::Get().fps_limit > 60 || hpps_FastForward() > 1) return 0;
     WaitVblank(xbox_Nv2aVblankCount(), 1);  // the next vblank
     return 0;
 }

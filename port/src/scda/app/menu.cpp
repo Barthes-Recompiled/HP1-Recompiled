@@ -260,6 +260,10 @@ static void ResetPage(Settings& s, const char* page) {
         std::memcpy(&s.vibration, &d.vibration, sizeof(s.vibration));
         std::memcpy(&s.vibration_strength, &d.vibration_strength, sizeof(s.vibration_strength));
     }
+    if (!std::strcmp(page, "Gameplay")) {
+        std::memcpy(&s.cutscene_skip, &d.cutscene_skip, sizeof(s.cutscene_skip));
+        std::memcpy(&s.intro_skip, &d.intro_skip, sizeof(s.intro_skip));
+    }
     if (!std::strcmp(page, "Accessibility")) {
         std::memcpy(&s.colorblind, &d.colorblind, sizeof(s.colorblind));
         std::memcpy(&s.colorblind_strength, &d.colorblind_strength, sizeof(s.colorblind_strength));
@@ -398,6 +402,15 @@ void DrawPanel(bool start) {
     if (tabs && ImGui::BeginTabItem("Controls")) {
         page = "Controls";
         DrawControls(s);
+        ImGui::EndTabItem();
+    }
+    if (tabs && ImGui::BeginTabItem("Gameplay")) {
+        page = "Gameplay";
+        Row("Cutscenes");
+        if (ImGui::Checkbox("Hold Start or Back to fast-forward a cutscene", &s.cutscene_skip)) Changed();
+        ImGui::TextDisabled("Runs it to its own end, muted and with the picture held, so nothing it sets up is missed.");
+        if (ImGui::Checkbox("Skip the logos at start-up", &s.intro_skip)) Changed();
+        ImGui::TextDisabled("The EA and Warner Bros. logo movies; takes effect at the next start.");
         ImGui::EndTabItem();
     }
     if (tabs && ImGui::BeginTabItem("Accessibility")) {

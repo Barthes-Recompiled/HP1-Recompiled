@@ -12,7 +12,7 @@
 
 #define HPPS_TRAINER_NAME    "Local\\hpps_trainer"
 #define HPPS_TRAINER_MAGIC   0x52545048u  /* "HPTR" */
-#define HPPS_TRAINER_VERSION 4u
+#define HPPS_TRAINER_VERSION 5u
 
 /* the title's spell numbers (button slots at 0x329DD5..7; 0 = none) */
 enum { kSpellNone = 0, kSpellFlipendo = 1, kSpellLumos = 2, kSpellDiffindo = 5, kSpellSpongify = 8,
@@ -86,6 +86,14 @@ typedef struct HppsTrainerShm {
     volatile uint8_t snap_block[HPPS_PROGRESS_SIZE];
     volatile uint32_t restore_seq, restore_level;
     volatile uint8_t restore_block[HPPS_PROGRESS_SIZE];
+
+    /* version 5: trainer / tools -> game: pad input added to port 0 (hle_input.c), for driving the game without a
+     * person and without OS key presses (tests): buttons (XINPUT wButtons), the 8 analog buttons (A B X Y Black
+     * White LT RT, 0-255) and the left / right stick, held for inject_ms from when inject_seq is bumped (as HP:CoS) */
+    volatile uint32_t inject_seq, inject_ms;
+    volatile uint16_t inject_buttons, pad5;
+    volatile uint8_t inject_analog[8];
+    volatile int16_t inject_stick[4];
 } HppsTrainerShm;
 
 #endif

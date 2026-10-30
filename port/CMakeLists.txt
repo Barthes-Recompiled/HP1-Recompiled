@@ -88,6 +88,8 @@ set(GAME_SOURCES
     src/hle_frontend.c
     # Characters taken out of the world, never drawn (RECOMP_HIDE_CHARACTERS=0 = drawn).
     src/hle_world.c
+    # Holding Start/Back fast-forwards a cutscene (hpps.toml cutscene_skip; false = Xbox).
+    src/hle_skip.c
     src/profiler.c
     # Direct3D 8 on a host D3D12 renderer, ported from SCDA-XBERecomp
     # (src/scda, MIT): the XDK's D3D entry points instead of the NV2A.
@@ -102,6 +104,7 @@ set(GAME_SOURCES
     #   --exclude-manual port/src/hle_trainer.c
     #   --exclude-manual port/src/hle_frontend.c
     #   --exclude-manual port/src/hle_world.c
+    #   --exclude-manual port/src/hle_skip.c
     #   --exclude-manual port/src/scda/xdk/hle_d3d8.cpp
     # Add game-specific sources here, e.g.:
     # src/asset_loader.c

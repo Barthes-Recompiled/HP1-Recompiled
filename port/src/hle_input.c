@@ -51,6 +51,8 @@ static int trace_on(void)
 
 extern int app_KbmOn(void);  /* scda/app/input.cpp: keyboard and mouse play as controller 1 */
 extern void app_InputPad0Present(int present);
+void hpps_TrainerInject(XBOX_GAMEPAD *g);  /* hle_trainer.c: input a tool asks for, added to port 0 */
+void hpps_SkipPad(const XBOX_GAMEPAD *g);  /* hle_skip.c: holding Start/Back fast-forwards a cutscene */
 
 /* scda/app/input.cpp's sneak toggle: Harry's pace as the game last picked it, [[0x3565B0] + 0xDC] + 0x2574 (0 stand,
  * 1 sneak, 2 walk, 3 run, set by the movement code at 0x8567A from the stick's push); -1 when there is no Harry */
@@ -300,6 +302,10 @@ static void get_state_direct(void)
         app_InputPad((int)g_h[h].port, &s.Gamepad);
         stick_compensate(&s.Gamepad.sThumbLX, &s.Gamepad.sThumbLY);
         stick_compensate(&s.Gamepad.sThumbRX, &s.Gamepad.sThumbRY);
+        if (g_h[h].port == 0) {
+            hpps_TrainerInject(&s.Gamepad);
+            hpps_SkipPad(&s.Gamepad);
+        }
         hpps_last_pad = s.Gamepad;
         /* the packet number moves only when something changed, as XAPI's does */
         if (memcmp(&s.Gamepad, &g_h[h].last, sizeof(s.Gamepad))) g_h[h].packet++;
