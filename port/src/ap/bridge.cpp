@@ -330,7 +330,11 @@ extern "C" int hpps_ap_cards_goal(void) {
 extern "C" int hpps_ap_has(const char* item_name) {
   Bridge& b = B();
   auto it = Cat().item.find(item_name ? item_name : "");
-  if (!b.bound || it == Cat().item.end()) return 0;
+  if (it == Cat().item.end()) return 0;
+  // play-tests without a server: RECOMP_AP_UNLOCK_ALL=1 counts every pass as received (the travel menu all open)
+  static const int unlock_all = [] { const char* u = std::getenv("RECOMP_AP_UNLOCK_ALL"); return u && *u == '1'; }();
+  if (unlock_all) return 1;
+  if (!b.bound) return 0;
   int64_t id = it->second.value("id", int64_t(0));
   for (int64_t g : b.session.given)
     if (g == id) return 1;
