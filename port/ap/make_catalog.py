@@ -167,7 +167,7 @@ def main():
     items = collections.OrderedDict()
     nid = ITEM_BASE
     for lv in HUBS:
-        items["%s Pass" % LEVELS[lv]] = {"id": nid, "kind": "pass", "level": lv, "class": "progression"}; nid += 1
+        items["%s Unlock" % LEVELS[lv]] = {"id": nid, "kind": "pass", "level": lv, "class": "progression"}; nid += 1
     for name, (lv, script) in DUNGEONS.items():
         if name in DROPPED_DUNGEONS:
             continue
@@ -185,7 +185,7 @@ def main():
         items[name] = {"id": nid, "kind": kind, "class": cls}; nid += 1
 
     digest = hashlib.sha256("\n".join(keys).encode() + json.dumps(list(items)).encode()).hexdigest()[:12]
-    catalog = {"version": "hpps-2-" + digest, "game": GAME, "location_base": LOCATION_BASE, "item_base": ITEM_BASE,
+    catalog = {"version": "hpps-3-" + digest, "game": GAME, "location_base": LOCATION_BASE, "item_base": ITEM_BASE,
                "regions": {"hubs": [LEVELS[l] for l in HUBS],
                            "dungeons": [d for d in DUNGEONS if d not in DROPPED_DUNGEONS]},
                "items": items, "locations": locations}

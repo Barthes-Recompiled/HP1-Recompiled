@@ -1,5 +1,5 @@
 {
- "version": "hpps-2-5a0b235b976f",
+ "version": "hpps-3-0aae9a4bcf26",
  "game": "Harry Potter and the Philosopher's Stone Recomp",
  "location_base": 74100000,
  "item_base": 74110000,
@@ -36,79 +36,79 @@
   ]
  },
  "items": {
-  "Day 0 Pass": {
+  "Day 0 Unlock": {
    "id": 74110000,
    "kind": "pass",
    "level": 6,
    "class": "progression"
   },
-  "Night 0 Pass": {
+  "Night 0 Unlock": {
    "id": 74110001,
    "kind": "pass",
    "level": 7,
    "class": "progression"
   },
-  "Day 1 Pass": {
+  "Day 1 Unlock": {
    "id": 74110002,
    "kind": "pass",
    "level": 8,
    "class": "progression"
   },
-  "Night 1 Pass": {
+  "Night 1 Unlock": {
    "id": 74110003,
    "kind": "pass",
    "level": 10,
    "class": "progression"
   },
-  "Day 2 Pass": {
+  "Day 2 Unlock": {
    "id": 74110004,
    "kind": "pass",
    "level": 11,
    "class": "progression"
   },
-  "Night 2 Pass": {
+  "Night 2 Unlock": {
    "id": 74110005,
    "kind": "pass",
    "level": 13,
    "class": "progression"
   },
-  "Day 3 Pass": {
+  "Day 3 Unlock": {
    "id": 74110006,
    "kind": "pass",
    "level": 15,
    "class": "progression"
   },
-  "Night 3 Pass": {
+  "Night 3 Unlock": {
    "id": 74110007,
    "kind": "pass",
    "level": 17,
    "class": "progression"
   },
-  "Day 4 Pass": {
+  "Day 4 Unlock": {
    "id": 74110008,
    "kind": "pass",
    "level": 19,
    "class": "progression"
   },
-  "Night 4 Pass": {
+  "Night 4 Unlock": {
    "id": 74110009,
    "kind": "pass",
    "level": 21,
    "class": "progression"
   },
-  "Day 5 Pass": {
+  "Day 5 Unlock": {
    "id": 74110010,
    "kind": "pass",
    "level": 23,
    "class": "progression"
   },
-  "Night 5 Pass": {
+  "Night 5 Unlock": {
    "id": 74110011,
    "kind": "pass",
    "level": 25,
    "class": "progression"
   },
-  "Day 6 Pass": {
+  "Day 6 Unlock": {
    "id": 74110012,
    "kind": "pass",
    "level": 31,
