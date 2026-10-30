@@ -1,0 +1,6948 @@
+{
+ "version": "hpps-1-6f4a0f3f1855",
+ "game": "Harry Potter and the Philosopher's Stone Recomp",
+ "location_base": 74100000,
+ "item_base": 74110000,
+ "regions": {
+  "hubs": [
+   "Day 0",
+   "Night 0",
+   "Day 1",
+   "Night 1",
+   "Day 2",
+   "Night 2",
+   "Day 3",
+   "Night 3",
+   "Day 4",
+   "Night 4",
+   "Day 5",
+   "Night 5",
+   "Day 6"
+  ],
+  "dungeons": [
+   "Lumos Lesson",
+   "Spongify Lesson",
+   "Diffindo Lesson",
+   "Incendio Lesson",
+   "Troll",
+   "Library",
+   "Ingredients",
+   "Quidditch",
+   "Norbert",
+   "Forbidden Forest",
+   "Devil's Snare",
+   "Flying Keys",
+   "Wizard Chess",
+   "Quirrell"
+  ]
+ },
+ "items": {
+  "Day 0 Pass": {
+   "id": 74110000,
+   "kind": "pass",
+   "level": 6,
+   "class": "progression"
+  },
+  "Night 0 Pass": {
+   "id": 74110001,
+   "kind": "pass",
+   "level": 7,
+   "class": "progression"
+  },
+  "Day 1 Pass": {
+   "id": 74110002,
+   "kind": "pass",
+   "level": 8,
+   "class": "progression"
+  },
+  "Night 1 Pass": {
+   "id": 74110003,
+   "kind": "pass",
+   "level": 10,
+   "class": "progression"
+  },
+  "Day 2 Pass": {
+   "id": 74110004,
+   "kind": "pass",
+   "level": 11,
+   "class": "progression"
+  },
+  "Night 2 Pass": {
+   "id": 74110005,
+   "kind": "pass",
+   "level": 13,
+   "class": "progression"
+  },
+  "Day 3 Pass": {
+   "id": 74110006,
+   "kind": "pass",
+   "level": 15,
+   "class": "progression"
+  },
+  "Night 3 Pass": {
+   "id": 74110007,
+   "kind": "pass",
+   "level": 17,
+   "class": "progression"
+  },
+  "Day 4 Pass": {
+   "id": 74110008,
+   "kind": "pass",
+   "level": 19,
+   "class": "progression"
+  },
+  "Night 4 Pass": {
+   "id": 74110009,
+   "kind": "pass",
+   "level": 21,
+   "class": "progression"
+  },
+  "Day 5 Pass": {
+   "id": 74110010,
+   "kind": "pass",
+   "level": 23,
+   "class": "progression"
+  },
+  "Night 5 Pass": {
+   "id": 74110011,
+   "kind": "pass",
+   "level": 25,
+   "class": "progression"
+  },
+  "Day 6 Pass": {
+   "id": 74110012,
+   "kind": "pass",
+   "level": 31,
+   "class": "progression"
+  },
+  "Lumos Lesson Pass": {
+   "id": 74110013,
+   "kind": "dungeon",
+   "level": 9,
+   "script": null,
+   "class": "progression"
+  },
+  "Spongify Lesson Pass": {
+   "id": 74110014,
+   "kind": "dungeon",
+   "level": 12,
+   "script": null,
+   "class": "progression"
+  },
+  "Diffindo Lesson Pass": {
+   "id": 74110015,
+   "kind": "dungeon",
+   "level": 16,
+   "script": null,
+   "class": "progression"
+  },
+  "Incendio Lesson Pass": {
+   "id": 74110016,
+   "kind": "dungeon",
+   "level": 20,
+   "script": null,
+   "class": "progression"
+  },
+  "Troll Pass": {
+   "id": 74110017,
+   "kind": "dungeon",
+   "level": 13,
+   "script": "TrollIntro",
+   "class": "progression"
+  },
+  "Library Pass": {
+   "id": 74110018,
+   "kind": "dungeon",
+   "level": 17,
+   "script": "LibraryStealthSection",
+   "class": "progression"
+  },
+  "Ingredients Pass": {
+   "id": 74110019,
+   "kind": "dungeon",
+   "level": 23,
+   "script": "IngredientsCheck",
+   "class": "progression"
+  },
+  "Quidditch Pass": {
+   "id": 74110020,
+   "kind": "dungeon",
+   "level": 23,
+   "script": "HPE53Script",
+   "class": "progression"
+  },
+  "Norbert Pass": {
+   "id": 74110021,
+   "kind": "dungeon",
+   "level": null,
+   "script": null,
+   "class": "progression"
+  },
+  "Forbidden Forest Pass": {
+   "id": 74110022,
+   "kind": "dungeon",
+   "level": null,
+   "script": null,
+   "class": "progression"
+  },
+  "Devil's Snare Pass": {
+   "id": 74110023,
+   "kind": "dungeon",
+   "level": 26,
+   "script": null,
+   "class": "progression"
+  },
+  "Flying Keys Pass": {
+   "id": 74110024,
+   "kind": "dungeon",
+   "level": 27,
+   "script": null,
+   "class": "progression"
+  },
+  "Wizard Chess Pass": {
+   "id": 74110025,
+   "kind": "dungeon",
+   "level": 28,
+   "script": null,
+   "class": "progression"
+  },
+  "Quirrell Pass": {
+   "id": 74110026,
+   "kind": "dungeon",
+   "level": 29,
+   "script": null,
+   "class": "progression"
+  },
+  "Flipendo": {
+   "id": 74110027,
+   "kind": "spell",
+   "spell": 1,
+   "class": "progression"
+  },
+  "Lumos": {
+   "id": 74110028,
+   "kind": "spell",
+   "spell": 2,
+   "class": "progression"
+  },
+  "Diffindo": {
+   "id": 74110029,
+   "kind": "spell",
+   "spell": 5,
+   "class": "progression"
+  },
+  "Spongify": {
+   "id": 74110030,
+   "kind": "spell",
+   "spell": 8,
+   "class": "progression"
+  },
+  "Incendio": {
+   "id": 74110031,
+   "kind": "spell",
+   "spell": 10,
+   "class": "progression"
+  },
+  "Alohomora": {
+   "id": 74110032,
+   "kind": "spell",
+   "spell": 12,
+   "class": "progression"
+  },
+  "Wizard Card 1": {
+   "id": 74110033,
+   "kind": "card",
+   "card": 1,
+   "class": "useful"
+  },
+  "Wizard Card 2": {
+   "id": 74110034,
+   "kind": "card",
+   "card": 2,
+   "class": "useful"
+  },
+  "Wizard Card 3": {
+   "id": 74110035,
+   "kind": "card",
+   "card": 3,
+   "class": "useful"
+  },
+  "Wizard Card 4": {
+   "id": 74110036,
+   "kind": "card",
+   "card": 4,
+   "class": "useful"
+  },
+  "Wizard Card 5": {
+   "id": 74110037,
+   "kind": "card",
+   "card": 5,
+   "class": "useful"
+  },
+  "Wizard Card 6": {
+   "id": 74110038,
+   "kind": "card",
+   "card": 6,
+   "class": "useful"
+  },
+  "Wizard Card 7": {
+   "id": 74110039,
+   "kind": "card",
+   "card": 7,
+   "class": "useful"
+  },
+  "Wizard Card 8": {
+   "id": 74110040,
+   "kind": "card",
+   "card": 8,
+   "class": "useful"
+  },
+  "Wizard Card 9": {
+   "id": 74110041,
+   "kind": "card",
+   "card": 9,
+   "class": "useful"
+  },
+  "Wizard Card 10": {
+   "id": 74110042,
+   "kind": "card",
+   "card": 10,
+   "class": "useful"
+  },
+  "Wizard Card 11": {
+   "id": 74110043,
+   "kind": "card",
+   "card": 11,
+   "class": "useful"
+  },
+  "Wizard Card 12": {
+   "id": 74110044,
+   "kind": "card",
+   "card": 12,
+   "class": "useful"
+  },
+  "Wizard Card 13": {
+   "id": 74110045,
+   "kind": "card",
+   "card": 13,
+   "class": "useful"
+  },
+  "Wizard Card 14": {
+   "id": 74110046,
+   "kind": "card",
+   "card": 14,
+   "class": "useful"
+  },
+  "Wizard Card 15": {
+   "id": 74110047,
+   "kind": "card",
+   "card": 15,
+   "class": "useful"
+  },
+  "Wizard Card 16": {
+   "id": 74110048,
+   "kind": "card",
+   "card": 16,
+   "class": "useful"
+  },
+  "Wizard Card 17": {
+   "id": 74110049,
+   "kind": "card",
+   "card": 17,
+   "class": "useful"
+  },
+  "Wizard Card 18": {
+   "id": 74110050,
+   "kind": "card",
+   "card": 18,
+   "class": "useful"
+  },
+  "Wizard Card 19": {
+   "id": 74110051,
+   "kind": "card",
+   "card": 19,
+   "class": "useful"
+  },
+  "Wizard Card 20": {
+   "id": 74110052,
+   "kind": "card",
+   "card": 20,
+   "class": "useful"
+  },
+  "Wizard Card 21": {
+   "id": 74110053,
+   "kind": "card",
+   "card": 21,
+   "class": "useful"
+  },
+  "Wizard Card 22": {
+   "id": 74110054,
+   "kind": "card",
+   "card": 22,
+   "class": "useful"
+  },
+  "Wizard Card 23": {
+   "id": 74110055,
+   "kind": "card",
+   "card": 23,
+   "class": "useful"
+  },
+  "Wizard Card 24": {
+   "id": 74110056,
+   "kind": "card",
+   "card": 24,
+   "class": "useful"
+  },
+  "Wizard Card 25": {
+   "id": 74110057,
+   "kind": "card",
+   "card": 25,
+   "class": "useful"
+  },
+  "Wizard Card 26": {
+   "id": 74110058,
+   "kind": "card",
+   "card": 26,
+   "class": "useful"
+  },
+  "Wizard Card 27": {
+   "id": 74110059,
+   "kind": "card",
+   "card": 27,
+   "class": "useful"
+  },
+  "Wizard Card 28": {
+   "id": 74110060,
+   "kind": "card",
+   "card": 28,
+   "class": "useful"
+  },
+  "Wizard Card 29": {
+   "id": 74110061,
+   "kind": "card",
+   "card": 29,
+   "class": "useful"
+  },
+  "Wizard Card 30": {
+   "id": 74110062,
+   "kind": "card",
+   "card": 30,
+   "class": "useful"
+  },
+  "Wizard Card 31": {
+   "id": 74110063,
+   "kind": "card",
+   "card": 31,
+   "class": "useful"
+  },
+  "Wizard Card 32": {
+   "id": 74110064,
+   "kind": "card",
+   "card": 32,
+   "class": "useful"
+  },
+  "Wizard Card 33": {
+   "id": 74110065,
+   "kind": "card",
+   "card": 33,
+   "class": "useful"
+  },
+  "Wizard Card 34": {
+   "id": 74110066,
+   "kind": "card",
+   "card": 34,
+   "class": "useful"
+  },
+  "Wizard Card 35": {
+   "id": 74110067,
+   "kind": "card",
+   "card": 35,
+   "class": "useful"
+  },
+  "Wizard Card 36": {
+   "id": 74110068,
+   "kind": "card",
+   "card": 36,
+   "class": "useful"
+  },
+  "Wizard Card 37": {
+   "id": 74110069,
+   "kind": "card",
+   "card": 37,
+   "class": "useful"
+  },
+  "Wizard Card 38": {
+   "id": 74110070,
+   "kind": "card",
+   "card": 38,
+   "class": "useful"
+  },
+  "Wizard Card 39": {
+   "id": 74110071,
+   "kind": "card",
+   "card": 39,
+   "class": "useful"
+  },
+  "Wizard Card 40": {
+   "id": 74110072,
+   "kind": "card",
+   "card": 40,
+   "class": "useful"
+  },
+  "Wizard Card 41": {
+   "id": 74110073,
+   "kind": "card",
+   "card": 41,
+   "class": "useful"
+  },
+  "Wizard Card 42": {
+   "id": 74110074,
+   "kind": "card",
+   "card": 42,
+   "class": "useful"
+  },
+  "Wizard Card 43": {
+   "id": 74110075,
+   "kind": "card",
+   "card": 43,
+   "class": "useful"
+  },
+  "Wizard Card 44": {
+   "id": 74110076,
+   "kind": "card",
+   "card": 44,
+   "class": "useful"
+  },
+  "Wizard Card 45": {
+   "id": 74110077,
+   "kind": "card",
+   "card": 45,
+   "class": "useful"
+  },
+  "Wizard Card 46": {
+   "id": 74110078,
+   "kind": "card",
+   "card": 46,
+   "class": "useful"
+  },
+  "Wizard Card 47": {
+   "id": 74110079,
+   "kind": "card",
+   "card": 47,
+   "class": "useful"
+  },
+  "Wizard Card 48": {
+   "id": 74110080,
+   "kind": "card",
+   "card": 48,
+   "class": "useful"
+  },
+  "Wizard Card 49": {
+   "id": 74110081,
+   "kind": "card",
+   "card": 49,
+   "class": "useful"
+  },
+  "Wizard Card 50": {
+   "id": 74110082,
+   "kind": "card",
+   "card": 50,
+   "class": "useful"
+  },
+  "Wizard Card 51": {
+   "id": 74110083,
+   "kind": "card",
+   "card": 51,
+   "class": "useful"
+  },
+  "Wizard Card 52": {
+   "id": 74110084,
+   "kind": "card",
+   "card": 52,
+   "class": "useful"
+  },
+  "Wizard Card 53": {
+   "id": 74110085,
+   "kind": "card",
+   "card": 53,
+   "class": "useful"
+  },
+  "Wizard Card 54": {
+   "id": 74110086,
+   "kind": "card",
+   "card": 54,
+   "class": "useful"
+  },
+  "Wizard Card 55": {
+   "id": 74110087,
+   "kind": "card",
+   "card": 55,
+   "class": "useful"
+  },
+  "Wizard Card 56": {
+   "id": 74110088,
+   "kind": "card",
+   "card": 56,
+   "class": "useful"
+  },
+  "Wizard Card 57": {
+   "id": 74110089,
+   "kind": "card",
+   "card": 57,
+   "class": "useful"
+  },
+  "Wizard Card 58": {
+   "id": 74110090,
+   "kind": "card",
+   "card": 58,
+   "class": "useful"
+  },
+  "Wizard Card 59": {
+   "id": 74110091,
+   "kind": "card",
+   "card": 59,
+   "class": "useful"
+  },
+  "Wizard Card 60": {
+   "id": 74110092,
+   "kind": "card",
+   "card": 60,
+   "class": "useful"
+  },
+  "Wizard Card 61": {
+   "id": 74110093,
+   "kind": "card",
+   "card": 61,
+   "class": "useful"
+  },
+  "Wizard Card 62": {
+   "id": 74110094,
+   "kind": "card",
+   "card": 62,
+   "class": "useful"
+  },
+  "Wizard Card 63": {
+   "id": 74110095,
+   "kind": "card",
+   "card": 63,
+   "class": "useful"
+  },
+  "Wizard Card 64": {
+   "id": 74110096,
+   "kind": "card",
+   "card": 64,
+   "class": "useful"
+  },
+  "Wizard Card 65": {
+   "id": 74110097,
+   "kind": "card",
+   "card": 65,
+   "class": "useful"
+  },
+  "Wizard Card 66": {
+   "id": 74110098,
+   "kind": "card",
+   "card": 66,
+   "class": "useful"
+  },
+  "Wizard Card 67": {
+   "id": 74110099,
+   "kind": "card",
+   "card": 67,
+   "class": "useful"
+  },
+  "Wizard Card 68": {
+   "id": 74110100,
+   "kind": "card",
+   "card": 68,
+   "class": "useful"
+  },
+  "Wizard Card 69": {
+   "id": 74110101,
+   "kind": "card",
+   "card": 69,
+   "class": "useful"
+  },
+  "Wizard Card 70": {
+   "id": 74110102,
+   "kind": "card",
+   "card": 70,
+   "class": "useful"
+  },
+  "Wizard Card 71": {
+   "id": 74110103,
+   "kind": "card",
+   "card": 71,
+   "class": "useful"
+  },
+  "Wizard Card 72": {
+   "id": 74110104,
+   "kind": "card",
+   "card": 72,
+   "class": "useful"
+  },
+  "Wizard Card 73": {
+   "id": 74110105,
+   "kind": "card",
+   "card": 73,
+   "class": "useful"
+  },
+  "Wizard Card 74": {
+   "id": 74110106,
+   "kind": "card",
+   "card": 74,
+   "class": "useful"
+  },
+  "Wizard Card 75": {
+   "id": 74110107,
+   "kind": "card",
+   "card": 75,
+   "class": "useful"
+  },
+  "Wizard Card 76": {
+   "id": 74110108,
+   "kind": "card",
+   "card": 76,
+   "class": "useful"
+  },
+  "Wizard Card 77": {
+   "id": 74110109,
+   "kind": "card",
+   "card": 77,
+   "class": "useful"
+  },
+  "Wizard Card 78": {
+   "id": 74110110,
+   "kind": "card",
+   "card": 78,
+   "class": "useful"
+  },
+  "Wizard Card 79": {
+   "id": 74110111,
+   "kind": "card",
+   "card": 79,
+   "class": "useful"
+  },
+  "Wizard Card 80": {
+   "id": 74110112,
+   "kind": "card",
+   "card": 80,
+   "class": "useful"
+  },
+  "Wizard Card 81": {
+   "id": 74110113,
+   "kind": "card",
+   "card": 81,
+   "class": "useful"
+  },
+  "Wizard Card 82": {
+   "id": 74110114,
+   "kind": "card",
+   "card": 82,
+   "class": "useful"
+  },
+  "Wizard Card 83": {
+   "id": 74110115,
+   "kind": "card",
+   "card": 83,
+   "class": "useful"
+  },
+  "Wizard Card 84": {
+   "id": 74110116,
+   "kind": "card",
+   "card": 84,
+   "class": "useful"
+  },
+  "Wizard Card 85": {
+   "id": 74110117,
+   "kind": "card",
+   "card": 85,
+   "class": "useful"
+  },
+  "Wizard Card 86": {
+   "id": 74110118,
+   "kind": "card",
+   "card": 86,
+   "class": "useful"
+  },
+  "Wizard Card 87": {
+   "id": 74110119,
+   "kind": "card",
+   "card": 87,
+   "class": "useful"
+  },
+  "Wizard Card 88": {
+   "id": 74110120,
+   "kind": "card",
+   "card": 88,
+   "class": "useful"
+  },
+  "Wizard Card 89": {
+   "id": 74110121,
+   "kind": "card",
+   "card": 89,
+   "class": "useful"
+  },
+  "Wizard Card 90": {
+   "id": 74110122,
+   "kind": "card",
+   "card": 90,
+   "class": "useful"
+  },
+  "Wizard Card 91": {
+   "id": 74110123,
+   "kind": "card",
+   "card": 91,
+   "class": "useful"
+  },
+  "Wizard Card 92": {
+   "id": 74110124,
+   "kind": "card",
+   "card": 92,
+   "class": "useful"
+  },
+  "Wizard Card 93": {
+   "id": 74110125,
+   "kind": "card",
+   "card": 93,
+   "class": "useful"
+  },
+  "Wizard Card 94": {
+   "id": 74110126,
+   "kind": "card",
+   "card": 94,
+   "class": "useful"
+  },
+  "Wizard Card 95": {
+   "id": 74110127,
+   "kind": "card",
+   "card": 95,
+   "class": "useful"
+  },
+  "Wizard Card 96": {
+   "id": 74110128,
+   "kind": "card",
+   "card": 96,
+   "class": "useful"
+  },
+  "Wizard Card 97": {
+   "id": 74110129,
+   "kind": "card",
+   "card": 97,
+   "class": "useful"
+  },
+  "Wizard Card 98": {
+   "id": 74110130,
+   "kind": "card",
+   "card": 98,
+   "class": "useful"
+  },
+  "Wizard Card 99": {
+   "id": 74110131,
+   "kind": "card",
+   "card": 99,
+   "class": "useful"
+  },
+  "Wizard Card 100": {
+   "id": 74110132,
+   "kind": "card",
+   "card": 100,
+   "class": "useful"
+  },
+  "Wizard Card 101": {
+   "id": 74110133,
+   "kind": "card",
+   "card": 101,
+   "class": "useful"
+  },
+  "Health Bar": {
+   "id": 74110134,
+   "kind": "health",
+   "class": "useful"
+  },
+  "Big Bean Bag": {
+   "id": 74110135,
+   "kind": "bag",
+   "class": "useful"
+  },
+  "Bertie Bott's Beans": {
+   "id": 74110136,
+   "kind": "beans",
+   "class": "filler"
+  },
+  "Chocolate Frog": {
+   "id": 74110137,
+   "kind": "frog",
+   "class": "filler"
+  },
+  "Cauldron Cake": {
+   "id": 74110138,
+   "kind": "sweet",
+   "class": "filler"
+  }
+ },
+ "locations": [
+  {
+   "id": 74100000,
+   "key": "beans:10",
+   "name": "10 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100001,
+   "key": "beans:100",
+   "name": "100 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100002,
+   "key": "beans:110",
+   "name": "110 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100003,
+   "key": "beans:120",
+   "name": "120 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100004,
+   "key": "beans:130",
+   "name": "130 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100005,
+   "key": "beans:140",
+   "name": "140 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100006,
+   "key": "beans:150",
+   "name": "150 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100007,
+   "key": "beans:160",
+   "name": "160 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100008,
+   "key": "beans:170",
+   "name": "170 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100009,
+   "key": "beans:180",
+   "name": "180 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100010,
+   "key": "beans:190",
+   "name": "190 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100011,
+   "key": "beans:20",
+   "name": "20 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100012,
+   "key": "beans:200",
+   "name": "200 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100013,
+   "key": "beans:210",
+   "name": "210 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100014,
+   "key": "beans:220",
+   "name": "220 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100015,
+   "key": "beans:230",
+   "name": "230 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100016,
+   "key": "beans:240",
+   "name": "240 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100017,
+   "key": "beans:250",
+   "name": "250 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100018,
+   "key": "beans:260",
+   "name": "260 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100019,
+   "key": "beans:270",
+   "name": "270 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100020,
+   "key": "beans:280",
+   "name": "280 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100021,
+   "key": "beans:290",
+   "name": "290 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100022,
+   "key": "beans:30",
+   "name": "30 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100023,
+   "key": "beans:300",
+   "name": "300 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100024,
+   "key": "beans:310",
+   "name": "310 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100025,
+   "key": "beans:320",
+   "name": "320 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100026,
+   "key": "beans:330",
+   "name": "330 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100027,
+   "key": "beans:340",
+   "name": "340 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100028,
+   "key": "beans:350",
+   "name": "350 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100029,
+   "key": "beans:360",
+   "name": "360 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100030,
+   "key": "beans:370",
+   "name": "370 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100031,
+   "key": "beans:380",
+   "name": "380 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100032,
+   "key": "beans:390",
+   "name": "390 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100033,
+   "key": "beans:40",
+   "name": "40 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100034,
+   "key": "beans:400",
+   "name": "400 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100035,
+   "key": "beans:410",
+   "name": "410 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100036,
+   "key": "beans:420",
+   "name": "420 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100037,
+   "key": "beans:430",
+   "name": "430 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100038,
+   "key": "beans:440",
+   "name": "440 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100039,
+   "key": "beans:450",
+   "name": "450 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100040,
+   "key": "beans:460",
+   "name": "460 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100041,
+   "key": "beans:470",
+   "name": "470 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100042,
+   "key": "beans:480",
+   "name": "480 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100043,
+   "key": "beans:490",
+   "name": "490 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100044,
+   "key": "beans:50",
+   "name": "50 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100045,
+   "key": "beans:500",
+   "name": "500 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100046,
+   "key": "beans:60",
+   "name": "60 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100047,
+   "key": "beans:70",
+   "name": "70 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100048,
+   "key": "beans:80",
+   "name": "80 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100049,
+   "key": "beans:90",
+   "name": "90 beans collected",
+   "region": "Hogwarts",
+   "group": "Bean Milestones"
+  },
+  {
+   "id": 74100050,
+   "key": "cards:1",
+   "name": "1 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100051,
+   "key": "cards:10",
+   "name": "10 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100052,
+   "key": "cards:100",
+   "name": "100 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100053,
+   "key": "cards:101",
+   "name": "101 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100054,
+   "key": "cards:11",
+   "name": "11 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100055,
+   "key": "cards:12",
+   "name": "12 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100056,
+   "key": "cards:13",
+   "name": "13 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100057,
+   "key": "cards:14",
+   "name": "14 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100058,
+   "key": "cards:15",
+   "name": "15 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100059,
+   "key": "cards:16",
+   "name": "16 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100060,
+   "key": "cards:17",
+   "name": "17 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100061,
+   "key": "cards:18",
+   "name": "18 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100062,
+   "key": "cards:19",
+   "name": "19 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100063,
+   "key": "cards:2",
+   "name": "2 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100064,
+   "key": "cards:20",
+   "name": "20 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100065,
+   "key": "cards:21",
+   "name": "21 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100066,
+   "key": "cards:22",
+   "name": "22 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100067,
+   "key": "cards:23",
+   "name": "23 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100068,
+   "key": "cards:24",
+   "name": "24 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100069,
+   "key": "cards:25",
+   "name": "25 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100070,
+   "key": "cards:26",
+   "name": "26 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100071,
+   "key": "cards:27",
+   "name": "27 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100072,
+   "key": "cards:28",
+   "name": "28 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100073,
+   "key": "cards:29",
+   "name": "29 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100074,
+   "key": "cards:3",
+   "name": "3 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100075,
+   "key": "cards:30",
+   "name": "30 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100076,
+   "key": "cards:31",
+   "name": "31 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100077,
+   "key": "cards:32",
+   "name": "32 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100078,
+   "key": "cards:33",
+   "name": "33 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100079,
+   "key": "cards:34",
+   "name": "34 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100080,
+   "key": "cards:35",
+   "name": "35 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100081,
+   "key": "cards:36",
+   "name": "36 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100082,
+   "key": "cards:37",
+   "name": "37 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100083,
+   "key": "cards:38",
+   "name": "38 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100084,
+   "key": "cards:39",
+   "name": "39 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100085,
+   "key": "cards:4",
+   "name": "4 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100086,
+   "key": "cards:40",
+   "name": "40 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100087,
+   "key": "cards:41",
+   "name": "41 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100088,
+   "key": "cards:42",
+   "name": "42 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100089,
+   "key": "cards:43",
+   "name": "43 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100090,
+   "key": "cards:44",
+   "name": "44 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100091,
+   "key": "cards:45",
+   "name": "45 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100092,
+   "key": "cards:46",
+   "name": "46 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100093,
+   "key": "cards:47",
+   "name": "47 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100094,
+   "key": "cards:48",
+   "name": "48 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100095,
+   "key": "cards:49",
+   "name": "49 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100096,
+   "key": "cards:5",
+   "name": "5 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100097,
+   "key": "cards:50",
+   "name": "50 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100098,
+   "key": "cards:51",
+   "name": "51 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100099,
+   "key": "cards:52",
+   "name": "52 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100100,
+   "key": "cards:53",
+   "name": "53 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100101,
+   "key": "cards:54",
+   "name": "54 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100102,
+   "key": "cards:55",
+   "name": "55 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100103,
+   "key": "cards:56",
+   "name": "56 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100104,
+   "key": "cards:57",
+   "name": "57 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100105,
+   "key": "cards:58",
+   "name": "58 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100106,
+   "key": "cards:59",
+   "name": "59 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100107,
+   "key": "cards:6",
+   "name": "6 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100108,
+   "key": "cards:60",
+   "name": "60 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100109,
+   "key": "cards:61",
+   "name": "61 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100110,
+   "key": "cards:62",
+   "name": "62 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100111,
+   "key": "cards:63",
+   "name": "63 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100112,
+   "key": "cards:64",
+   "name": "64 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100113,
+   "key": "cards:65",
+   "name": "65 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100114,
+   "key": "cards:66",
+   "name": "66 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100115,
+   "key": "cards:67",
+   "name": "67 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100116,
+   "key": "cards:68",
+   "name": "68 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100117,
+   "key": "cards:69",
+   "name": "69 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100118,
+   "key": "cards:7",
+   "name": "7 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100119,
+   "key": "cards:70",
+   "name": "70 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100120,
+   "key": "cards:71",
+   "name": "71 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100121,
+   "key": "cards:72",
+   "name": "72 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100122,
+   "key": "cards:73",
+   "name": "73 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100123,
+   "key": "cards:74",
+   "name": "74 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100124,
+   "key": "cards:75",
+   "name": "75 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100125,
+   "key": "cards:76",
+   "name": "76 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100126,
+   "key": "cards:77",
+   "name": "77 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100127,
+   "key": "cards:78",
+   "name": "78 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100128,
+   "key": "cards:79",
+   "name": "79 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100129,
+   "key": "cards:8",
+   "name": "8 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100130,
+   "key": "cards:80",
+   "name": "80 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100131,
+   "key": "cards:81",
+   "name": "81 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100132,
+   "key": "cards:82",
+   "name": "82 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100133,
+   "key": "cards:83",
+   "name": "83 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100134,
+   "key": "cards:84",
+   "name": "84 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100135,
+   "key": "cards:85",
+   "name": "85 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100136,
+   "key": "cards:86",
+   "name": "86 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100137,
+   "key": "cards:87",
+   "name": "87 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100138,
+   "key": "cards:88",
+   "name": "88 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100139,
+   "key": "cards:89",
+   "name": "89 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100140,
+   "key": "cards:9",
+   "name": "9 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100141,
+   "key": "cards:90",
+   "name": "90 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100142,
+   "key": "cards:91",
+   "name": "91 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100143,
+   "key": "cards:92",
+   "name": "92 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100144,
+   "key": "cards:93",
+   "name": "93 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100145,
+   "key": "cards:94",
+   "name": "94 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100146,
+   "key": "cards:95",
+   "name": "95 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100147,
+   "key": "cards:96",
+   "name": "96 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100148,
+   "key": "cards:97",
+   "name": "97 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100149,
+   "key": "cards:98",
+   "name": "98 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100150,
+   "key": "cards:99",
+   "name": "99 wizard cards owned",
+   "region": "Hogwarts",
+   "group": "Card Milestones"
+  },
+  {
+   "id": 74100151,
+   "key": "enemy:10:FlyingBook:BadBook01",
+   "name": "Night 1 - defeat FlyingBook BadBook01",
+   "region": "Night 1",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100152,
+   "key": "enemy:10:FlyingBook:BadBook02",
+   "name": "Night 1 - defeat FlyingBook BadBook02",
+   "region": "Night 1",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100153,
+   "key": "enemy:10:FlyingBook:BadBook03",
+   "name": "Night 1 - defeat FlyingBook BadBook03",
+   "region": "Night 1",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100154,
+   "key": "enemy:10:FlyingBook:BadBook04",
+   "name": "Night 1 - defeat FlyingBook BadBook04",
+   "region": "Night 1",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100155,
+   "key": "enemy:10:FlyingBook:BadBook05",
+   "name": "Night 1 - defeat FlyingBook BadBook05",
+   "region": "Night 1",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100156,
+   "key": "enemy:10:Ghost:LibGhost01",
+   "name": "Night 1 - defeat Ghost LibGhost01",
+   "region": "Night 1",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100157,
+   "key": "enemy:10:Ghost:LibGhost02",
+   "name": "Night 1 - defeat Ghost LibGhost02",
+   "region": "Night 1",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100158,
+   "key": "enemy:12:Ghost:Ghost01",
+   "name": "Spongify Lesson - defeat Ghost Ghost01",
+   "region": "Spongify Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100159,
+   "key": "enemy:12:Ghost:Ghost02",
+   "name": "Spongify Lesson - defeat Ghost Ghost02",
+   "region": "Spongify Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100160,
+   "key": "enemy:12:Ghost:TestGhost01",
+   "name": "Spongify Lesson - defeat Ghost TestGhost01",
+   "region": "Spongify Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100161,
+   "key": "enemy:12:Ghost:TestGhost02",
+   "name": "Spongify Lesson - defeat Ghost TestGhost02",
+   "region": "Spongify Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100162,
+   "key": "enemy:12:Ghost:TestGhost03",
+   "name": "Spongify Lesson - defeat Ghost TestGhost03",
+   "region": "Spongify Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100163,
+   "key": "enemy:12:Ghost:TestGhost04",
+   "name": "Spongify Lesson - defeat Ghost TestGhost04",
+   "region": "Spongify Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100164,
+   "key": "enemy:12:Ghost:TestGhost05",
+   "name": "Spongify Lesson - defeat Ghost TestGhost05",
+   "region": "Spongify Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100165,
+   "key": "enemy:12:Ghost:TestGhost06",
+   "name": "Spongify Lesson - defeat Ghost TestGhost06",
+   "region": "Spongify Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100166,
+   "key": "enemy:12:Ghost:TestGhost07",
+   "name": "Spongify Lesson - defeat Ghost TestGhost07",
+   "region": "Spongify Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100167,
+   "key": "enemy:12:Ghost:TestGhost08",
+   "name": "Spongify Lesson - defeat Ghost TestGhost08",
+   "region": "Spongify Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100168,
+   "key": "enemy:12:Imp:Imp01ThirdFloor",
+   "name": "Spongify Lesson - defeat Imp Imp01ThirdFloor",
+   "region": "Spongify Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100169,
+   "key": "enemy:12:Imp:Imp02ThirdFloor",
+   "name": "Spongify Lesson - defeat Imp Imp02ThirdFloor",
+   "region": "Spongify Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100170,
+   "key": "enemy:12:Imp:ImpRoom11",
+   "name": "Spongify Lesson - defeat Imp ImpRoom11",
+   "region": "Spongify Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100171,
+   "key": "enemy:12:Imp:ImpRoom11a",
+   "name": "Spongify Lesson - defeat Imp ImpRoom11a",
+   "region": "Spongify Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100172,
+   "key": "enemy:12:StaticShooter:Imp01",
+   "name": "Spongify Lesson - defeat StaticShooter Imp01",
+   "region": "Spongify Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100173,
+   "key": "enemy:13:TrollBathRoom:Troll",
+   "name": "Night 2 - defeat TrollBathRoom Troll",
+   "region": "Night 2",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100174,
+   "key": "enemy:16:Bowtruckle:Bowtruckle1",
+   "name": "Diffindo Lesson - defeat Bowtruckle Bowtruckle1",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100175,
+   "key": "enemy:16:Bowtruckle:Bowtruckle2",
+   "name": "Diffindo Lesson - defeat Bowtruckle Bowtruckle2",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100176,
+   "key": "enemy:16:Doxy:Doxy2",
+   "name": "Diffindo Lesson - defeat Doxy Doxy2",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100177,
+   "key": "enemy:16:Doxy:Doxy4",
+   "name": "Diffindo Lesson - defeat Doxy Doxy4",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100178,
+   "key": "enemy:16:Doxy:Doxy5",
+   "name": "Diffindo Lesson - defeat Doxy Doxy5",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100179,
+   "key": "enemy:16:Doxy:Doxy7",
+   "name": "Diffindo Lesson - defeat Doxy Doxy7",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100180,
+   "key": "enemy:16:Doxy:Doxy8",
+   "name": "Diffindo Lesson - defeat Doxy Doxy8",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100181,
+   "key": "enemy:16:Doxy:Doxy9",
+   "name": "Diffindo Lesson - defeat Doxy Doxy9",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100182,
+   "key": "enemy:16:Gytrash:Gytrash1",
+   "name": "Diffindo Lesson - defeat Gytrash Gytrash1",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100183,
+   "key": "enemy:16:Gytrash:Gytrash2",
+   "name": "Diffindo Lesson - defeat Gytrash Gytrash2",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100184,
+   "key": "enemy:16:GytrashBoss:gytrash1",
+   "name": "Diffindo Lesson - defeat GytrashBoss gytrash1",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100185,
+   "key": "enemy:16:GytrashBoss:gytrash2",
+   "name": "Diffindo Lesson - defeat GytrashBoss gytrash2",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100186,
+   "key": "enemy:16:Horklump:Horklump_A01",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A01",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100187,
+   "key": "enemy:16:Horklump:Horklump_A02",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A02",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100188,
+   "key": "enemy:16:Horklump:Horklump_A03",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A03",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100189,
+   "key": "enemy:16:Horklump:Horklump_A04",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A04",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100190,
+   "key": "enemy:16:Horklump:Horklump_A05",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A05",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100191,
+   "key": "enemy:16:Horklump:Horklump_A06",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A06",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100192,
+   "key": "enemy:16:Horklump:Horklump_A07",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A07",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100193,
+   "key": "enemy:16:Horklump:Horklump_A08",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A08",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100194,
+   "key": "enemy:16:Horklump:Horklump_A09",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A09",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100195,
+   "key": "enemy:16:Horklump:Horklump_A10",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A10",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100196,
+   "key": "enemy:16:Horklump:Horklump_A11",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A11",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100197,
+   "key": "enemy:16:Horklump:Horklump_A12",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A12",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100198,
+   "key": "enemy:16:Horklump:Horklump_A13",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A13",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100199,
+   "key": "enemy:16:Horklump:Horklump_A14",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A14",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100200,
+   "key": "enemy:16:Horklump:Horklump_A15",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A15",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100201,
+   "key": "enemy:16:Horklump:Horklump_A16",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A16",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100202,
+   "key": "enemy:16:Horklump:Horklump_A17",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A17",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100203,
+   "key": "enemy:16:Horklump:Horklump_A18",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A18",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100204,
+   "key": "enemy:16:Horklump:Horklump_A19",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A19",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100205,
+   "key": "enemy:16:Horklump:Horklump_A20",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_A20",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100206,
+   "key": "enemy:16:Horklump:Horklump_B1",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_B1",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100207,
+   "key": "enemy:16:Horklump:Horklump_B2",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_B2",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100208,
+   "key": "enemy:16:Horklump:Horklump_B3",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_B3",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100209,
+   "key": "enemy:16:Horklump:Horklump_B4",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_B4",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100210,
+   "key": "enemy:16:Horklump:Horklump_B5",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_B5",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100211,
+   "key": "enemy:16:Horklump:Horklump_C1",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_C1",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100212,
+   "key": "enemy:16:Horklump:Horklump_C2",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_C2",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100213,
+   "key": "enemy:16:Horklump:Horklump_D1",
+   "name": "Diffindo Lesson - defeat Horklump Horklump_D1",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100214,
+   "key": "enemy:16:ProtrudingRoot:Root1",
+   "name": "Diffindo Lesson - defeat ProtrudingRoot Root1",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100215,
+   "key": "enemy:16:ProtrudingRoot:Root2",
+   "name": "Diffindo Lesson - defeat ProtrudingRoot Root2",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100216,
+   "key": "enemy:16:StaticShooter:ImpD",
+   "name": "Diffindo Lesson - defeat StaticShooter ImpD",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100217,
+   "key": "enemy:16:Troll:Troll1",
+   "name": "Diffindo Lesson - defeat Troll Troll1",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100218,
+   "key": "enemy:16:Troll:Troll2",
+   "name": "Diffindo Lesson - defeat Troll Troll2",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100219,
+   "key": "enemy:16:VenomousTentacular:VenomousTentacula",
+   "name": "Diffindo Lesson - defeat VenomousTentacular VenomousTentacula",
+   "region": "Diffindo Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100220,
+   "key": "enemy:17:Filch:LibraryFilch",
+   "name": "Night 3 - defeat Filch LibraryFilch",
+   "region": "Night 3",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100221,
+   "key": "enemy:17:Ghost:LibMainRoom04Ghost01",
+   "name": "Night 3 - defeat Ghost LibMainRoom04Ghost01",
+   "region": "Night 3",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100222,
+   "key": "enemy:17:Ghost:LibMainRoom04Ghost02",
+   "name": "Night 3 - defeat Ghost LibMainRoom04Ghost02",
+   "region": "Night 3",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100223,
+   "key": "enemy:17:Percy:AnnexePrefect2",
+   "name": "Night 3 - defeat Percy AnnexePrefect2",
+   "region": "Night 3",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100224,
+   "key": "enemy:17:Percy:AnnexePrefect3",
+   "name": "Night 3 - defeat Percy AnnexePrefect3",
+   "region": "Night 3",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100225,
+   "key": "enemy:17:Percy:Prefect1",
+   "name": "Night 3 - defeat Percy Prefect1",
+   "region": "Night 3",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100226,
+   "key": "enemy:17:Percy:Prefect_Invisible2",
+   "name": "Night 3 - defeat Percy Prefect_Invisible2",
+   "region": "Night 3",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100227,
+   "key": "enemy:17:Percy:Prefect_Invisible3",
+   "name": "Night 3 - defeat Percy Prefect_Invisible3",
+   "region": "Night 3",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100228,
+   "key": "enemy:17:Percy:Prefect_Invisible4",
+   "name": "Night 3 - defeat Percy Prefect_Invisible4",
+   "region": "Night 3",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100229,
+   "key": "enemy:17:Percy:Teacher_Invisible1",
+   "name": "Night 3 - defeat Percy Teacher_Invisible1",
+   "region": "Night 3",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100230,
+   "key": "enemy:17:RotDev:FlipRotateDevice_Large",
+   "name": "Night 3 - defeat RotDev FlipRotateDevice_Large",
+   "region": "Night 3",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100231,
+   "key": "enemy:20:Ghost:GhostINC02",
+   "name": "Incendio Lesson - defeat Ghost GhostINC02",
+   "region": "Incendio Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100232,
+   "key": "enemy:20:Ghost:SpawnedGhost1",
+   "name": "Incendio Lesson - defeat Ghost SpawnedGhost1",
+   "region": "Incendio Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100233,
+   "key": "enemy:20:Ghost:SpawnedGhost2",
+   "name": "Incendio Lesson - defeat Ghost SpawnedGhost2",
+   "region": "Incendio Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100234,
+   "key": "enemy:20:Ghost:ghostINC01",
+   "name": "Incendio Lesson - defeat Ghost ghostINC01",
+   "region": "Incendio Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100235,
+   "key": "enemy:20:Imp:Imp1",
+   "name": "Incendio Lesson - defeat Imp Imp1",
+   "region": "Incendio Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100236,
+   "key": "enemy:20:Imp:Imp2",
+   "name": "Incendio Lesson - defeat Imp Imp2",
+   "region": "Incendio Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100237,
+   "key": "enemy:20:VenomousTentacular:VenomousTentacula",
+   "name": "Incendio Lesson - defeat VenomousTentacular VenomousTentacula",
+   "region": "Incendio Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100238,
+   "key": "enemy:26:DevilSnare:DevilSnareLeft",
+   "name": "Devil's Snare - defeat DevilSnare DevilSnareLeft",
+   "region": "Devil's Snare",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100239,
+   "key": "enemy:6:Imp:Imp1",
+   "name": "Day 0 - defeat Imp Imp1",
+   "region": "Day 0",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100240,
+   "key": "enemy:6:Imp:Imp2",
+   "name": "Day 0 - defeat Imp Imp2",
+   "region": "Day 0",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100241,
+   "key": "enemy:6:RotDev:RTDLarge",
+   "name": "Day 0 - defeat RotDev RTDLarge",
+   "region": "Day 0",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100242,
+   "key": "enemy:6:RotDev:RotateTargetDevice",
+   "name": "Day 0 - defeat RotDev RotateTargetDevice",
+   "region": "Day 0",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100243,
+   "key": "enemy:9:Ghost:Ghost01",
+   "name": "Lumos Lesson - defeat Ghost Ghost01",
+   "region": "Lumos Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100244,
+   "key": "enemy:9:Ghost:Ghost02",
+   "name": "Lumos Lesson - defeat Ghost Ghost02",
+   "region": "Lumos Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100245,
+   "key": "enemy:9:Imp:BridgeImp01",
+   "name": "Lumos Lesson - defeat Imp BridgeImp01",
+   "region": "Lumos Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100246,
+   "key": "enemy:9:StaticShooter:Imp03",
+   "name": "Lumos Lesson - defeat StaticShooter Imp03",
+   "region": "Lumos Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100247,
+   "key": "enemy:9:StaticShooter:Imp04",
+   "name": "Lumos Lesson - defeat StaticShooter Imp04",
+   "region": "Lumos Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100248,
+   "key": "enemy:9:StaticShooter:Imp05",
+   "name": "Lumos Lesson - defeat StaticShooter Imp05",
+   "region": "Lumos Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100249,
+   "key": "enemy:9:StaticShooter:Imp06",
+   "name": "Lumos Lesson - defeat StaticShooter Imp06",
+   "region": "Lumos Lesson",
+   "group": "Enemies"
+  },
+  {
+   "id": 74100250,
+   "key": "enemytype:Bowtruckle",
+   "name": "First Bowtruckle defeated",
+   "region": "Hogwarts",
+   "group": "Enemy Types"
+  },
+  {
+   "id": 74100251,
+   "key": "enemytype:DevilSnare",
+   "name": "First DevilSnare defeated",
+   "region": "Hogwarts",
+   "group": "Enemy Types"
+  },
+  {
+   "id": 74100252,
+   "key": "enemytype:Doxy",
+   "name": "First Doxy defeated",
+   "region": "Hogwarts",
+   "group": "Enemy Types"
+  },
+  {
+   "id": 74100253,
+   "key": "enemytype:Filch",
+   "name": "First Filch defeated",
+   "region": "Hogwarts",
+   "group": "Enemy Types"
+  },
+  {
+   "id": 74100254,
+   "key": "enemytype:FlyingBook",
+   "name": "First FlyingBook defeated",
+   "region": "Hogwarts",
+   "group": "Enemy Types"
+  },
+  {
+   "id": 74100255,
+   "key": "enemytype:Ghost",
+   "name": "First Ghost defeated",
+   "region": "Hogwarts",
+   "group": "Enemy Types"
+  },
+  {
+   "id": 74100256,
+   "key": "enemytype:Gytrash",
+   "name": "First Gytrash defeated",
+   "region": "Hogwarts",
+   "group": "Enemy Types"
+  },
+  {
+   "id": 74100257,
+   "key": "enemytype:GytrashBoss",
+   "name": "First GytrashBoss defeated",
+   "region": "Hogwarts",
+   "group": "Enemy Types"
+  },
+  {
+   "id": 74100258,
+   "key": "enemytype:Horklump",
+   "name": "First Horklump defeated",
+   "region": "Hogwarts",
+   "group": "Enemy Types"
+  },
+  {
+   "id": 74100259,
+   "key": "enemytype:Imp",
+   "name": "First Imp defeated",
+   "region": "Hogwarts",
+   "group": "Enemy Types"
+  },
+  {
+   "id": 74100260,
+   "key": "enemytype:Percy",
+   "name": "First Percy defeated",
+   "region": "Hogwarts",
+   "group": "Enemy Types"
+  },
+  {
+   "id": 74100261,
+   "key": "enemytype:ProtrudingRoot",
+   "name": "First ProtrudingRoot defeated",
+   "region": "Hogwarts",
+   "group": "Enemy Types"
+  },
+  {
+   "id": 74100262,
+   "key": "enemytype:RotDev",
+   "name": "First RotDev defeated",
+   "region": "Hogwarts",
+   "group": "Enemy Types"
+  },
+  {
+   "id": 74100263,
+   "key": "enemytype:StaticShooter",
+   "name": "First StaticShooter defeated",
+   "region": "Hogwarts",
+   "group": "Enemy Types"
+  },
+  {
+   "id": 74100264,
+   "key": "enemytype:Troll",
+   "name": "First Troll defeated",
+   "region": "Hogwarts",
+   "group": "Enemy Types"
+  },
+  {
+   "id": 74100265,
+   "key": "enemytype:TrollBathRoom",
+   "name": "First TrollBathRoom defeated",
+   "region": "Hogwarts",
+   "group": "Enemy Types"
+  },
+  {
+   "id": 74100266,
+   "key": "enemytype:VenomousTentacular",
+   "name": "First VenomousTentacular defeated",
+   "region": "Hogwarts",
+   "group": "Enemy Types"
+  },
+  {
+   "id": 74100267,
+   "key": "object:11:GenericWizardCardChest01",
+   "name": "Day 2 - Chest GenericWizardCardChest01",
+   "region": "Day 2",
+   "group": "Chests"
+  },
+  {
+   "id": 74100268,
+   "key": "object:12:Bean01Spong11",
+   "name": "Spongify Lesson - Bean Bean01Spong11",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100269,
+   "key": "object:12:Bean01Spong4",
+   "name": "Spongify Lesson - Bean Bean01Spong4",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100270,
+   "key": "object:12:Bean01Spongify1",
+   "name": "Spongify Lesson - Bean Bean01Spongify1",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100271,
+   "key": "object:12:Bean01Spongify7",
+   "name": "Spongify Lesson - Bean Bean01Spongify7",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100272,
+   "key": "object:12:Bean02Spong11",
+   "name": "Spongify Lesson - Bean Bean02Spong11",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100273,
+   "key": "object:12:Bean02Spong4",
+   "name": "Spongify Lesson - Bean Bean02Spong4",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100274,
+   "key": "object:12:Bean02Spongify1",
+   "name": "Spongify Lesson - Bean Bean02Spongify1",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100275,
+   "key": "object:12:Bean02Spongify7",
+   "name": "Spongify Lesson - Bean Bean02Spongify7",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100276,
+   "key": "object:12:Bean03Spong11",
+   "name": "Spongify Lesson - Bean Bean03Spong11",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100277,
+   "key": "object:12:Bean03Spong4",
+   "name": "Spongify Lesson - Bean Bean03Spong4",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100278,
+   "key": "object:12:Bean03Spongify7",
+   "name": "Spongify Lesson - Bean Bean03Spongify7",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100279,
+   "key": "object:12:Bean04Spong11",
+   "name": "Spongify Lesson - Bean Bean04Spong11",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100280,
+   "key": "object:12:Bean04Spong4",
+   "name": "Spongify Lesson - Bean Bean04Spong4",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100281,
+   "key": "object:12:Bean04Spongify7",
+   "name": "Spongify Lesson - Bean Bean04Spongify7",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100282,
+   "key": "object:12:Bean05Spong11",
+   "name": "Spongify Lesson - Bean Bean05Spong11",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100283,
+   "key": "object:12:Bean05Spong4",
+   "name": "Spongify Lesson - Bean Bean05Spong4",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100284,
+   "key": "object:12:Bean05Spongify7",
+   "name": "Spongify Lesson - Bean Bean05Spongify7",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100285,
+   "key": "object:12:Bean06Spong4",
+   "name": "Spongify Lesson - Bean Bean06Spong4",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100286,
+   "key": "object:12:Bean06Spongify7",
+   "name": "Spongify Lesson - Bean Bean06Spongify7",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100287,
+   "key": "object:12:Bean07Spong4",
+   "name": "Spongify Lesson - Bean Bean07Spong4",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100288,
+   "key": "object:12:Bean07Spongify7",
+   "name": "Spongify Lesson - Bean Bean07Spongify7",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100289,
+   "key": "object:12:Bean08Spong4",
+   "name": "Spongify Lesson - Bean Bean08Spong4",
+   "region": "Spongify Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100290,
+   "key": "object:12:ChestSpong1",
+   "name": "Spongify Lesson - Chest ChestSpong1",
+   "region": "Spongify Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100291,
+   "key": "object:12:Chest_Spongify17",
+   "name": "Spongify Lesson - Chest Chest_Spongify17",
+   "region": "Spongify Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100292,
+   "key": "object:12:ChocFrog01",
+   "name": "Spongify Lesson - Chocolate Frog ChocFrog01",
+   "region": "Spongify Lesson",
+   "group": "Chocolate Frogs"
+  },
+  {
+   "id": 74100293,
+   "key": "object:12:ChocFrog02",
+   "name": "Spongify Lesson - Chocolate Frog ChocFrog02",
+   "region": "Spongify Lesson",
+   "group": "Chocolate Frogs"
+  },
+  {
+   "id": 74100294,
+   "key": "object:12:ChocFrog04",
+   "name": "Spongify Lesson - Chocolate Frog ChocFrog04",
+   "region": "Spongify Lesson",
+   "group": "Chocolate Frogs"
+  },
+  {
+   "id": 74100295,
+   "key": "object:12:ChocFrog05",
+   "name": "Spongify Lesson - Chocolate Frog ChocFrog05",
+   "region": "Spongify Lesson",
+   "group": "Chocolate Frogs"
+  },
+  {
+   "id": 74100296,
+   "key": "object:12:ChocFrogSpong4",
+   "name": "Spongify Lesson - Chocolate Frog ChocFrogSpong4",
+   "region": "Spongify Lesson",
+   "group": "Chocolate Frogs"
+  },
+  {
+   "id": 74100297,
+   "key": "object:12:Chocfrog03",
+   "name": "Spongify Lesson - Chocolate Frog Chocfrog03",
+   "region": "Spongify Lesson",
+   "group": "Chocolate Frogs"
+  },
+  {
+   "id": 74100298,
+   "key": "object:12:Day2EntranceHallCardTraderPupil",
+   "name": "Spongify Lesson - Wizard Card Day2EntranceHallCardTraderPupil",
+   "region": "Spongify Lesson",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100299,
+   "key": "object:12:Day2GrStaircaseCardTraderPupil",
+   "name": "Spongify Lesson - Wizard Card Day2GrStaircaseCardTraderPupil",
+   "region": "Spongify Lesson",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100300,
+   "key": "object:12:Day2HogExteriorCardTraderPupil",
+   "name": "Spongify Lesson - Wizard Card Day2HogExteriorCardTraderPupil",
+   "region": "Spongify Lesson",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100301,
+   "key": "object:12:GenericWizardCardChest01",
+   "name": "Spongify Lesson - Chest GenericWizardCardChest01",
+   "region": "Spongify Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100302,
+   "key": "object:12:ImpRoomChest01",
+   "name": "Spongify Lesson - Chest ImpRoomChest01",
+   "region": "Spongify Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100303,
+   "key": "object:12:LargeChest01Spongify8a",
+   "name": "Spongify Lesson - Chest LargeChest01Spongify8a",
+   "region": "Spongify Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100304,
+   "key": "object:12:LargeChest02Spongify8",
+   "name": "Spongify Lesson - Chest LargeChest02Spongify8",
+   "region": "Spongify Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100305,
+   "key": "object:12:SearchObjects",
+   "name": "Spongify Lesson - Secret SearchObjects",
+   "region": "Spongify Lesson",
+   "group": "Secrets"
+  },
+  {
+   "id": 74100306,
+   "key": "object:12:SmallChest01Spongify12",
+   "name": "Spongify Lesson - Chest SmallChest01Spongify12",
+   "region": "Spongify Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100307,
+   "key": "object:12:SmallChest01Spongify14",
+   "name": "Spongify Lesson - Chest SmallChest01Spongify14",
+   "region": "Spongify Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100308,
+   "key": "object:12:SmallChest01Spongify5",
+   "name": "Spongify Lesson - Chest SmallChest01Spongify5",
+   "region": "Spongify Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100309,
+   "key": "object:12:SmallChest01Spongify6",
+   "name": "Spongify Lesson - Chest SmallChest01Spongify6",
+   "region": "Spongify Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100310,
+   "key": "object:12:SmallChest02Spongify12",
+   "name": "Spongify Lesson - Chest SmallChest02Spongify12",
+   "region": "Spongify Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100311,
+   "key": "object:12:WizCardChest",
+   "name": "Spongify Lesson - Chest WizCardChest",
+   "region": "Spongify Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100312,
+   "key": "object:12:WizChest2",
+   "name": "Spongify Lesson - Chest WizChest2",
+   "region": "Spongify Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100313,
+   "key": "object:12:WizChestFade01",
+   "name": "Spongify Lesson - Chest WizChestFade01",
+   "region": "Spongify Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100314,
+   "key": "object:16:ChestB1",
+   "name": "Diffindo Lesson - Chest ChestB1",
+   "region": "Diffindo Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100315,
+   "key": "object:16:ChestC1",
+   "name": "Diffindo Lesson - Chest ChestC1",
+   "region": "Diffindo Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100316,
+   "key": "object:16:ChestC2",
+   "name": "Diffindo Lesson - Chest ChestC2",
+   "region": "Diffindo Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100317,
+   "key": "object:16:ChestD1",
+   "name": "Diffindo Lesson - Chest ChestD1",
+   "region": "Diffindo Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100318,
+   "key": "object:16:ChestE1",
+   "name": "Diffindo Lesson - Chest ChestE1",
+   "region": "Diffindo Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100319,
+   "key": "object:16:Chest_OwlTreat",
+   "name": "Diffindo Lesson - Chest Chest_OwlTreat",
+   "region": "Diffindo Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100320,
+   "key": "object:16:Day3EntHallCardTraderPupil",
+   "name": "Diffindo Lesson - Wizard Card Day3EntHallCardTraderPupil",
+   "region": "Diffindo Lesson",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100321,
+   "key": "object:16:Day3GFGrStaircaseCardTraderPupil",
+   "name": "Diffindo Lesson - Wizard Card Day3GFGrStaircaseCardTraderPupil",
+   "region": "Diffindo Lesson",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100322,
+   "key": "object:16:Day3GrfCorridorCardTraderPupil",
+   "name": "Diffindo Lesson - Wizard Card Day3GrfCorridorCardTraderPupil",
+   "region": "Diffindo Lesson",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100323,
+   "key": "object:16:Day3HerbCardTraderPupil",
+   "name": "Diffindo Lesson - Wizard Card Day3HerbCardTraderPupil",
+   "region": "Diffindo Lesson",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100324,
+   "key": "object:16:Gnome1",
+   "name": "Diffindo Lesson - Gnome Gnome1",
+   "region": "Diffindo Lesson",
+   "group": "Gnomes"
+  },
+  {
+   "id": 74100325,
+   "key": "object:16:GorgeChest",
+   "name": "Diffindo Lesson - Chest GorgeChest",
+   "region": "Diffindo Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100326,
+   "key": "object:16:LadderGnome1",
+   "name": "Diffindo Lesson - Gnome LadderGnome1",
+   "region": "Diffindo Lesson",
+   "group": "Gnomes"
+  },
+  {
+   "id": 74100327,
+   "key": "object:16:LadderGnome2",
+   "name": "Diffindo Lesson - Gnome LadderGnome2",
+   "region": "Diffindo Lesson",
+   "group": "Gnomes"
+  },
+  {
+   "id": 74100328,
+   "key": "object:17:Chest1",
+   "name": "Night 3 - Chest Chest1",
+   "region": "Night 3",
+   "group": "Chests"
+  },
+  {
+   "id": 74100329,
+   "key": "object:17:Chest2",
+   "name": "Night 3 - Chest Chest2",
+   "region": "Night 3",
+   "group": "Chests"
+  },
+  {
+   "id": 74100330,
+   "key": "object:17:PumpkinPasty1",
+   "name": "Night 3 - Sweet PumpkinPasty1",
+   "region": "Night 3",
+   "group": "Sweets"
+  },
+  {
+   "id": 74100331,
+   "key": "object:17:PumpkinPasty2",
+   "name": "Night 3 - Sweet PumpkinPasty2",
+   "region": "Night 3",
+   "group": "Sweets"
+  },
+  {
+   "id": 74100332,
+   "key": "object:17:chesttest",
+   "name": "Night 3 - Chest chesttest",
+   "region": "Night 3",
+   "group": "Chests"
+  },
+  {
+   "id": 74100333,
+   "key": "object:19:Chest3",
+   "name": "Day 4 - Chest Chest3",
+   "region": "Day 4",
+   "group": "Chests"
+  },
+  {
+   "id": 74100334,
+   "key": "object:19:Chest4",
+   "name": "Day 4 - Chest Chest4",
+   "region": "Day 4",
+   "group": "Chests"
+  },
+  {
+   "id": 74100335,
+   "key": "object:19:Chest5",
+   "name": "Day 4 - Chest Chest5",
+   "region": "Day 4",
+   "group": "Chests"
+  },
+  {
+   "id": 74100336,
+   "key": "object:19:StinkpelletChest",
+   "name": "Day 4 - Chest StinkpelletChest",
+   "region": "Day 4",
+   "group": "Chests"
+  },
+  {
+   "id": 74100337,
+   "key": "object:20:ChestINF01",
+   "name": "Incendio Lesson - Chest ChestINF01",
+   "region": "Incendio Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100338,
+   "key": "object:20:ChestINF02",
+   "name": "Incendio Lesson - Chest ChestINF02",
+   "region": "Incendio Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100339,
+   "key": "object:20:ChestINF03",
+   "name": "Incendio Lesson - Chest ChestINF03",
+   "region": "Incendio Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100340,
+   "key": "object:20:ChestINX01",
+   "name": "Incendio Lesson - Chest ChestINX01",
+   "region": "Incendio Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100341,
+   "key": "object:20:ChestINX02",
+   "name": "Incendio Lesson - Chest ChestINX02",
+   "region": "Incendio Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100342,
+   "key": "object:20:ChestINX03",
+   "name": "Incendio Lesson - Chest ChestINX03",
+   "region": "Incendio Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100343,
+   "key": "object:20:ChestINX04",
+   "name": "Incendio Lesson - Chest ChestINX04",
+   "region": "Incendio Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100344,
+   "key": "object:20:Chest_Diffindo1",
+   "name": "Incendio Lesson - Chest Chest_Diffindo1",
+   "region": "Incendio Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100345,
+   "key": "object:20:Chest_Lumos1",
+   "name": "Incendio Lesson - Chest Chest_Lumos1",
+   "region": "Incendio Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100346,
+   "key": "object:20:Chest_Lumos2",
+   "name": "Incendio Lesson - Chest Chest_Lumos2",
+   "region": "Incendio Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100347,
+   "key": "object:20:Chest_Lumos3",
+   "name": "Incendio Lesson - Chest Chest_Lumos3",
+   "region": "Incendio Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100348,
+   "key": "object:20:ChocFrog01",
+   "name": "Incendio Lesson - Chocolate Frog ChocFrog01",
+   "region": "Incendio Lesson",
+   "group": "Chocolate Frogs"
+  },
+  {
+   "id": 74100349,
+   "key": "object:20:ChocFrog02",
+   "name": "Incendio Lesson - Chocolate Frog ChocFrog02",
+   "region": "Incendio Lesson",
+   "group": "Chocolate Frogs"
+  },
+  {
+   "id": 74100350,
+   "key": "object:20:Day4CardTraderEntranceHallPupil",
+   "name": "Incendio Lesson - Wizard Card Day4CardTraderEntranceHallPupil",
+   "region": "Incendio Lesson",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100351,
+   "key": "object:20:Day4CardTraderFloor2Pupil",
+   "name": "Incendio Lesson - Wizard Card Day4CardTraderFloor2Pupil",
+   "region": "Incendio Lesson",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100352,
+   "key": "object:20:Day4GFGrStairCardTraderPupil",
+   "name": "Incendio Lesson - Wizard Card Day4GFGrStairCardTraderPupil",
+   "region": "Incendio Lesson",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100353,
+   "key": "object:20:Day4GryfinDormCardTraderPupil",
+   "name": "Incendio Lesson - Wizard Card Day4GryfinDormCardTraderPupil",
+   "region": "Incendio Lesson",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100354,
+   "key": "object:20:WizardChest_1",
+   "name": "Incendio Lesson - Chest WizardChest_1",
+   "region": "Incendio Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100355,
+   "key": "object:20:WizardChest_2",
+   "name": "Incendio Lesson - Chest WizardChest_2",
+   "region": "Incendio Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100356,
+   "key": "object:20:WizardChest_3",
+   "name": "Incendio Lesson - Chest WizardChest_3",
+   "region": "Incendio Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100357,
+   "key": "object:20:WizardChest_4",
+   "name": "Incendio Lesson - Chest WizardChest_4",
+   "region": "Incendio Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100358,
+   "key": "object:20:searchobjects",
+   "name": "Incendio Lesson - Secret searchobjects",
+   "region": "Incendio Lesson",
+   "group": "Secrets"
+  },
+  {
+   "id": 74100359,
+   "key": "object:21:chesttest",
+   "name": "Night 4 - Chest chesttest",
+   "region": "Night 4",
+   "group": "Chests"
+  },
+  {
+   "id": 74100360,
+   "key": "object:23:wizardchest",
+   "name": "Day 5 - Chest wizardchest",
+   "region": "Day 5",
+   "group": "Chests"
+  },
+  {
+   "id": 74100361,
+   "key": "object:25:Day5CloistersCardTrader",
+   "name": "Night 5 - Wizard Card Day5CloistersCardTrader",
+   "region": "Night 5",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100362,
+   "key": "object:25:Day5DungeonCardTraderPupil",
+   "name": "Night 5 - Wizard Card Day5DungeonCardTraderPupil",
+   "region": "Night 5",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100363,
+   "key": "object:25:Day5EntrHallCardTraderPupil",
+   "name": "Night 5 - Wizard Card Day5EntrHallCardTraderPupil",
+   "region": "Night 5",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100364,
+   "key": "object:26:AntidoteCauldronEffect",
+   "name": "Devil's Snare - Sweet AntidoteCauldronEffect",
+   "region": "Devil's Snare",
+   "group": "Sweets"
+  },
+  {
+   "id": 74100365,
+   "key": "object:26:AntidoteCauldronSound",
+   "name": "Devil's Snare - Sweet AntidoteCauldronSound",
+   "region": "Devil's Snare",
+   "group": "Sweets"
+  },
+  {
+   "id": 74100366,
+   "key": "object:26:ChocFrog1",
+   "name": "Devil's Snare - Chocolate Frog ChocFrog1",
+   "region": "Devil's Snare",
+   "group": "Chocolate Frogs"
+  },
+  {
+   "id": 74100367,
+   "key": "object:26:ChocFrog2",
+   "name": "Devil's Snare - Chocolate Frog ChocFrog2",
+   "region": "Devil's Snare",
+   "group": "Chocolate Frogs"
+  },
+  {
+   "id": 74100368,
+   "key": "object:26:WarpCauldronRoom",
+   "name": "Devil's Snare - Sweet WarpCauldronRoom",
+   "region": "Devil's Snare",
+   "group": "Sweets"
+  },
+  {
+   "id": 74100369,
+   "key": "object:26:chesttest",
+   "name": "Devil's Snare - Chest chesttest",
+   "region": "Devil's Snare",
+   "group": "Chests"
+  },
+  {
+   "id": 74100370,
+   "key": "object:29:ChocFrog1",
+   "name": "Quirrell - Chocolate Frog ChocFrog1",
+   "region": "Quirrell",
+   "group": "Chocolate Frogs"
+  },
+  {
+   "id": 74100371,
+   "key": "object:29:ChocFrog2",
+   "name": "Quirrell - Chocolate Frog ChocFrog2",
+   "region": "Quirrell",
+   "group": "Chocolate Frogs"
+  },
+  {
+   "id": 74100372,
+   "key": "object:29:ChocFrog3",
+   "name": "Quirrell - Chocolate Frog ChocFrog3",
+   "region": "Quirrell",
+   "group": "Chocolate Frogs"
+  },
+  {
+   "id": 74100373,
+   "key": "object:6:BIG_BeanBlue01",
+   "name": "Day 0 - Bean BIG_BeanBlue01",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100374,
+   "key": "object:6:BIG_BeanBlue02",
+   "name": "Day 0 - Bean BIG_BeanBlue02",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100375,
+   "key": "object:6:BIG_BeanBlue03",
+   "name": "Day 0 - Bean BIG_BeanBlue03",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100376,
+   "key": "object:6:BIG_BeanBlue04",
+   "name": "Day 0 - Bean BIG_BeanBlue04",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100377,
+   "key": "object:6:BIG_BeanBlue05",
+   "name": "Day 0 - Bean BIG_BeanBlue05",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100378,
+   "key": "object:6:BIG_BeanBlue06",
+   "name": "Day 0 - Bean BIG_BeanBlue06",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100379,
+   "key": "object:6:BIG_BeanBlue07",
+   "name": "Day 0 - Bean BIG_BeanBlue07",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100380,
+   "key": "object:6:BIG_BeanBlue08",
+   "name": "Day 0 - Bean BIG_BeanBlue08",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100381,
+   "key": "object:6:BIG_BeanBlue09",
+   "name": "Day 0 - Bean BIG_BeanBlue09",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100382,
+   "key": "object:6:BIG_BeanGreen01",
+   "name": "Day 0 - Bean BIG_BeanGreen01",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100383,
+   "key": "object:6:BIG_BeanGreen02",
+   "name": "Day 0 - Bean BIG_BeanGreen02",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100384,
+   "key": "object:6:BIG_BeanGreen03",
+   "name": "Day 0 - Bean BIG_BeanGreen03",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100385,
+   "key": "object:6:BIG_BeanGreen04",
+   "name": "Day 0 - Bean BIG_BeanGreen04",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100386,
+   "key": "object:6:BIG_BeanGreen05",
+   "name": "Day 0 - Bean BIG_BeanGreen05",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100387,
+   "key": "object:6:BIG_BeanGreen06",
+   "name": "Day 0 - Bean BIG_BeanGreen06",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100388,
+   "key": "object:6:BIG_BeanGreen07",
+   "name": "Day 0 - Bean BIG_BeanGreen07",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100389,
+   "key": "object:6:BIG_BeanGreen08",
+   "name": "Day 0 - Bean BIG_BeanGreen08",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100390,
+   "key": "object:6:BIG_BeanRed01",
+   "name": "Day 0 - Bean BIG_BeanRed01",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100391,
+   "key": "object:6:BIG_BeanRed02",
+   "name": "Day 0 - Bean BIG_BeanRed02",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100392,
+   "key": "object:6:BIG_BeanRed03",
+   "name": "Day 0 - Bean BIG_BeanRed03",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100393,
+   "key": "object:6:BIG_BeanRed04",
+   "name": "Day 0 - Bean BIG_BeanRed04",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100394,
+   "key": "object:6:BIG_BeanRed05",
+   "name": "Day 0 - Bean BIG_BeanRed05",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100395,
+   "key": "object:6:BIG_BeanRed06",
+   "name": "Day 0 - Bean BIG_BeanRed06",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100396,
+   "key": "object:6:BIG_BeanRed07",
+   "name": "Day 0 - Bean BIG_BeanRed07",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100397,
+   "key": "object:6:BIG_BeanRed08",
+   "name": "Day 0 - Bean BIG_BeanRed08",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100398,
+   "key": "object:6:BIG_BeanYellow01",
+   "name": "Day 0 - Bean BIG_BeanYellow01",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100399,
+   "key": "object:6:BIG_BeanYellow02",
+   "name": "Day 0 - Bean BIG_BeanYellow02",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100400,
+   "key": "object:6:BIG_BeanYellow03",
+   "name": "Day 0 - Bean BIG_BeanYellow03",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100401,
+   "key": "object:6:BIG_BeanYellow04",
+   "name": "Day 0 - Bean BIG_BeanYellow04",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100402,
+   "key": "object:6:BIG_BeanYellow05",
+   "name": "Day 0 - Bean BIG_BeanYellow05",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100403,
+   "key": "object:6:BIG_BeanYellow06",
+   "name": "Day 0 - Bean BIG_BeanYellow06",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100404,
+   "key": "object:6:BIG_BeanYellow07",
+   "name": "Day 0 - Bean BIG_BeanYellow07",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100405,
+   "key": "object:6:BIG_BeanYellow08",
+   "name": "Day 0 - Bean BIG_BeanYellow08",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100406,
+   "key": "object:6:BIG_BeanYellow09",
+   "name": "Day 0 - Bean BIG_BeanYellow09",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100407,
+   "key": "object:6:BIG_BeanYellow10",
+   "name": "Day 0 - Bean BIG_BeanYellow10",
+   "region": "Day 0",
+   "group": "Beans"
+  },
+  {
+   "id": 74100408,
+   "key": "object:6:Chest_1",
+   "name": "Day 0 - Chest Chest_1",
+   "region": "Day 0",
+   "group": "Chests"
+  },
+  {
+   "id": 74100409,
+   "key": "object:6:Chest_2",
+   "name": "Day 0 - Chest Chest_2",
+   "region": "Day 0",
+   "group": "Chests"
+  },
+  {
+   "id": 74100410,
+   "key": "object:6:Crawl_FromWizChestCrawlIn",
+   "name": "Day 0 - Chest Crawl_FromWizChestCrawlIn",
+   "region": "Day 0",
+   "group": "Chests"
+  },
+  {
+   "id": 74100411,
+   "key": "object:6:Crawl_FromWizChestCrawlOut",
+   "name": "Day 0 - Chest Crawl_FromWizChestCrawlOut",
+   "region": "Day 0",
+   "group": "Chests"
+  },
+  {
+   "id": 74100412,
+   "key": "object:6:Crawl_ToWizChestCrawlIn",
+   "name": "Day 0 - Chest Crawl_ToWizChestCrawlIn",
+   "region": "Day 0",
+   "group": "Chests"
+  },
+  {
+   "id": 74100413,
+   "key": "object:6:Crawl_ToWizChestCrawlOut",
+   "name": "Day 0 - Chest Crawl_ToWizChestCrawlOut",
+   "region": "Day 0",
+   "group": "Chests"
+  },
+  {
+   "id": 74100414,
+   "key": "object:6:SearchObjects",
+   "name": "Day 0 - Secret SearchObjects",
+   "region": "Day 0",
+   "group": "Secrets"
+  },
+  {
+   "id": 74100415,
+   "key": "object:6:WizardChest_1",
+   "name": "Day 0 - Chest WizardChest_1",
+   "region": "Day 0",
+   "group": "Chests"
+  },
+  {
+   "id": 74100416,
+   "key": "object:6:WizardChest_3",
+   "name": "Day 0 - Chest WizardChest_3",
+   "region": "Day 0",
+   "group": "Chests"
+  },
+  {
+   "id": 74100417,
+   "key": "object:6:WizzzzzCard",
+   "name": "Day 0 - Wizard Card WizzzzzCard",
+   "region": "Day 0",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100418,
+   "key": "object:9:Bean01",
+   "name": "Lumos Lesson - Bean Bean01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100419,
+   "key": "object:9:Bean02",
+   "name": "Lumos Lesson - Bean Bean02",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100420,
+   "key": "object:9:Bean03",
+   "name": "Lumos Lesson - Bean Bean03",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100421,
+   "key": "object:9:Bean04",
+   "name": "Lumos Lesson - Bean Bean04",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100422,
+   "key": "object:9:Bean05",
+   "name": "Lumos Lesson - Bean Bean05",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100423,
+   "key": "object:9:Bean06",
+   "name": "Lumos Lesson - Bean Bean06",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100424,
+   "key": "object:9:Bean07",
+   "name": "Lumos Lesson - Bean Bean07",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100425,
+   "key": "object:9:Bean08",
+   "name": "Lumos Lesson - Bean Bean08",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100426,
+   "key": "object:9:Bean09",
+   "name": "Lumos Lesson - Bean Bean09",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100427,
+   "key": "object:9:Bean10",
+   "name": "Lumos Lesson - Bean Bean10",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100428,
+   "key": "object:9:Bean11",
+   "name": "Lumos Lesson - Bean Bean11",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100429,
+   "key": "object:9:Bean12",
+   "name": "Lumos Lesson - Bean Bean12",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100430,
+   "key": "object:9:BeanBlue12_01",
+   "name": "Lumos Lesson - Bean BeanBlue12_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100431,
+   "key": "object:9:BeanBlue15_01",
+   "name": "Lumos Lesson - Bean BeanBlue15_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100432,
+   "key": "object:9:BeanBlue18_01",
+   "name": "Lumos Lesson - Bean BeanBlue18_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100433,
+   "key": "object:9:BeanBlue18_02",
+   "name": "Lumos Lesson - Bean BeanBlue18_02",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100434,
+   "key": "object:9:BeanBlue18_03",
+   "name": "Lumos Lesson - Bean BeanBlue18_03",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100435,
+   "key": "object:9:BeanBlue7_01",
+   "name": "Lumos Lesson - Bean BeanBlue7_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100436,
+   "key": "object:9:BeanBlue7_02",
+   "name": "Lumos Lesson - Bean BeanBlue7_02",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100437,
+   "key": "object:9:BeanBlue7_03",
+   "name": "Lumos Lesson - Bean BeanBlue7_03",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100438,
+   "key": "object:9:BeanBlue7_04",
+   "name": "Lumos Lesson - Bean BeanBlue7_04",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100439,
+   "key": "object:9:BeanBlue7_05",
+   "name": "Lumos Lesson - Bean BeanBlue7_05",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100440,
+   "key": "object:9:BeanBlue7_06",
+   "name": "Lumos Lesson - Bean BeanBlue7_06",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100441,
+   "key": "object:9:BeanBlue9_01",
+   "name": "Lumos Lesson - Bean BeanBlue9_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100442,
+   "key": "object:9:BeanGreen12_01",
+   "name": "Lumos Lesson - Bean BeanGreen12_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100443,
+   "key": "object:9:BeanGreen15_01",
+   "name": "Lumos Lesson - Bean BeanGreen15_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100444,
+   "key": "object:9:BeanGreen18_01",
+   "name": "Lumos Lesson - Bean BeanGreen18_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100445,
+   "key": "object:9:BeanGreen18_02",
+   "name": "Lumos Lesson - Bean BeanGreen18_02",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100446,
+   "key": "object:9:BeanGreen18_03",
+   "name": "Lumos Lesson - Bean BeanGreen18_03",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100447,
+   "key": "object:9:BeanGreen7_01",
+   "name": "Lumos Lesson - Bean BeanGreen7_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100448,
+   "key": "object:9:BeanGreen7_02",
+   "name": "Lumos Lesson - Bean BeanGreen7_02",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100449,
+   "key": "object:9:BeanGreen7_03",
+   "name": "Lumos Lesson - Bean BeanGreen7_03",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100450,
+   "key": "object:9:BeanGreen7_04",
+   "name": "Lumos Lesson - Bean BeanGreen7_04",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100451,
+   "key": "object:9:BeanGreen7_05",
+   "name": "Lumos Lesson - Bean BeanGreen7_05",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100452,
+   "key": "object:9:BeanRed12_01",
+   "name": "Lumos Lesson - Bean BeanRed12_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100453,
+   "key": "object:9:BeanRed15_01",
+   "name": "Lumos Lesson - Bean BeanRed15_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100454,
+   "key": "object:9:BeanRed18_01",
+   "name": "Lumos Lesson - Bean BeanRed18_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100455,
+   "key": "object:9:BeanRed18_02",
+   "name": "Lumos Lesson - Bean BeanRed18_02",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100456,
+   "key": "object:9:BeanRed7_01",
+   "name": "Lumos Lesson - Bean BeanRed7_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100457,
+   "key": "object:9:BeanRed7_02",
+   "name": "Lumos Lesson - Bean BeanRed7_02",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100458,
+   "key": "object:9:BeanRed7_03",
+   "name": "Lumos Lesson - Bean BeanRed7_03",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100459,
+   "key": "object:9:BeanRed7_04",
+   "name": "Lumos Lesson - Bean BeanRed7_04",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100460,
+   "key": "object:9:BeanRed7_05",
+   "name": "Lumos Lesson - Bean BeanRed7_05",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100461,
+   "key": "object:9:BeanYellow12_01",
+   "name": "Lumos Lesson - Bean BeanYellow12_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100462,
+   "key": "object:9:BeanYellow15_01",
+   "name": "Lumos Lesson - Bean BeanYellow15_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100463,
+   "key": "object:9:BeanYellow18_01",
+   "name": "Lumos Lesson - Bean BeanYellow18_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100464,
+   "key": "object:9:BeanYellow18_02",
+   "name": "Lumos Lesson - Bean BeanYellow18_02",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100465,
+   "key": "object:9:BeanYellow18_03",
+   "name": "Lumos Lesson - Bean BeanYellow18_03",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100466,
+   "key": "object:9:BeanYellow18_04",
+   "name": "Lumos Lesson - Bean BeanYellow18_04",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100467,
+   "key": "object:9:BeanYellow7_01",
+   "name": "Lumos Lesson - Bean BeanYellow7_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100468,
+   "key": "object:9:BeanYellow7_02",
+   "name": "Lumos Lesson - Bean BeanYellow7_02",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100469,
+   "key": "object:9:BeanYellow7_03",
+   "name": "Lumos Lesson - Bean BeanYellow7_03",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100470,
+   "key": "object:9:BeanYellow7_04",
+   "name": "Lumos Lesson - Bean BeanYellow7_04",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100471,
+   "key": "object:9:BeanYellow7_05",
+   "name": "Lumos Lesson - Bean BeanYellow7_05",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100472,
+   "key": "object:9:BeanYellow9_01",
+   "name": "Lumos Lesson - Bean BeanYellow9_01",
+   "region": "Lumos Lesson",
+   "group": "Beans"
+  },
+  {
+   "id": 74100473,
+   "key": "object:9:Chest01",
+   "name": "Lumos Lesson - Chest Chest01",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100474,
+   "key": "object:9:Chest02",
+   "name": "Lumos Lesson - Chest Chest02",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100475,
+   "key": "object:9:Chest05",
+   "name": "Lumos Lesson - Chest Chest05",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100476,
+   "key": "object:9:Chest07",
+   "name": "Lumos Lesson - Chest Chest07",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100477,
+   "key": "object:9:Chest08",
+   "name": "Lumos Lesson - Chest Chest08",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100478,
+   "key": "object:9:Chest09",
+   "name": "Lumos Lesson - Chest Chest09",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100479,
+   "key": "object:9:Chest10",
+   "name": "Lumos Lesson - Chest Chest10",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100480,
+   "key": "object:9:Chest11",
+   "name": "Lumos Lesson - Chest Chest11",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100481,
+   "key": "object:9:Chest12",
+   "name": "Lumos Lesson - Chest Chest12",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100482,
+   "key": "object:9:Chest12_Pasty",
+   "name": "Lumos Lesson - Chest Chest12_Pasty",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100483,
+   "key": "object:9:Chest14",
+   "name": "Lumos Lesson - Chest Chest14",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100484,
+   "key": "object:9:Chest15",
+   "name": "Lumos Lesson - Chest Chest15",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100485,
+   "key": "object:9:Chest16",
+   "name": "Lumos Lesson - Chest Chest16",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100486,
+   "key": "object:9:Chest17",
+   "name": "Lumos Lesson - Chest Chest17",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100487,
+   "key": "object:9:Day1CloistersCardTraderPupil",
+   "name": "Lumos Lesson - Wizard Card Day1CloistersCardTraderPupil",
+   "region": "Lumos Lesson",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100488,
+   "key": "object:9:Day1EntHallCardTraderPupil",
+   "name": "Lumos Lesson - Wizard Card Day1EntHallCardTraderPupil",
+   "region": "Lumos Lesson",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100489,
+   "key": "object:9:Day1Floor3CardTraderPupil",
+   "name": "Lumos Lesson - Wizard Card Day1Floor3CardTraderPupil",
+   "region": "Lumos Lesson",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100490,
+   "key": "object:9:GhostChest",
+   "name": "Lumos Lesson - Chest GhostChest",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100491,
+   "key": "object:9:GhostChest01",
+   "name": "Lumos Lesson - Chest GhostChest01",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100492,
+   "key": "object:9:LargeChest01_Card",
+   "name": "Lumos Lesson - Chest LargeChest01_Card",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100493,
+   "key": "object:9:OwlTreat01",
+   "name": "Lumos Lesson - Item OwlTreat01",
+   "region": "Lumos Lesson",
+   "group": "Items"
+  },
+  {
+   "id": 74100494,
+   "key": "object:9:WarpGargoyleSecret",
+   "name": "Lumos Lesson - Secret WarpGargoyleSecret",
+   "region": "Lumos Lesson",
+   "group": "Secrets"
+  },
+  {
+   "id": 74100495,
+   "key": "object:9:WizardChest01",
+   "name": "Lumos Lesson - Chest WizardChest01",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100496,
+   "key": "object:9:WizardChest02",
+   "name": "Lumos Lesson - Chest WizardChest02",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100497,
+   "key": "object:9:WizardChest03",
+   "name": "Lumos Lesson - Chest WizardChest03",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100498,
+   "key": "object:9:WizardChest04",
+   "name": "Lumos Lesson - Chest WizardChest04",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100499,
+   "key": "object:9:WoodChest01",
+   "name": "Lumos Lesson - Chest WoodChest01",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100500,
+   "key": "object:9:WoodChest02",
+   "name": "Lumos Lesson - Chest WoodChest02",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100501,
+   "key": "object:9:WoodChest03",
+   "name": "Lumos Lesson - Chest WoodChest03",
+   "region": "Lumos Lesson",
+   "group": "Chests"
+  },
+  {
+   "id": 74100502,
+   "key": "object:9:_ExitSecretRoom",
+   "name": "Lumos Lesson - Secret _ExitSecretRoom",
+   "region": "Lumos Lesson",
+   "group": "Secrets"
+  },
+  {
+   "id": 74100503,
+   "key": "object:9:searchobjects",
+   "name": "Lumos Lesson - Secret searchobjects",
+   "region": "Lumos Lesson",
+   "group": "Secrets"
+  },
+  {
+   "id": 74100504,
+   "key": "scene:10:SecretCorridorA_CrawlContextOf",
+   "name": "Night 1 - SecretCorridorA_CrawlContextOf",
+   "region": "Night 1",
+   "group": "Scenes"
+  },
+  {
+   "id": 74100505,
+   "key": "scene:10:SecretCorridorA_CrawlContextOn",
+   "name": "Night 1 - SecretCorridorA_CrawlContextOn",
+   "region": "Night 1",
+   "group": "Scenes"
+  },
+  {
+   "id": 74100506,
+   "key": "scene:11:HermioneEntersFatLadyRoom",
+   "name": "Day 2 - HermioneEntersFatLadyRoom",
+   "region": "Day 2",
+   "group": "Scenes"
+  },
+  {
+   "id": 74100507,
+   "key": "scene:11:RonOutsideFatLady",
+   "name": "Day 2 - RonOutsideFatLady",
+   "region": "Day 2",
+   "group": "Scenes"
+  },
+  {
+   "id": 74100508,
+   "key": "scene:11:Stage2Hoops",
+   "name": "Day 2 - Stage2Hoops",
+   "region": "Day 2",
+   "group": "Quidditch"
+  },
+  {
+   "id": 74100509,
+   "key": "scene:11:Stage2HoopsFinished",
+   "name": "Day 2 - Stage2HoopsFinished",
+   "region": "Day 2",
+   "group": "Quidditch"
+  },
+  {
+   "id": 74100510,
+   "key": "scene:15:Stage2Hoops",
+   "name": "Day 3 - Stage2Hoops",
+   "region": "Day 3",
+   "group": "Quidditch"
+  },
+  {
+   "id": 74100511,
+   "key": "scene:15:Stage2HoopsFinished",
+   "name": "Day 3 - Stage2HoopsFinished",
+   "region": "Day 3",
+   "group": "Quidditch"
+  },
+  {
+   "id": 74100512,
+   "key": "scene:17:PeevesBossFight",
+   "name": "Night 3 - PeevesBossFight",
+   "region": "Night 3",
+   "group": "Scenes"
+  },
+  {
+   "id": 74100513,
+   "key": "scene:17:PeevesPursuit02",
+   "name": "Night 3 - PeevesPursuit02",
+   "region": "Night 3",
+   "group": "Scenes"
+  },
+  {
+   "id": 74100514,
+   "key": "scene:17:PeevesPursuitStairs",
+   "name": "Night 3 - PeevesPursuitStairs",
+   "region": "Night 3",
+   "group": "Scenes"
+  },
+  {
+   "id": 74100515,
+   "key": "scene:19:GenGryffSecretStart02",
+   "name": "Day 4 - GenGryffSecretStart02",
+   "region": "Day 4",
+   "group": "Scenes"
+  },
+  {
+   "id": 74100516,
+   "key": "scene:19:Stage2Hoops",
+   "name": "Day 4 - Stage2Hoops",
+   "region": "Day 4",
+   "group": "Quidditch"
+  },
+  {
+   "id": 74100517,
+   "key": "scene:19:Stage2HoopsFinished",
+   "name": "Day 4 - Stage2HoopsFinished",
+   "region": "Day 4",
+   "group": "Quidditch"
+  },
+  {
+   "id": 74100518,
+   "key": "scene:21:CrawlDcamSecretCorridorA",
+   "name": "Night 4 - CrawlDcamSecretCorridorA",
+   "region": "Night 4",
+   "group": "Scenes"
+  },
+  {
+   "id": 74100519,
+   "key": "scene:21:SecretCorridorA_CrawlContextOf",
+   "name": "Night 4 - SecretCorridorA_CrawlContextOf",
+   "region": "Night 4",
+   "group": "Scenes"
+  },
+  {
+   "id": 74100520,
+   "key": "scene:21:SecretCorridorA_CrawlContextOn",
+   "name": "Night 4 - SecretCorridorA_CrawlContextOn",
+   "region": "Night 4",
+   "group": "Scenes"
+  },
+  {
+   "id": 74100521,
+   "key": "scene:21:SecretCorridorA_to_Floor4MainR",
+   "name": "Night 4 - SecretCorridorA_to_Floor4MainR",
+   "region": "Night 4",
+   "group": "Scenes"
+  },
+  {
+   "id": 74100522,
+   "key": "scene:23:QuidLevelComplete1",
+   "name": "Day 5 - QuidLevelComplete1",
+   "region": "Day 5",
+   "group": "Quidditch"
+  },
+  {
+   "id": 74100523,
+   "key": "scene:23:QuidLevelComplete2",
+   "name": "Day 5 - QuidLevelComplete2",
+   "region": "Day 5",
+   "group": "Quidditch"
+  },
+  {
+   "id": 74100524,
+   "key": "scene:23:QuidLevelComplete3",
+   "name": "Day 5 - QuidLevelComplete3",
+   "region": "Day 5",
+   "group": "Quidditch"
+  },
+  {
+   "id": 74100525,
+   "key": "scene:23:SnitchChase",
+   "name": "Day 5 - SnitchChase",
+   "region": "Day 5",
+   "group": "Quidditch"
+  },
+  {
+   "id": 74100526,
+   "key": "scene:23:Stage2Hoops",
+   "name": "Day 5 - Stage2Hoops",
+   "region": "Day 5",
+   "group": "Quidditch"
+  },
+  {
+   "id": 74100527,
+   "key": "scene:23:Stage2HoopsFinished",
+   "name": "Day 5 - Stage2HoopsFinished",
+   "region": "Day 5",
+   "group": "Quidditch"
+  },
+  {
+   "id": 74100528,
+   "key": "scene:25:SecretCorridorA_CrawlContextOf",
+   "name": "Night 5 - SecretCorridorA_CrawlContextOf",
+   "region": "Night 5",
+   "group": "Scenes"
+  },
+  {
+   "id": 74100529,
+   "key": "scene:25:SecretCorridorA_CrawlContextOn",
+   "name": "Night 5 - SecretCorridorA_CrawlContextOn",
+   "region": "Night 5",
+   "group": "Scenes"
+  },
+  {
+   "id": 74100530,
+   "key": "scene:25:SecretCorridorA_to_Floor4MainR",
+   "name": "Night 5 - SecretCorridorA_to_Floor4MainR",
+   "region": "Night 5",
+   "group": "Scenes"
+  },
+  {
+   "id": 74100531,
+   "key": "scene:7:ForceFatLady",
+   "name": "Night 0 - ForceFatLady",
+   "region": "Night 0",
+   "group": "Scenes"
+  },
+  {
+   "id": 74100532,
+   "key": "scene:7:PercyPassword",
+   "name": "Night 0 - PercyPassword",
+   "region": "Night 0",
+   "group": "Scenes"
+  },
+  {
+   "id": 74100533,
+   "key": "scene:8:FlyingCourse",
+   "name": "Day 1 - FlyingCourse",
+   "region": "Day 1",
+   "group": "Quidditch"
+  },
+  {
+   "id": 74100534,
+   "key": "scene:8:Stage2Hoops",
+   "name": "Day 1 - Stage2Hoops",
+   "region": "Day 1",
+   "group": "Quidditch"
+  },
+  {
+   "id": 74100535,
+   "key": "scene:8:Stage2HoopsFinished",
+   "name": "Day 1 - Stage2HoopsFinished",
+   "region": "Day 1",
+   "group": "Quidditch"
+  },
+  {
+   "id": 74100536,
+   "key": "scene:8:Stage2HoopsFinishedRetry",
+   "name": "Day 1 - Stage2HoopsFinishedRetry",
+   "region": "Day 1",
+   "group": "Quidditch"
+  },
+  {
+   "id": 74100537,
+   "key": "scene:8:Stage2HoopsRetry",
+   "name": "Day 1 - Stage2HoopsRetry",
+   "region": "Day 1",
+   "group": "Quidditch"
+  },
+  {
+   "id": 74100538,
+   "key": "script:10:AlohamoraSpellbookPickup:CollectInventoryItem:12",
+   "name": "Night 1 - AlohamoraSpellbookPickup gift 12",
+   "region": "Night 1",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100539,
+   "key": "script:10:Startup:CollectInventoryItem:23",
+   "name": "Night 1 - Startup gift 23",
+   "region": "Night 1",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100540,
+   "key": "script:10:Startup:CollectInventoryItem:24",
+   "name": "Night 1 - Startup gift 24",
+   "region": "Night 1",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100541,
+   "key": "script:11:HPE26:AwardSpellChallengePoints:3|HogwartsExtras.SC_Difference",
+   "name": "Day 2 - HPE26 (3/HogwartsExtras.SC_Difference)",
+   "region": "Day 2",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100542,
+   "key": "script:11:NEWLumosHousePoints:AwardSpellChallengePoints:1|HogwartsExtras.SC_Difference",
+   "name": "Day 2 - NEWLumosHousePoints (1/HogwartsExtras.SC_Difference)",
+   "region": "Day 2",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100543,
+   "key": "script:11:NEWSpongifyHousePoints:AwardSpellChallengePoints:3|HogwartsExtras.SC_Difference",
+   "name": "Day 2 - NEWSpongifyHousePoints (3/HogwartsExtras.SC_Difference)",
+   "region": "Day 2",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100544,
+   "key": "script:11:Stage2HoopsFinished:AwardSpellChallengePoints:0|10",
+   "name": "Day 2 - Stage2HoopsFinished (0/10)",
+   "region": "Day 2",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100545,
+   "key": "script:11:Stage2HoopsFinished:AwardSpellChallengePoints:0|20",
+   "name": "Day 2 - Stage2HoopsFinished (0/20)",
+   "region": "Day 2",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100546,
+   "key": "script:11:Stage2HoopsFinished:AwardSpellChallengePoints:0|30",
+   "name": "Day 2 - Stage2HoopsFinished (0/30)",
+   "region": "Day 2",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100547,
+   "key": "script:11:Stage2HoopsFinished:AwardSpellChallengePoints:0|40",
+   "name": "Day 2 - Stage2HoopsFinished (0/40)",
+   "region": "Day 2",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100548,
+   "key": "script:11:Stage2HoopsFinished:AwardSpellChallengePoints:0|5",
+   "name": "Day 2 - Stage2HoopsFinished (0/5)",
+   "region": "Day 2",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100549,
+   "key": "script:11:Stage2HoopsFinished:AwardSpellChallengePoints:0|50",
+   "name": "Day 2 - Stage2HoopsFinished (0/50)",
+   "region": "Day 2",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100550,
+   "key": "script:11:Startup:CollectInventoryItem:23",
+   "name": "Day 2 - Startup gift 23",
+   "region": "Day 2",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100551,
+   "key": "script:11:Startup:CollectInventoryItem:24",
+   "name": "Day 2 - Startup gift 24",
+   "region": "Day 2",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100552,
+   "key": "script:12:SpellBookActionPressed:CollectInventoryItem:8",
+   "name": "Spongify Lesson - SpellBookActionPressed gift 8",
+   "region": "Spongify Lesson",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100553,
+   "key": "script:12:startup:CollectInventoryItem:23",
+   "name": "Spongify Lesson - startup gift 23",
+   "region": "Spongify Lesson",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100554,
+   "key": "script:12:startup:CollectInventoryItem:24",
+   "name": "Spongify Lesson - startup gift 24",
+   "region": "Spongify Lesson",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100555,
+   "key": "script:13:Startup:CollectInventoryItem:23",
+   "name": "Night 2 - Startup gift 23",
+   "region": "Night 2",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100556,
+   "key": "script:13:Startup:CollectInventoryItem:24",
+   "name": "Night 2 - Startup gift 24",
+   "region": "Night 2",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100557,
+   "key": "script:13:Startup:CollectInventoryItem:31",
+   "name": "Night 2 - Startup gift 31",
+   "region": "Night 2",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100558,
+   "key": "script:15:GetDittanyScript:CollectInventoryItem:38",
+   "name": "Day 3 - GetDittanyScript gift 38",
+   "region": "Day 3",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100559,
+   "key": "script:15:GetDittanyScript:CollectInventoryItem:39",
+   "name": "Day 3 - GetDittanyScript gift 39",
+   "region": "Day 3",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100560,
+   "key": "script:15:HPE33Script:CollectInventoryItem:26",
+   "name": "Day 3 - HPE33Script gift 26",
+   "region": "Day 3",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100561,
+   "key": "script:15:NEWLumosHousePoints:AwardSpellChallengePoints:1|HogwartsExtras.SC_Difference",
+   "name": "Day 3 - NEWLumosHousePoints (1/HogwartsExtras.SC_Difference)",
+   "region": "Day 3",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100562,
+   "key": "script:15:NEWSpongifyHousePoints:AwardSpellChallengePoints:3|HogwartsExtras.SC_Difference",
+   "name": "Day 3 - NEWSpongifyHousePoints (3/HogwartsExtras.SC_Difference)",
+   "region": "Day 3",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100563,
+   "key": "script:15:Stage2HoopsFinished:AwardSpellChallengePoints:0|10",
+   "name": "Day 3 - Stage2HoopsFinished (0/10)",
+   "region": "Day 3",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100564,
+   "key": "script:15:Stage2HoopsFinished:AwardSpellChallengePoints:0|20",
+   "name": "Day 3 - Stage2HoopsFinished (0/20)",
+   "region": "Day 3",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100565,
+   "key": "script:15:Stage2HoopsFinished:AwardSpellChallengePoints:0|30",
+   "name": "Day 3 - Stage2HoopsFinished (0/30)",
+   "region": "Day 3",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100566,
+   "key": "script:15:Stage2HoopsFinished:AwardSpellChallengePoints:0|40",
+   "name": "Day 3 - Stage2HoopsFinished (0/40)",
+   "region": "Day 3",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100567,
+   "key": "script:15:Stage2HoopsFinished:AwardSpellChallengePoints:0|5",
+   "name": "Day 3 - Stage2HoopsFinished (0/5)",
+   "region": "Day 3",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100568,
+   "key": "script:15:Stage2HoopsFinished:AwardSpellChallengePoints:0|50",
+   "name": "Day 3 - Stage2HoopsFinished (0/50)",
+   "region": "Day 3",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100569,
+   "key": "script:15:Startup:CollectInventoryItem:23",
+   "name": "Day 3 - Startup gift 23",
+   "region": "Day 3",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100570,
+   "key": "script:15:Startup:CollectInventoryItem:24",
+   "name": "Day 3 - Startup gift 24",
+   "region": "Day 3",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100571,
+   "key": "script:15:Startup:CollectInventoryItem:25",
+   "name": "Day 3 - Startup gift 25",
+   "region": "Day 3",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100572,
+   "key": "script:16:Day3DiffindoHousePoints:AwardSpellChallengePoints:4|SC_Difference",
+   "name": "Diffindo Lesson - Day3DiffindoHousePoints (4/SC_Difference)",
+   "region": "Diffindo Lesson",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100573,
+   "key": "script:16:Garg_OwlTreat_PickUp:CollectInventoryItem:20",
+   "name": "Diffindo Lesson - Garg_OwlTreat_PickUp gift 20",
+   "region": "Diffindo Lesson",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100574,
+   "key": "script:16:NEWDiffindoHousePoints:AwardSpellChallengePoints:4|SC_Difference",
+   "name": "Diffindo Lesson - NEWDiffindoHousePoints (4/SC_Difference)",
+   "region": "Diffindo Lesson",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100575,
+   "key": "script:16:Spell_BookActionPressed:CollectInventoryItem:5",
+   "name": "Diffindo Lesson - Spell_BookActionPressed gift 5",
+   "region": "Diffindo Lesson",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100576,
+   "key": "script:16:Startup:CollectInventoryItem:23",
+   "name": "Diffindo Lesson - Startup gift 23",
+   "region": "Diffindo Lesson",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100577,
+   "key": "script:16:Startup:CollectInventoryItem:24",
+   "name": "Diffindo Lesson - Startup gift 24",
+   "region": "Diffindo Lesson",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100578,
+   "key": "script:17:HogwartsBook:CollectInventoryItem:48",
+   "name": "Night 3 - HogwartsBook gift 48",
+   "region": "Night 3",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100579,
+   "key": "script:17:PeevesBossFight:CollectInventoryItem:48",
+   "name": "Night 3 - PeevesBossFight gift 48",
+   "region": "Night 3",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100580,
+   "key": "script:17:Save9:CollectInventoryItem:48",
+   "name": "Night 3 - Save9 gift 48",
+   "region": "Night 3",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100581,
+   "key": "script:17:SearchChest2:CollectInventoryItem:18",
+   "name": "Night 3 - SearchChest2 gift 18",
+   "region": "Night 3",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100582,
+   "key": "script:17:SearchChest:CollectInventoryItem:18",
+   "name": "Night 3 - SearchChest gift 18",
+   "region": "Night 3",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100583,
+   "key": "script:17:Startup:CollectInventoryItem:23",
+   "name": "Night 3 - Startup gift 23",
+   "region": "Night 3",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100584,
+   "key": "script:17:Startup:CollectInventoryItem:24",
+   "name": "Night 3 - Startup gift 24",
+   "region": "Night 3",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100585,
+   "key": "script:17:Startup:CollectInventoryItem:25",
+   "name": "Night 3 - Startup gift 25",
+   "region": "Night 3",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100586,
+   "key": "script:17:Startup:CollectInventoryItem:35",
+   "name": "Night 3 - Startup gift 35",
+   "region": "Night 3",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100587,
+   "key": "script:19:CommonRoom:CollectWizardCard:101",
+   "name": "Day 4 - CommonRoom card",
+   "region": "Day 4",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100588,
+   "key": "script:19:ExitCharmsScript:AwardSpellChallengePoints:5|HogwartsExtras.SC_Difference",
+   "name": "Day 4 - ExitCharmsScript (5/HogwartsExtras.SC_Difference)",
+   "region": "Day 4",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100589,
+   "key": "script:19:NEWDiffindoHousePoints:AwardSpellChallengePoints:4|HogwartsExtras.SC_Difference",
+   "name": "Day 4 - NEWDiffindoHousePoints (4/HogwartsExtras.SC_Difference)",
+   "region": "Day 4",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100590,
+   "key": "script:19:NEWIncendioHousePoints:AwardSpellChallengePoints:5|HogwartsExtras.SC_Difference",
+   "name": "Day 4 - NEWIncendioHousePoints (5/HogwartsExtras.SC_Difference)",
+   "region": "Day 4",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100591,
+   "key": "script:19:NEWLumosHousePoints:AwardSpellChallengePoints:1|HogwartsExtras.SC_Difference",
+   "name": "Day 4 - NEWLumosHousePoints (1/HogwartsExtras.SC_Difference)",
+   "region": "Day 4",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100592,
+   "key": "script:19:NEWSpongifyHousePoints:AwardSpellChallengePoints:3|HogwartsExtras.SC_Difference",
+   "name": "Day 4 - NEWSpongifyHousePoints (3/HogwartsExtras.SC_Difference)",
+   "region": "Day 4",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100593,
+   "key": "script:19:Stage2HoopsFinished:AwardSpellChallengePoints:0|10",
+   "name": "Day 4 - Stage2HoopsFinished (0/10)",
+   "region": "Day 4",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100594,
+   "key": "script:19:Stage2HoopsFinished:AwardSpellChallengePoints:0|20",
+   "name": "Day 4 - Stage2HoopsFinished (0/20)",
+   "region": "Day 4",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100595,
+   "key": "script:19:Stage2HoopsFinished:AwardSpellChallengePoints:0|30",
+   "name": "Day 4 - Stage2HoopsFinished (0/30)",
+   "region": "Day 4",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100596,
+   "key": "script:19:Stage2HoopsFinished:AwardSpellChallengePoints:0|40",
+   "name": "Day 4 - Stage2HoopsFinished (0/40)",
+   "region": "Day 4",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100597,
+   "key": "script:19:Stage2HoopsFinished:AwardSpellChallengePoints:0|5",
+   "name": "Day 4 - Stage2HoopsFinished (0/5)",
+   "region": "Day 4",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100598,
+   "key": "script:19:Stage2HoopsFinished:AwardSpellChallengePoints:0|50",
+   "name": "Day 4 - Stage2HoopsFinished (0/50)",
+   "region": "Day 4",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100599,
+   "key": "script:19:Startup:CollectInventoryItem:23",
+   "name": "Day 4 - Startup gift 23",
+   "region": "Day 4",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100600,
+   "key": "script:19:Startup:CollectInventoryItem:24",
+   "name": "Day 4 - Startup gift 24",
+   "region": "Day 4",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100601,
+   "key": "script:19:Startup:CollectInventoryItem:25",
+   "name": "Day 4 - Startup gift 25",
+   "region": "Day 4",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100602,
+   "key": "script:19:Startup:CollectInventoryItem:32",
+   "name": "Day 4 - Startup gift 32",
+   "region": "Day 4",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100603,
+   "key": "script:19:Startup:CollectWizardCard:10",
+   "name": "Day 4 - Startup card [603]",
+   "region": "Day 4",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100604,
+   "key": "script:19:Startup:CollectWizardCard:11",
+   "name": "Day 4 - Startup card [604]",
+   "region": "Day 4",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100605,
+   "key": "script:19:Startup:CollectWizardCard:12",
+   "name": "Day 4 - Startup card [605]",
+   "region": "Day 4",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100606,
+   "key": "script:19:Startup:CollectWizardCard:13",
+   "name": "Day 4 - Startup card [606]",
+   "region": "Day 4",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100607,
+   "key": "script:20:OwlTreat_Collected:CollectInventoryItem:20",
+   "name": "Incendio Lesson - OwlTreat_Collected gift 20",
+   "region": "Incendio Lesson",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100608,
+   "key": "script:20:SpellbookRead:CollectInventoryItem:10",
+   "name": "Incendio Lesson - SpellbookRead gift 10",
+   "region": "Incendio Lesson",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100609,
+   "key": "script:20:Startup:CollectInventoryItem:23",
+   "name": "Incendio Lesson - Startup gift 23",
+   "region": "Incendio Lesson",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100610,
+   "key": "script:20:Startup:CollectInventoryItem:24",
+   "name": "Incendio Lesson - Startup gift 24",
+   "region": "Incendio Lesson",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100611,
+   "key": "script:20:Startup:CollectInventoryItem:25",
+   "name": "Incendio Lesson - Startup gift 25",
+   "region": "Incendio Lesson",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100612,
+   "key": "script:21:Startup:CollectInventoryItem:23",
+   "name": "Night 4 - Startup gift 23",
+   "region": "Night 4",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100613,
+   "key": "script:21:Startup:CollectInventoryItem:24",
+   "name": "Night 4 - Startup gift 24",
+   "region": "Night 4",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100614,
+   "key": "script:21:Startup:CollectInventoryItem:25",
+   "name": "Night 4 - Startup gift 25",
+   "region": "Night 4",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100615,
+   "key": "script:23:GetFlobberwormmucus:CollectInventoryItem:41",
+   "name": "Day 5 - GetFlobberwormmucus gift 41",
+   "region": "Day 5",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100616,
+   "key": "script:23:GetMoondew:CollectInventoryItem:42",
+   "name": "Day 5 - GetMoondew gift 42",
+   "region": "Day 5",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100617,
+   "key": "script:23:GetPuffapodspores:CollectInventoryItem:43",
+   "name": "Day 5 - GetPuffapodspores gift 43",
+   "region": "Day 5",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100618,
+   "key": "script:23:HPE51Script:CollectInventoryItem:21",
+   "name": "Day 5 - HPE51Script gift 21",
+   "region": "Day 5",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100619,
+   "key": "script:23:NEWDiffindoHousePoints:AwardSpellChallengePoints:4|HogwartsExtras.SC_Difference",
+   "name": "Day 5 - NEWDiffindoHousePoints (4/HogwartsExtras.SC_Difference)",
+   "region": "Day 5",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100620,
+   "key": "script:23:NEWIncendioHousePoints:AwardSpellChallengePoints:5|HogwartsExtras.SC_Difference",
+   "name": "Day 5 - NEWIncendioHousePoints (5/HogwartsExtras.SC_Difference)",
+   "region": "Day 5",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100621,
+   "key": "script:23:NEWLumosHousePoints:AwardSpellChallengePoints:1|HogwartsExtras.SC_Difference",
+   "name": "Day 5 - NEWLumosHousePoints (1/HogwartsExtras.SC_Difference)",
+   "region": "Day 5",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100622,
+   "key": "script:23:NEWSpongifyHousePoints:AwardSpellChallengePoints:3|HogwartsExtras.SC_Difference",
+   "name": "Day 5 - NEWSpongifyHousePoints (3/HogwartsExtras.SC_Difference)",
+   "region": "Day 5",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100623,
+   "key": "script:23:Stage2HoopsFinished:AwardSpellChallengePoints:0|10",
+   "name": "Day 5 - Stage2HoopsFinished (0/10)",
+   "region": "Day 5",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100624,
+   "key": "script:23:Stage2HoopsFinished:AwardSpellChallengePoints:0|20",
+   "name": "Day 5 - Stage2HoopsFinished (0/20)",
+   "region": "Day 5",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100625,
+   "key": "script:23:Stage2HoopsFinished:AwardSpellChallengePoints:0|30",
+   "name": "Day 5 - Stage2HoopsFinished (0/30)",
+   "region": "Day 5",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100626,
+   "key": "script:23:Stage2HoopsFinished:AwardSpellChallengePoints:0|40",
+   "name": "Day 5 - Stage2HoopsFinished (0/40)",
+   "region": "Day 5",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100627,
+   "key": "script:23:Stage2HoopsFinished:AwardSpellChallengePoints:0|5",
+   "name": "Day 5 - Stage2HoopsFinished (0/5)",
+   "region": "Day 5",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100628,
+   "key": "script:23:Stage2HoopsFinished:AwardSpellChallengePoints:0|50",
+   "name": "Day 5 - Stage2HoopsFinished (0/50)",
+   "region": "Day 5",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100629,
+   "key": "script:23:Startup:CollectInventoryItem:21",
+   "name": "Day 5 - Startup gift 21",
+   "region": "Day 5",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100630,
+   "key": "script:23:Startup:CollectInventoryItem:23",
+   "name": "Day 5 - Startup gift 23",
+   "region": "Day 5",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100631,
+   "key": "script:23:Startup:CollectInventoryItem:24",
+   "name": "Day 5 - Startup gift 24",
+   "region": "Day 5",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100632,
+   "key": "script:23:Startup:CollectInventoryItem:25",
+   "name": "Day 5 - Startup gift 25",
+   "region": "Day 5",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100633,
+   "key": "script:23:Startup:CollectInventoryItem:3",
+   "name": "Day 5 - Startup gift 3",
+   "region": "Day 5",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100634,
+   "key": "script:23:Startup:CollectInventoryItem:41",
+   "name": "Day 5 - Startup gift 41",
+   "region": "Day 5",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100635,
+   "key": "script:23:Startup:CollectInventoryItem:42",
+   "name": "Day 5 - Startup gift 42",
+   "region": "Day 5",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100636,
+   "key": "script:23:Startup:CollectInventoryItem:43",
+   "name": "Day 5 - Startup gift 43",
+   "region": "Day 5",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100637,
+   "key": "script:25:Startup:CollectInventoryItem:21",
+   "name": "Night 5 - Startup gift 21",
+   "region": "Night 5",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100638,
+   "key": "script:25:Startup:CollectInventoryItem:23",
+   "name": "Night 5 - Startup gift 23",
+   "region": "Night 5",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100639,
+   "key": "script:25:Startup:CollectInventoryItem:24",
+   "name": "Night 5 - Startup gift 24",
+   "region": "Night 5",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100640,
+   "key": "script:25:Startup:CollectInventoryItem:25",
+   "name": "Night 5 - Startup gift 25",
+   "region": "Night 5",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100641,
+   "key": "script:26:Startup:CollectInventoryItem:23",
+   "name": "Devil's Snare - Startup gift 23",
+   "region": "Devil's Snare",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100642,
+   "key": "script:26:Startup:CollectInventoryItem:24",
+   "name": "Devil's Snare - Startup gift 24",
+   "region": "Devil's Snare",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100643,
+   "key": "script:26:Startup:CollectInventoryItem:25",
+   "name": "Devil's Snare - Startup gift 25",
+   "region": "Devil's Snare",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100644,
+   "key": "script:27:Startup:CollectInventoryItem:23",
+   "name": "Flying Keys - Startup gift 23",
+   "region": "Flying Keys",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100645,
+   "key": "script:27:Startup:CollectInventoryItem:24",
+   "name": "Flying Keys - Startup gift 24",
+   "region": "Flying Keys",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100646,
+   "key": "script:27:Startup:CollectInventoryItem:25",
+   "name": "Flying Keys - Startup gift 25",
+   "region": "Flying Keys",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100647,
+   "key": "script:28:Startup:CollectInventoryItem:23",
+   "name": "Wizard Chess - Startup gift 23",
+   "region": "Wizard Chess",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100648,
+   "key": "script:28:Startup:CollectInventoryItem:24",
+   "name": "Wizard Chess - Startup gift 24",
+   "region": "Wizard Chess",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100649,
+   "key": "script:28:Startup:CollectInventoryItem:25",
+   "name": "Wizard Chess - Startup gift 25",
+   "region": "Wizard Chess",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100650,
+   "key": "script:29:Startup:CollectInventoryItem:23",
+   "name": "Quirrell - Startup gift 23",
+   "region": "Quirrell",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100651,
+   "key": "script:29:Startup:CollectInventoryItem:24",
+   "name": "Quirrell - Startup gift 24",
+   "region": "Quirrell",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100652,
+   "key": "script:29:Startup:CollectInventoryItem:25",
+   "name": "Quirrell - Startup gift 25",
+   "region": "Quirrell",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100653,
+   "key": "script:6:BeastBookReadScript:CollectInventoryItem:24",
+   "name": "Day 0 - BeastBookReadScript gift 24",
+   "region": "Day 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100654,
+   "key": "script:6:RTD_Dev2Done:CollectWizardCard:41",
+   "name": "Day 0 - RTD_Dev2Done card",
+   "region": "Day 0",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100655,
+   "key": "script:6:RTD_SpellBookDone:CollectInventoryItem:47",
+   "name": "Day 0 - RTD_SpellBookDone gift 47",
+   "region": "Day 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100656,
+   "key": "script:6:Save3:CollectInventoryItem:1",
+   "name": "Day 0 - Save3 gift 1",
+   "region": "Day 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100657,
+   "key": "script:6:Save3:CollectInventoryItem:23",
+   "name": "Day 0 - Save3 gift 23",
+   "region": "Day 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100658,
+   "key": "script:6:Save4:CollectInventoryItem:1",
+   "name": "Day 0 - Save4 gift 1",
+   "region": "Day 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100659,
+   "key": "script:6:Save4:CollectInventoryItem:23",
+   "name": "Day 0 - Save4 gift 23",
+   "region": "Day 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100660,
+   "key": "script:6:Save5:CollectInventoryItem:1",
+   "name": "Day 0 - Save5 gift 1",
+   "region": "Day 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100661,
+   "key": "script:6:Save5:CollectInventoryItem:23",
+   "name": "Day 0 - Save5 gift 23",
+   "region": "Day 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100662,
+   "key": "script:6:Save6:CollectInventoryItem:1",
+   "name": "Day 0 - Save6 gift 1",
+   "region": "Day 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100663,
+   "key": "script:6:Save6:CollectInventoryItem:23",
+   "name": "Day 0 - Save6 gift 23",
+   "region": "Day 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100664,
+   "key": "script:6:Save6:CollectInventoryItem:24",
+   "name": "Day 0 - Save6 gift 24",
+   "region": "Day 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100665,
+   "key": "script:6:Save6:CollectInventoryItem:47",
+   "name": "Day 0 - Save6 gift 47",
+   "region": "Day 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100666,
+   "key": "script:6:SpellBook_Collected:CollectInventoryItem:1",
+   "name": "Day 0 - SpellBook_Collected gift 1",
+   "region": "Day 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100667,
+   "key": "script:6:SpellBook_Collected:CollectInventoryItem:23",
+   "name": "Day 0 - SpellBook_Collected gift 23",
+   "region": "Day 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100668,
+   "key": "script:6:Startup:CollectInventoryItem:1",
+   "name": "Day 0 - Startup gift 1",
+   "region": "Day 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100669,
+   "key": "script:6:Startup:CollectInventoryItem:47",
+   "name": "Day 0 - Startup gift 47",
+   "region": "Day 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100670,
+   "key": "script:6:WandTestAreaIN:CollectInventoryItem:45",
+   "name": "Day 0 - WandTestAreaIN gift 45",
+   "region": "Day 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100671,
+   "key": "script:7:Startup:CollectInventoryItem:1",
+   "name": "Night 0 - Startup gift 1",
+   "region": "Night 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100672,
+   "key": "script:7:Startup:CollectInventoryItem:23",
+   "name": "Night 0 - Startup gift 23",
+   "region": "Night 0",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100673,
+   "key": "script:8:HPE11:CollectInventoryItem:3",
+   "name": "Day 1 - HPE11 gift 3",
+   "region": "Day 1",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100674,
+   "key": "script:8:HPE14:AwardSpellChallengePoints:1|HogwartsExtras.SC_Difference",
+   "name": "Day 1 - HPE14 (1/HogwartsExtras.SC_Difference)",
+   "region": "Day 1",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100675,
+   "key": "script:8:NEWLumosHousePoints:AwardSpellChallengePoints:1|HogwartsExtras.SC_Difference",
+   "name": "Day 1 - NEWLumosHousePoints (1/HogwartsExtras.SC_Difference)",
+   "region": "Day 1",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100676,
+   "key": "script:8:Stage2HoopsFinished:AwardSpellChallengePoints:0|10",
+   "name": "Day 1 - Stage2HoopsFinished (0/10)",
+   "region": "Day 1",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100677,
+   "key": "script:8:Stage2HoopsFinished:AwardSpellChallengePoints:0|20",
+   "name": "Day 1 - Stage2HoopsFinished (0/20)",
+   "region": "Day 1",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100678,
+   "key": "script:8:Stage2HoopsFinished:AwardSpellChallengePoints:0|30",
+   "name": "Day 1 - Stage2HoopsFinished (0/30)",
+   "region": "Day 1",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100679,
+   "key": "script:8:Stage2HoopsFinished:AwardSpellChallengePoints:0|40",
+   "name": "Day 1 - Stage2HoopsFinished (0/40)",
+   "region": "Day 1",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100680,
+   "key": "script:8:Stage2HoopsFinished:AwardSpellChallengePoints:0|5",
+   "name": "Day 1 - Stage2HoopsFinished (0/5)",
+   "region": "Day 1",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100681,
+   "key": "script:8:Stage2HoopsFinished:AwardSpellChallengePoints:0|50",
+   "name": "Day 1 - Stage2HoopsFinished (0/50)",
+   "region": "Day 1",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100682,
+   "key": "script:8:Stage2HoopsFinishedRetry:AwardSpellChallengePoints:0|10",
+   "name": "Day 1 - Stage2HoopsFinishedRetry (0/10)",
+   "region": "Day 1",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100683,
+   "key": "script:8:Stage2HoopsFinishedRetry:AwardSpellChallengePoints:0|20",
+   "name": "Day 1 - Stage2HoopsFinishedRetry (0/20)",
+   "region": "Day 1",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100684,
+   "key": "script:8:Stage2HoopsFinishedRetry:AwardSpellChallengePoints:0|30",
+   "name": "Day 1 - Stage2HoopsFinishedRetry (0/30)",
+   "region": "Day 1",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100685,
+   "key": "script:8:Stage2HoopsFinishedRetry:AwardSpellChallengePoints:0|40",
+   "name": "Day 1 - Stage2HoopsFinishedRetry (0/40)",
+   "region": "Day 1",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100686,
+   "key": "script:8:Stage2HoopsFinishedRetry:AwardSpellChallengePoints:0|5",
+   "name": "Day 1 - Stage2HoopsFinishedRetry (0/5)",
+   "region": "Day 1",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100687,
+   "key": "script:8:Stage2HoopsFinishedRetry:AwardSpellChallengePoints:0|50",
+   "name": "Day 1 - Stage2HoopsFinishedRetry (0/50)",
+   "region": "Day 1",
+   "group": "Challenge Points"
+  },
+  {
+   "id": 74100688,
+   "key": "script:8:Startup:CollectInventoryItem:23",
+   "name": "Day 1 - Startup gift 23",
+   "region": "Day 1",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100689,
+   "key": "script:9:LargeChest01_CardScript:CollectWizardCard:0",
+   "name": "Lumos Lesson - LargeChest01_CardScript card",
+   "region": "Lumos Lesson",
+   "group": "Wizard Cards"
+  },
+  {
+   "id": 74100690,
+   "key": "script:9:PickupOwlTreat:CollectInventoryItem:20",
+   "name": "Lumos Lesson - PickupOwlTreat gift 20",
+   "region": "Lumos Lesson",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100691,
+   "key": "script:9:PickupSpellBook:CollectInventoryItem:2",
+   "name": "Lumos Lesson - PickupSpellBook gift 2",
+   "region": "Lumos Lesson",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100692,
+   "key": "script:9:Startup:CollectInventoryItem:20",
+   "name": "Lumos Lesson - Startup gift 20",
+   "region": "Lumos Lesson",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100693,
+   "key": "script:9:Startup:CollectInventoryItem:23",
+   "name": "Lumos Lesson - Startup gift 23",
+   "region": "Lumos Lesson",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100694,
+   "key": "script:9:Startup:CollectInventoryItem:24",
+   "name": "Lumos Lesson - Startup gift 24",
+   "region": "Lumos Lesson",
+   "group": "Gifts"
+  },
+  {
+   "id": 74100695,
+   "key": "spell:10:first_cast",
+   "name": "First cast of Incendio",
+   "region": "Hogwarts",
+   "group": "Spells"
+  },
+  {
+   "id": 74100696,
+   "key": "spell:12:first_cast",
+   "name": "First cast of Alohomora",
+   "region": "Hogwarts",
+   "group": "Spells"
+  },
+  {
+   "id": 74100697,
+   "key": "spell:1:first_cast",
+   "name": "First cast of Flipendo",
+   "region": "Hogwarts",
+   "group": "Spells"
+  },
+  {
+   "id": 74100698,
+   "key": "spell:2:first_cast",
+   "name": "First cast of Lumos",
+   "region": "Hogwarts",
+   "group": "Spells"
+  },
+  {
+   "id": 74100699,
+   "key": "spell:5:first_cast",
+   "name": "First cast of Diffindo",
+   "region": "Hogwarts",
+   "group": "Spells"
+  },
+  {
+   "id": 74100700,
+   "key": "spell:8:first_cast",
+   "name": "First cast of Spongify",
+   "region": "Hogwarts",
+   "group": "Spells"
+  },
+  {
+   "id": 74100701,
+   "key": "task:10:added",
+   "name": "Task Hermione_Dark_Arts added (Day 1)",
+   "region": "Day 1",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100702,
+   "key": "task:10:completed",
+   "name": "Task Hermione_Dark_Arts completed",
+   "region": "Day 1",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100703,
+   "key": "task:11:added",
+   "name": "Task Ron_Flying_Class added (Day 1)",
+   "region": "Day 1",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100704,
+   "key": "task:11:completed",
+   "name": "Task Ron_Flying_Class completed",
+   "region": "Day 1",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100705,
+   "key": "task:12:added",
+   "name": "Task Hedwig_Hagrids_Hut added (Day 1)",
+   "region": "Day 1",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100706,
+   "key": "task:12:completed",
+   "name": "Task Hedwig_Hagrids_Hut completed",
+   "region": "Day 1",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100707,
+   "key": "task:13:added",
+   "name": "Task Get_Book_Restricted added (Night 3)",
+   "region": "Night 3",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100708,
+   "key": "task:13:completed",
+   "name": "Task Get_Book_Restricted completed",
+   "region": "Night 3",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100709,
+   "key": "task:14:added",
+   "name": "Task Get_Book_Peeves added (Night 3)",
+   "region": "Night 3",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100710,
+   "key": "task:14:completed",
+   "name": "Task Get_Book_Peeves completed",
+   "region": "Night 3",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100711,
+   "key": "task:15:added",
+   "name": "Task Percy_Gryffindor added (Night 0)",
+   "region": "Night 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100712,
+   "key": "task:15:completed",
+   "name": "Task Percy_Gryffindor completed",
+   "region": "Night 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100713,
+   "key": "task:16:added",
+   "name": "Task Visit_Shop added (Night 0)",
+   "region": "Night 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100714,
+   "key": "task:16:completed",
+   "name": "Task Visit_Shop completed",
+   "region": "Night 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100715,
+   "key": "task:17:added",
+   "name": "Task Spongify_Challenge added (Day 2)",
+   "region": "Day 2",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100716,
+   "key": "task:17:completed",
+   "name": "Task Spongify_Challenge completed",
+   "region": "Day 2",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100717,
+   "key": "task:18:added",
+   "name": "Task Ron_Hagrids_Hut added (Day 2)",
+   "region": "Day 2",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100718,
+   "key": "task:18:completed",
+   "name": "Task Ron_Hagrids_Hut completed",
+   "region": "Day 2",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100719,
+   "key": "task:19:added",
+   "name": "Task Fourth_Floor_Duel added (Night 1)",
+   "region": "Night 1",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100720,
+   "key": "task:19:completed",
+   "name": "Task Fourth_Floor_Duel completed",
+   "region": "Night 1",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100721,
+   "key": "task:1:added",
+   "name": "Task Gui_Remember1_Tasks_0034 added (Night 3)",
+   "region": "Night 3",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100722,
+   "key": "task:1:completed",
+   "name": "Task Gui_Remember1_Tasks_0034 completed",
+   "region": "Night 3",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100723,
+   "key": "task:20:added",
+   "name": "Task Pursuit_Hagrids added (Night 4)",
+   "region": "Night 4",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100724,
+   "key": "task:20:completed",
+   "name": "Task Pursuit_Hagrids completed",
+   "region": "Night 4",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100725,
+   "key": "task:21:added",
+   "name": "Task Get_Moon_Dew added (Night 4)",
+   "region": "Night 4",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100726,
+   "key": "task:21:completed",
+   "name": "Task Get_Moon_Dew completed",
+   "region": "Night 4",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100727,
+   "key": "task:22:added",
+   "name": "Task Hermione_Potions added (Day 5)",
+   "region": "Day 5",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100728,
+   "key": "task:22:completed",
+   "name": "Task Hermione_Potions completed",
+   "region": "Day 5",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100729,
+   "key": "task:24:added",
+   "name": "Task Ron_Staff_Room added (Day 5)",
+   "region": "Day 5",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100730,
+   "key": "task:24:completed",
+   "name": "Task Ron_Staff_Room completed",
+   "region": "Day 5",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100731,
+   "key": "task:25:added",
+   "name": "Task Forbidden_Corridor added (Night 5)",
+   "region": "Night 5",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100732,
+   "key": "task:25:completed",
+   "name": "Task Forbidden_Corridor completed",
+   "region": "Night 5",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100733,
+   "key": "task:27:added",
+   "name": "Task Pursuit_Quidditch added (Day 5)",
+   "region": "Day 5",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100734,
+   "key": "task:27:completed",
+   "name": "Task Pursuit_Quidditch completed",
+   "region": "Day 5",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100735,
+   "key": "task:28:added",
+   "name": "Task Gui_Remember1_Tasks_0033 added (Diffindo Lesson)",
+   "region": "Diffindo Lesson",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100736,
+   "key": "task:28:completed",
+   "name": "Task Gui_Remember1_Tasks_0033 completed",
+   "region": "Diffindo Lesson",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100737,
+   "key": "task:29:added",
+   "name": "Task Collect_Folio_Bruti added (Day 0)",
+   "region": "Day 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100738,
+   "key": "task:29:completed",
+   "name": "Task Collect_Folio_Bruti completed",
+   "region": "Day 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100739,
+   "key": "task:2:added",
+   "name": "Task Halloween_Feast added (Night 2)",
+   "region": "Night 2",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100740,
+   "key": "task:2:completed",
+   "name": "Task Halloween_Feast completed",
+   "region": "Night 2",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100741,
+   "key": "task:30:added",
+   "name": "Task Help_Wand_Find_Wizard added (Day 0)",
+   "region": "Day 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100742,
+   "key": "task:30:completed",
+   "name": "Task Help_Wand_Find_Wizard completed",
+   "region": "Day 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100743,
+   "key": "task:31:added",
+   "name": "Task Gui_Remember1_Tasks_0002 added (Day 0)",
+   "region": "Day 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100744,
+   "key": "task:31:completed",
+   "name": "Task Gui_Remember1_Tasks_0002 completed",
+   "region": "Day 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100745,
+   "key": "task:32:added",
+   "name": "Task Gui_Remember1_Tasks_0003 added (Day 0)",
+   "region": "Day 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100746,
+   "key": "task:32:completed",
+   "name": "Task Gui_Remember1_Tasks_0003 completed",
+   "region": "Day 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100747,
+   "key": "task:33:added",
+   "name": "Task Gui_Remember1_Tasks_0004 added (Day 0)",
+   "region": "Day 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100748,
+   "key": "task:33:completed",
+   "name": "Task Gui_Remember1_Tasks_0004 completed",
+   "region": "Day 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100749,
+   "key": "task:34:added",
+   "name": "Task Gui_Remember1_Tasks_0005 added (Day 0)",
+   "region": "Day 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100750,
+   "key": "task:34:completed",
+   "name": "Task Gui_Remember1_Tasks_0005 completed",
+   "region": "Day 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100751,
+   "key": "task:35:added",
+   "name": "Task Gui_Remember1_Tasks_0007 added (Day 0)",
+   "region": "Day 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100752,
+   "key": "task:35:completed",
+   "name": "Task Gui_Remember1_Tasks_0007 completed",
+   "region": "Day 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100753,
+   "key": "task:36:added",
+   "name": "Task Gui_Remember1_Tasks_0008 added (Day 0)",
+   "region": "Day 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100754,
+   "key": "task:36:completed",
+   "name": "Task Gui_Remember1_Tasks_0008 completed",
+   "region": "Day 0",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100755,
+   "key": "task:37:added",
+   "name": "Task Gui_Remember1_Tasks_0020 added (Night 1)",
+   "region": "Night 1",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100756,
+   "key": "task:37:completed",
+   "name": "Task Gui_Remember1_Tasks_0020 completed",
+   "region": "Night 1",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100757,
+   "key": "task:38:added",
+   "name": "Task Gui_Remember1_Tasks_0021 added (Night 1)",
+   "region": "Night 1",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100758,
+   "key": "task:38:completed",
+   "name": "Task Gui_Remember1_Tasks_0021 completed",
+   "region": "Night 1",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100759,
+   "key": "task:39:added",
+   "name": "Task Escape_Forbidden_Corridor added (Night 1)",
+   "region": "Night 1",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100760,
+   "key": "task:39:completed",
+   "name": "Task Escape_Forbidden_Corridor completed",
+   "region": "Night 1",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100761,
+   "key": "task:3:added",
+   "name": "Task Rescue_Hermione added (Night 2)",
+   "region": "Night 2",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100762,
+   "key": "task:3:completed",
+   "name": "Task Rescue_Hermione completed",
+   "region": "Night 2",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100763,
+   "key": "task:40:added",
+   "name": "Task Get Lumos Book added (Lumos Lesson)",
+   "region": "Lumos Lesson",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100764,
+   "key": "task:40:completed",
+   "name": "Task Get Lumos Book completed",
+   "region": "Lumos Lesson",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100765,
+   "key": "task:4:added",
+   "name": "Task Potions_Dungeons added (Day 3)",
+   "region": "Day 3",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100766,
+   "key": "task:4:completed",
+   "name": "Task Potions_Dungeons completed",
+   "region": "Day 3",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100767,
+   "key": "task:5:added",
+   "name": "Task Herbology_Class added (Day 3)",
+   "region": "Day 3",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100768,
+   "key": "task:5:completed",
+   "name": "Task Herbology_Class completed",
+   "region": "Day 3",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100769,
+   "key": "task:6:added",
+   "name": "Task Charms_Class added (Day 2)",
+   "region": "Day 2",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100770,
+   "key": "task:6:completed",
+   "name": "Task Charms_Class completed",
+   "region": "Day 2",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100771,
+   "key": "task:7:added",
+   "name": "Task Incendio_Challenge added (Day 4)",
+   "region": "Day 4",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100772,
+   "key": "task:7:completed",
+   "name": "Task Incendio_Challenge completed",
+   "region": "Day 4",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100773,
+   "key": "task:8:added",
+   "name": "Task Gryffindor_Emergency added (Day 4)",
+   "region": "Day 4",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100774,
+   "key": "task:8:completed",
+   "name": "Task Gryffindor_Emergency completed",
+   "region": "Day 4",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100775,
+   "key": "task:9:added",
+   "name": "Task Ron_Potions added (Day 1)",
+   "region": "Day 1",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100776,
+   "key": "task:9:completed",
+   "name": "Task Ron_Potions completed",
+   "region": "Day 1",
+   "group": "Tasks"
+  },
+  {
+   "id": 74100777,
+   "key": "trade:11:Day2EntranceHallCardTraderPupil:10",
+   "name": "Day 2 - Day2EntranceHallCardTraderPupil trade card 10",
+   "region": "Day 2",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100778,
+   "key": "trade:11:Day2EntranceHallCardTraderPupil:21",
+   "name": "Day 2 - Day2EntranceHallCardTraderPupil trade card 21",
+   "region": "Day 2",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100779,
+   "key": "trade:11:Day2EntranceHallCardTraderPupil:81",
+   "name": "Day 2 - Day2EntranceHallCardTraderPupil trade card 81",
+   "region": "Day 2",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100780,
+   "key": "trade:11:Day2EntranceHallCardTraderPupil:90",
+   "name": "Day 2 - Day2EntranceHallCardTraderPupil trade card 90",
+   "region": "Day 2",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100781,
+   "key": "trade:11:Day2EntranceHallCardTraderPupil:97",
+   "name": "Day 2 - Day2EntranceHallCardTraderPupil trade card 97",
+   "region": "Day 2",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100782,
+   "key": "trade:11:Day2GrStaircaseCardTraderPupil:21",
+   "name": "Day 2 - Day2GrStaircaseCardTraderPupil trade card 21",
+   "region": "Day 2",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100783,
+   "key": "trade:11:Day2GrStaircaseCardTraderPupil:27",
+   "name": "Day 2 - Day2GrStaircaseCardTraderPupil trade card 27",
+   "region": "Day 2",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100784,
+   "key": "trade:11:Day2GrStaircaseCardTraderPupil:46",
+   "name": "Day 2 - Day2GrStaircaseCardTraderPupil trade card 46",
+   "region": "Day 2",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100785,
+   "key": "trade:11:Day2GrStaircaseCardTraderPupil:52",
+   "name": "Day 2 - Day2GrStaircaseCardTraderPupil trade card 52",
+   "region": "Day 2",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100786,
+   "key": "trade:11:Day2GrStaircaseCardTraderPupil:66",
+   "name": "Day 2 - Day2GrStaircaseCardTraderPupil trade card 66",
+   "region": "Day 2",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100787,
+   "key": "trade:11:Day2HogExteriorCardTraderPupil:10",
+   "name": "Day 2 - Day2HogExteriorCardTraderPupil trade card 10",
+   "region": "Day 2",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100788,
+   "key": "trade:11:Day2HogExteriorCardTraderPupil:46",
+   "name": "Day 2 - Day2HogExteriorCardTraderPupil trade card 46",
+   "region": "Day 2",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100789,
+   "key": "trade:11:Day2HogExteriorCardTraderPupil:66",
+   "name": "Day 2 - Day2HogExteriorCardTraderPupil trade card 66",
+   "region": "Day 2",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100790,
+   "key": "trade:11:Day2HogExteriorCardTraderPupil:81",
+   "name": "Day 2 - Day2HogExteriorCardTraderPupil trade card 81",
+   "region": "Day 2",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100791,
+   "key": "trade:11:Day2HogExteriorCardTraderPupil:97",
+   "name": "Day 2 - Day2HogExteriorCardTraderPupil trade card 97",
+   "region": "Day 2",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100792,
+   "key": "trade:15:Day3EntHallCardTraderPupil:21",
+   "name": "Day 3 - Day3EntHallCardTraderPupil trade card 21",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100793,
+   "key": "trade:15:Day3EntHallCardTraderPupil:27",
+   "name": "Day 3 - Day3EntHallCardTraderPupil trade card 27",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100794,
+   "key": "trade:15:Day3EntHallCardTraderPupil:52",
+   "name": "Day 3 - Day3EntHallCardTraderPupil trade card 52",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100795,
+   "key": "trade:15:Day3EntHallCardTraderPupil:90",
+   "name": "Day 3 - Day3EntHallCardTraderPupil trade card 90",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100796,
+   "key": "trade:15:Day3EntHallCardTraderPupil:97",
+   "name": "Day 3 - Day3EntHallCardTraderPupil trade card 97",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100797,
+   "key": "trade:15:Day3GFGrStaircaseCardTraderPupil:10",
+   "name": "Day 3 - Day3GFGrStaircaseCardTraderPupil trade card 10",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100798,
+   "key": "trade:15:Day3GFGrStaircaseCardTraderPupil:21",
+   "name": "Day 3 - Day3GFGrStaircaseCardTraderPupil trade card 21",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100799,
+   "key": "trade:15:Day3GFGrStaircaseCardTraderPupil:46",
+   "name": "Day 3 - Day3GFGrStaircaseCardTraderPupil trade card 46",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100800,
+   "key": "trade:15:Day3GFGrStaircaseCardTraderPupil:66",
+   "name": "Day 3 - Day3GFGrStaircaseCardTraderPupil trade card 66",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100801,
+   "key": "trade:15:Day3GFGrStaircaseCardTraderPupil:90",
+   "name": "Day 3 - Day3GFGrStaircaseCardTraderPupil trade card 90",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100802,
+   "key": "trade:15:Day3GrfCorridorCardTraderPupil:10",
+   "name": "Day 3 - Day3GrfCorridorCardTraderPupil trade card 10",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100803,
+   "key": "trade:15:Day3GrfCorridorCardTraderPupil:27",
+   "name": "Day 3 - Day3GrfCorridorCardTraderPupil trade card 27",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100804,
+   "key": "trade:15:Day3GrfCorridorCardTraderPupil:52",
+   "name": "Day 3 - Day3GrfCorridorCardTraderPupil trade card 52",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100805,
+   "key": "trade:15:Day3GrfCorridorCardTraderPupil:81",
+   "name": "Day 3 - Day3GrfCorridorCardTraderPupil trade card 81",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100806,
+   "key": "trade:15:Day3GrfCorridorCardTraderPupil:97",
+   "name": "Day 3 - Day3GrfCorridorCardTraderPupil trade card 97",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100807,
+   "key": "trade:15:Day3HerbCardTraderPupil:21",
+   "name": "Day 3 - Day3HerbCardTraderPupil trade card 21",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100808,
+   "key": "trade:15:Day3HerbCardTraderPupil:46",
+   "name": "Day 3 - Day3HerbCardTraderPupil trade card 46",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100809,
+   "key": "trade:15:Day3HerbCardTraderPupil:66",
+   "name": "Day 3 - Day3HerbCardTraderPupil trade card 66",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100810,
+   "key": "trade:15:Day3HerbCardTraderPupil:81",
+   "name": "Day 3 - Day3HerbCardTraderPupil trade card 81",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100811,
+   "key": "trade:15:Day3HerbCardTraderPupil:97",
+   "name": "Day 3 - Day3HerbCardTraderPupil trade card 97",
+   "region": "Day 3",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100812,
+   "key": "trade:19:Day4CardTraderEntranceHallPupil:10",
+   "name": "Day 4 - Day4CardTraderEntranceHallPupil trade card 10",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100813,
+   "key": "trade:19:Day4CardTraderEntranceHallPupil:66",
+   "name": "Day 4 - Day4CardTraderEntranceHallPupil trade card 66",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100814,
+   "key": "trade:19:Day4CardTraderEntranceHallPupil:81",
+   "name": "Day 4 - Day4CardTraderEntranceHallPupil trade card 81",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100815,
+   "key": "trade:19:Day4CardTraderEntranceHallPupil:90",
+   "name": "Day 4 - Day4CardTraderEntranceHallPupil trade card 90",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100816,
+   "key": "trade:19:Day4CardTraderEntranceHallPupil:97",
+   "name": "Day 4 - Day4CardTraderEntranceHallPupil trade card 97",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100817,
+   "key": "trade:19:Day4CardTraderFloor2Pupil:10",
+   "name": "Day 4 - Day4CardTraderFloor2Pupil trade card 10",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100818,
+   "key": "trade:19:Day4CardTraderFloor2Pupil:17",
+   "name": "Day 4 - Day4CardTraderFloor2Pupil trade card 17",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100819,
+   "key": "trade:19:Day4CardTraderFloor2Pupil:27",
+   "name": "Day 4 - Day4CardTraderFloor2Pupil trade card 27",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100820,
+   "key": "trade:19:Day4CardTraderFloor2Pupil:46",
+   "name": "Day 4 - Day4CardTraderFloor2Pupil trade card 46",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100821,
+   "key": "trade:19:Day4CardTraderFloor2Pupil:52",
+   "name": "Day 4 - Day4CardTraderFloor2Pupil trade card 52",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100822,
+   "key": "trade:19:Day4GFGrStairCardTraderPupil:17",
+   "name": "Day 4 - Day4GFGrStairCardTraderPupil trade card 17",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100823,
+   "key": "trade:19:Day4GFGrStairCardTraderPupil:27",
+   "name": "Day 4 - Day4GFGrStairCardTraderPupil trade card 27",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100824,
+   "key": "trade:19:Day4GFGrStairCardTraderPupil:46",
+   "name": "Day 4 - Day4GFGrStairCardTraderPupil trade card 46",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100825,
+   "key": "trade:19:Day4GFGrStairCardTraderPupil:52",
+   "name": "Day 4 - Day4GFGrStairCardTraderPupil trade card 52",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100826,
+   "key": "trade:19:Day4GFGrStairCardTraderPupil:66",
+   "name": "Day 4 - Day4GFGrStairCardTraderPupil trade card 66",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100827,
+   "key": "trade:19:Day4GryfinDormCardTraderPupil:10",
+   "name": "Day 4 - Day4GryfinDormCardTraderPupil trade card 10",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100828,
+   "key": "trade:19:Day4GryfinDormCardTraderPupil:17",
+   "name": "Day 4 - Day4GryfinDormCardTraderPupil trade card 17",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100829,
+   "key": "trade:19:Day4GryfinDormCardTraderPupil:81",
+   "name": "Day 4 - Day4GryfinDormCardTraderPupil trade card 81",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100830,
+   "key": "trade:19:Day4GryfinDormCardTraderPupil:90",
+   "name": "Day 4 - Day4GryfinDormCardTraderPupil trade card 90",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100831,
+   "key": "trade:19:Day4GryfinDormCardTraderPupil:97",
+   "name": "Day 4 - Day4GryfinDormCardTraderPupil trade card 97",
+   "region": "Day 4",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100832,
+   "key": "trade:23:Day5CloistersCardTrader:10",
+   "name": "Day 5 - Day5CloistersCardTrader trade card 10",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100833,
+   "key": "trade:23:Day5CloistersCardTrader:21",
+   "name": "Day 5 - Day5CloistersCardTrader trade card 21",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100834,
+   "key": "trade:23:Day5CloistersCardTrader:27",
+   "name": "Day 5 - Day5CloistersCardTrader trade card 27",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100835,
+   "key": "trade:23:Day5CloistersCardTrader:90",
+   "name": "Day 5 - Day5CloistersCardTrader trade card 90",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100836,
+   "key": "trade:23:Day5CloistersCardTrader:97",
+   "name": "Day 5 - Day5CloistersCardTrader trade card 97",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100837,
+   "key": "trade:23:Day5DungeonCardTraderPupil:10",
+   "name": "Day 5 - Day5DungeonCardTraderPupil trade card 10",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100838,
+   "key": "trade:23:Day5DungeonCardTraderPupil:21",
+   "name": "Day 5 - Day5DungeonCardTraderPupil trade card 21",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100839,
+   "key": "trade:23:Day5DungeonCardTraderPupil:27",
+   "name": "Day 5 - Day5DungeonCardTraderPupil trade card 27",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100840,
+   "key": "trade:23:Day5DungeonCardTraderPupil:45",
+   "name": "Day 5 - Day5DungeonCardTraderPupil trade card 45",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100841,
+   "key": "trade:23:Day5DungeonCardTraderPupil:46",
+   "name": "Day 5 - Day5DungeonCardTraderPupil trade card 46",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100842,
+   "key": "trade:23:Day5DungeonCardTraderPupil:56",
+   "name": "Day 5 - Day5DungeonCardTraderPupil trade card 56",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100843,
+   "key": "trade:23:Day5DungeonCardTraderPupil:65",
+   "name": "Day 5 - Day5DungeonCardTraderPupil trade card 65",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100844,
+   "key": "trade:23:Day5DungeonCardTraderPupil:91",
+   "name": "Day 5 - Day5DungeonCardTraderPupil trade card 91",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100845,
+   "key": "trade:23:Day5DungeonCardTraderPupil:97",
+   "name": "Day 5 - Day5DungeonCardTraderPupil trade card 97",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100846,
+   "key": "trade:23:Day5EntrHallCardTraderPupil:52",
+   "name": "Day 5 - Day5EntrHallCardTraderPupil trade card 52",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100847,
+   "key": "trade:23:Day5EntrHallCardTraderPupil:66",
+   "name": "Day 5 - Day5EntrHallCardTraderPupil trade card 66",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100848,
+   "key": "trade:23:Day5EntrHallCardTraderPupil:81",
+   "name": "Day 5 - Day5EntrHallCardTraderPupil trade card 81",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100849,
+   "key": "trade:23:Day5EntrHallCardTraderPupil:90",
+   "name": "Day 5 - Day5EntrHallCardTraderPupil trade card 90",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100850,
+   "key": "trade:23:Day5EntrHallCardTraderPupil:97",
+   "name": "Day 5 - Day5EntrHallCardTraderPupil trade card 97",
+   "region": "Day 5",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100851,
+   "key": "trade:8:Day1CloistersCardTraderPupil:10",
+   "name": "Day 1 - Day1CloistersCardTraderPupil trade card 10",
+   "region": "Day 1",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100852,
+   "key": "trade:8:Day1CloistersCardTraderPupil:21",
+   "name": "Day 1 - Day1CloistersCardTraderPupil trade card 21",
+   "region": "Day 1",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100853,
+   "key": "trade:8:Day1CloistersCardTraderPupil:27",
+   "name": "Day 1 - Day1CloistersCardTraderPupil trade card 27",
+   "region": "Day 1",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100854,
+   "key": "trade:8:Day1CloistersCardTraderPupil:46",
+   "name": "Day 1 - Day1CloistersCardTraderPupil trade card 46",
+   "region": "Day 1",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100855,
+   "key": "trade:8:Day1CloistersCardTraderPupil:52",
+   "name": "Day 1 - Day1CloistersCardTraderPupil trade card 52",
+   "region": "Day 1",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100856,
+   "key": "trade:8:Day1EntHallCardTraderPupil:10",
+   "name": "Day 1 - Day1EntHallCardTraderPupil trade card 10",
+   "region": "Day 1",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100857,
+   "key": "trade:8:Day1EntHallCardTraderPupil:21",
+   "name": "Day 1 - Day1EntHallCardTraderPupil trade card 21",
+   "region": "Day 1",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100858,
+   "key": "trade:8:Day1EntHallCardTraderPupil:27",
+   "name": "Day 1 - Day1EntHallCardTraderPupil trade card 27",
+   "region": "Day 1",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100859,
+   "key": "trade:8:Day1EntHallCardTraderPupil:90",
+   "name": "Day 1 - Day1EntHallCardTraderPupil trade card 90",
+   "region": "Day 1",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100860,
+   "key": "trade:8:Day1EntHallCardTraderPupil:97",
+   "name": "Day 1 - Day1EntHallCardTraderPupil trade card 97",
+   "region": "Day 1",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100861,
+   "key": "trade:8:Day1Floor3CardTraderPupil:27",
+   "name": "Day 1 - Day1Floor3CardTraderPupil trade card 27",
+   "region": "Day 1",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100862,
+   "key": "trade:8:Day1Floor3CardTraderPupil:46",
+   "name": "Day 1 - Day1Floor3CardTraderPupil trade card 46",
+   "region": "Day 1",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100863,
+   "key": "trade:8:Day1Floor3CardTraderPupil:52",
+   "name": "Day 1 - Day1Floor3CardTraderPupil trade card 52",
+   "region": "Day 1",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100864,
+   "key": "trade:8:Day1Floor3CardTraderPupil:66",
+   "name": "Day 1 - Day1Floor3CardTraderPupil trade card 66",
+   "region": "Day 1",
+   "group": "Card Trades"
+  },
+  {
+   "id": 74100865,
+   "key": "trade:8:Day1Floor3CardTraderPupil:81",
+   "name": "Day 1 - Day1Floor3CardTraderPupil trade card 81",
+   "region": "Day 1",
+   "group": "Card Trades"
+  }
+ ]
+}
