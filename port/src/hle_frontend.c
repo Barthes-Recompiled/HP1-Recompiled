@@ -486,6 +486,8 @@ static float pause_step(void)
 #define PAGE_AREA_TOP   100.0f  /* the rows' tops (centred text hangs from y) keep below the name, lit rows included */
 #define PAGE_AREA_END   372.0f  /* and above the "..." and the hint at 430 */
 #define PAGE_STEP       30.0f
+#define PAGE_TEXT_H     30.0f   /* the room a row takes per unit of scale, which a lit row grows by */
+#define PAGE_COL_GAP    8.0f    /* half the gap between a row's label and value columns */
 #define PAGE_LIT_SCALE  1.2f    /* a lit row grows less than the menus' 1.4: long values stay clear of the edges */
 
 /* a flat rectangle in the 640 x 480 frame, drawn as the letterbox bars draw theirs (0x2A600: a state block for an
@@ -717,6 +719,21 @@ static void page_input(void)
     }
 }
 
+/* a row's text (n bytes of s) in a guest buffer of its own, which the game's printf reads as its format */
+static int page_text(uint32_t *va, const char *s, size_t n)
+{
+    if (!*va) *va = xbox_HeapAlloc(96, 16);
+    if (!*va) return 0;
+    char *dst = (char *)XBOX_PTR(*va);
+    size_t k = 0;
+    for (size_t j = 0; j < n && s[j] && k < 94; j++) {
+        if (s[j] == '%') dst[k++] = '%';  /* a literal % for the printf */
+        dst[k++] = s[j];
+    }
+    dst[k] = 0;
+    return 1;
+}
+
 /* the page in the rows' place, drawn after the title's (its own rows and hint undrawn: g_page_draw) */
 static void page_draw(void)
 {
@@ -739,10 +756,13 @@ static void page_draw(void)
     int shown = n < PAGE_ROWS_SHOWN ? n : PAGE_ROWS_SHOWN;
     float row0 = (PAGE_AREA_TOP + PAGE_AREA_END) * 0.5f - PAGE_STEP * (float)(shown - 1) * 0.5f;
     if (row0 < PAGE_AREA_TOP) row0 = PAGE_AREA_TOP;
+    /* the colours and sizes ease first; a lit row's growth then pushes the rows below it down (the text hangs from
+     * y), and the block moves up by half of it to stay centred */
+    float grow = 0.0f;
     for (int r = 0; r < PAGE_ROWS_SHOWN && g_pg.top + r < n; r++) {
         int i = g_pg.top + r, lit = i == g_pg.sel;
         float d = (float)(i > g_pg.sel ? i - g_pg.sel : g_pg.sel - i);
-        float target[4] = {0.2f - d / 60.0f, 0.64f - d * 0.05f, 0.99f - d * 0.04f, 0.95f - d * 0.05f};
+        float target[4];
         if (d > 3.0f) d = 3.0f;  /* on the dark backdrop the far rows stay readable */
         target[0] = 0.2f + 0.5f - d * 0.08f, target[1] = 0.64f + 0.2f - d * 0.05f, target[2] = 1.0f,
         target[3] = 1.0f - d * 0.08f;
@@ -752,51 +772,68 @@ static void page_draw(void)
         *sc += lit ? dt * 4.0f : -dt * 4.0f;
         if (*sc > top) *sc = top;
         if (*sc < 1.0f) *sc = 1.0f;
-        /* the text goes through a guest buffer per shown row (the game's printf reads it as its format) */
-        static uint32_t row_va[PAGE_ROWS_SHOWN];
-        if (!row_va[r]) row_va[r] = xbox_HeapAlloc(96, 16);
-        if (!row_va[r]) continue;
-        char *dst = (char *)XBOX_PTR(row_va[r]);
-        size_t k = 0;
-        for (const char *c = rows[i].text; *c && k < 94; c++) {
-            if (*c == '%') dst[k++] = '%';  /* a literal % for the printf */
-            dst[k++] = *c;
+        grow += (*sc - 1.0f) * PAGE_TEXT_H;
+    }
+    float y = row0 - grow * 0.5f;
+    for (int r = 0; r < PAGE_ROWS_SHOWN && g_pg.top + r < n; r++) {
+        int i = g_pg.top + r;
+        float *col = i < 64 ? g_pg.col[i] : g_pg.col[63], sc = i < 64 ? g_pg.scale[i] : g_pg.scale[63];
+        /* "label:  value" as two columns about the centre, the label right-aligned and the value left-aligned, so the
+         * values line up down the page; a row without a value stays centred */
+        static uint32_t row_va[PAGE_ROWS_SHOWN], val_va[PAGE_ROWS_SHOWN];
+        const char *sep = strstr(rows[i].text, ":  ");
+        float x = rows[i].indent ? 335.0f : 320.0f;
+        if (sep) {
+            if (!page_text(&row_va[r], rows[i].text, (size_t)(sep + 1 - rows[i].text)) ||
+                !page_text(&val_va[r], sep + 3, strlen(sep + 3)))
+                continue;
+            set_align(2, 0);
+            call_guest(sub_00168DF0, 2, sh);
+            draw_text(col, sc, x - PAGE_COL_GAP, y, row_va[r]);
+            set_align(0, 0);
+            call_guest(sub_00168DF0, 2, sh);
+            draw_text(col, sc, x + PAGE_COL_GAP, y, val_va[r]);
+        } else {
+            if (!page_text(&row_va[r], rows[i].text, strlen(rows[i].text))) continue;
+            set_align(1, 0);  /* a centred column */
+            call_guest(sub_00168DF0, 2, sh);
+            draw_text(col, sc, x, y, row_va[r]);
         }
-        dst[k] = 0;
-        set_align(1, 0);  /* a centred column */
-        call_guest(sub_00168DF0, 2, sh);
-        draw_text(col, *sc, rows[i].indent ? 335.0f : 320.0f, row0 + PAGE_STEP * r, row_va[r]);
+        y += PAGE_STEP + (sc - 1.0f) * PAGE_TEXT_H;
     }
     if (n > PAGE_ROWS_SHOWN) {  /* more above / below */
         static uint32_t up_va, down_va;
         static const float more[4] = {0.6f, 0.75f, 0.95f, 0.9f};
         set_align(1, 0);
-        if (g_pg.top > 0) draw_text(more, 0.9f, 320.0f, row0 - 20.0f, guest_text("...", &up_va));
+        if (g_pg.top > 0) draw_text(more, 0.9f, 320.0f, row0 - grow * 0.5f - 20.0f, guest_text("...", &up_va));
         if (g_pg.top + PAGE_ROWS_SHOWN < n)
-            draw_text(more, 0.9f, 320.0f, row0 + PAGE_STEP * (float)(shown - 1) + 26.0f,
+            draw_text(more, 0.9f, 320.0f, row0 + grow * 0.5f + PAGE_STEP * (float)(shown - 1) + 26.0f,
                       guest_text("...", &down_va));
     }
     if (g_pg.page == kPageButtons && g_pg.map_mode == kMapWait) {
+        /* waiting for a pad button the question takes the hint's place (A does not select meanwhile), clear of the
+         * rows and their "..." */
         static uint32_t wait_va;
         static const float wait_col[4] = {1.0f, 0.86f, 0.45f, 1.0f};
-        set_align(1, 0);
-        draw_text(wait_col, 0.9f, 320.0f, 392.0f,
+        set_align(1, 1);
+        draw_text(wait_col, 0.9f, 320.0f, 430.0f,
                   guest_text("Press a button for it. Hold B or press Esc to cancel", &wait_va));
+    } else {
+        /* the hint the pause menu's rows have: the A button and "select" */
+        static const float hint[4] = {0.183f, 0.596f, 0.85f, 1.0f};
+        set_align(0, 1);
+        uint32_t c[4] = {fb(hint[0]), fb(hint[1]), fb(hint[2]), fb(hint[3])};
+        call_guest(sub_00168D90, 4, c);
+        uint32_t sc1[1] = {fb(1.0f)};
+        call_guest(sub_00168E60, 1, sc1);
+        g_pause_hint = 1;
+        call_guest(sub_00030510_gen, 0, NULL);
+        g_pause_hint = 0;
+        uint32_t pos[2] = {fb(320.0f), fb(430.0f)};
+        call_guest(sub_00168D70_gen, 2, pos);
+        uint32_t t[1] = {game_text(kKeySelect)};
+        if (t[0]) call_guest(sub_00169A40_gen, 1, t);
     }
-    /* the hint the pause menu's rows have: the A button and "select" */
-    static const float hint[4] = {0.183f, 0.596f, 0.85f, 1.0f};
-    set_align(0, 1);
-    uint32_t c[4] = {fb(hint[0]), fb(hint[1]), fb(hint[2]), fb(hint[3])};
-    call_guest(sub_00168D90, 4, c);
-    uint32_t sc1[1] = {fb(1.0f)};
-    call_guest(sub_00168E60, 1, sc1);
-    g_pause_hint = 1;
-    call_guest(sub_00030510_gen, 0, NULL);
-    g_pause_hint = 0;
-    uint32_t pos[2] = {fb(320.0f), fb(430.0f)};
-    call_guest(sub_00168D70_gen, 2, pos);
-    uint32_t t[1] = {game_text(kKeySelect)};
-    if (t[0]) call_guest(sub_00169A40_gen, 1, t);
     /* the port everything here stands on */
     static uint32_t thanks_va;
     static const float thanks_col[4] = {0.55f, 0.65f, 0.8f, 0.85f};
