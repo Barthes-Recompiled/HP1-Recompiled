@@ -262,6 +262,7 @@ static void ResetPage(Settings& s, const char* page) {
     }
     if (!std::strcmp(page, "Gameplay")) {
         std::memcpy(&s.cutscene_skip, &d.cutscene_skip, sizeof(s.cutscene_skip));
+        std::memcpy(&s.intro_skip, &d.intro_skip, sizeof(s.intro_skip));
     }
     if (!std::strcmp(page, "Accessibility")) {
         std::memcpy(&s.colorblind, &d.colorblind, sizeof(s.colorblind));
@@ -408,6 +409,8 @@ void DrawPanel(bool start) {
         Row("Cutscenes");
         if (ImGui::Checkbox("Hold Start or Back to fast-forward a cutscene", &s.cutscene_skip)) Changed();
         ImGui::TextDisabled("Runs it to its own end, muted and with the picture held, so nothing it sets up is missed.");
+        if (ImGui::Checkbox("Skip the logos at start-up", &s.intro_skip)) Changed();
+        ImGui::TextDisabled("The EA and Warner Bros. logo movies; takes effect at the next start.");
         ImGui::EndTabItem();
     }
     if (tabs && ImGui::BeginTabItem("Accessibility")) {
