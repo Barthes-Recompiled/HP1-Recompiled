@@ -228,6 +228,7 @@ static void search_check(uint32_t ret)
     snprintf(key, sizeof key, "search:%s", low);
     hpps_ap_location(key);
     snprintf(key, sizeof key, "search:%u:%s", MEM32(LEVEL_NOW), low);
+    if (!hpps_ap_known(key)) fprintf(stderr, "[AP] searched %s: not a check in this catalog\n", key);
     hpps_ap_location(key);
 }
 
