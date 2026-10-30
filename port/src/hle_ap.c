@@ -373,6 +373,7 @@ void hpps_ApFrame(void)
     if (!hpps_ap_enabled()) return;
     hpps_ap_frame();
     travel();  /* before the connection check: the entries are gated by the passes held */
+    pickups();  /* checks made offline wait in pending_<slot>.json */
     if (!hpps_ap_active()) return;
     const char *kind;
     int value;
@@ -382,7 +383,6 @@ void hpps_ApFrame(void)
         g_giving = 0;
         hpps_ap_item_given();
     }
-    pickups();
     /* counters */
     static int cards_seen, beans_last = -1, beans_total;
     int owned = 0;
@@ -431,6 +431,9 @@ void hpps_ApPad(XBOX_GAMEPAD *g)
      * after the combo (a Back let go after the triggers) */
     if (g->bAnalogButtons[6] > 64 || g->bAnalogButtons[7] > 64 || GetTickCount() - fired < 500)
         g->wButtons &= (uint16_t)~0x0020;
+    /* the pause menu's input step runs only once the menu is up, so the combo presses Start for the game itself
+     * (hle_frontend.c then turns the pause menu into the Travel page) */
+    if (fired && GetTickCount() - fired < 120) g->wButtons |= 0x0010;
 }
 
 static void travel(void)
