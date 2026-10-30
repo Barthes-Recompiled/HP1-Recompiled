@@ -304,7 +304,7 @@ extern "C" int hpps_ap_next_item(const char** kind, int* value) {
     const json& it = Cat().item.at(name->second);
     g_kind = it.value("kind", "");
     *kind = g_kind.c_str();
-    *value = it.value("card", it.value("spell", 0));
+    *value = it.value("card", it.value("spell", it.value("item", 0)));
     return 1;
   }
   return 0;

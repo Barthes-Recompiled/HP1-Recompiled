@@ -14,8 +14,9 @@
  * Counters, once a frame: wizard cards owned (the 101 counts at 0x329BD4) and beans collected (rises of 0x329B8A).
  *
  * Items: a card through sub_0003E9A0(card) (the title's own: the inventory slot, a health bar each 20th); beans into
- * 0x329B8A up to the bag (0x329B8C); a health bar sub_00152160(); the big bag 150; a spell onto the first free button
- * (sub_0014FEB0(slot, spell), then sub_000342E0() for the abilities). Passes are kept by the bridge (the travel menu).
+ * 0x329B8A up to the bag (0x329B8C); a health bar sub_00152160(); the big bag 150; quest items and spells through the
+ * title's give-item sub_00041D20(item) (spells are inventory items of their number), a spell also onto the first free
+ * button (sub_0014FEB0(slot, spell), then sub_000342E0() for the abilities). Passes are kept by the bridge (the travel menu).
  * Not yet: placed pickups and enemies as checks, the vanilla rewards of checks left in place.
  */
 
@@ -35,6 +36,7 @@
 extern void sub_0003E9A0(void);
 extern void sub_00152160(void);
 extern void sub_0014FEB0(void);
+extern void sub_00041D20(void);
 extern void sub_000342E0(void);
 
 #define LEVEL_NOW    0x356CC4u
@@ -155,7 +157,13 @@ static int give(const char *kind, int value)
         MEM16(BEAN_BAG) = 150;
     } else if (!strcmp(kind, "frog")) {
         MEMF(0x329B90) = MEMF(0x329B94);  /* a chocolate frog: health filled */
+    } else if (!strcmp(kind, "quest") && value > 0) {
+        uint32_t arg = (uint32_t)value;
+        call_guest(sub_00041D20, 1, &arg);  /* the title's give-item: the inventory slot the scripts test */
     } else if (!strcmp(kind, "spell") && value > 0) {
+        /* a spell is an inventory item of its number (the scripts test QuizInventory(10) for Incendio) */
+        uint32_t arg = (uint32_t)value;
+        call_guest(sub_00041D20, 1, &arg);
         for (uint32_t s = 0; s < 3; s++)
             if (MEM8(SPELL_SLOTS + s) == (uint8_t)value) return 1;
         for (uint32_t s = 0; s < 3; s++)
