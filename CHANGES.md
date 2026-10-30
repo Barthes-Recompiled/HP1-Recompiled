@@ -1,5 +1,24 @@
 # Changes
 
+## v0.3.0 (2026-10-30), compared with v0.2.1
+
+### New options
+- **Bloom and sharpening** (F10 > Graphics > Post-processing), both off by default.
+- **Field of view slider (experimental)** (F10 > Graphics), 80 to 130 % of the game's.
+- **Announce bean flavours on pickup** (F10 > Enhancements, on by default). Turn it off and the flavour is no longer said aloud when Harry picks up a bean.
+
+### The launcher
+- **Checks your game files.** On the first start, after unpacking a disc image, and from "Verify game files", every file is compared with the disc's; damaged or missing ones are named, and "Repair" writes them again from a disc image in the game folder. Later starts only check the sizes.
+- **A new look:** the title in the Magic School One font over a Gryffindor scarlet backdrop, with no game artwork (the old main-menu picture is gone from every build); the exes have a wand icon in the same colours.
+- **No more crash under Wine** when a DXVK `dxgi.dll` sits beside the exes.
+- **`show_launcher` is the first setting in `hpps.toml`**, to bring the page back (or hold Shift, or F10).
+
+### Fixes
+- **A crash leaves `hpps_crash.log`** beside the game even with the debug logs off.
+- **Smoother camera:** the game's timer runs at 3000 ticks a second from the start, which removed a camera judder.
+- **Starts under Wine 11** and other setups where the usual memory address is taken.
+- **Another edition's game files are turned away with a clear message** instead of the game stopping at once (only the PAL release works), and a start-up fault that overwrote some of the game's data is fixed.
+
 ## v0.2.1 (2026-10-25), compared with v0.2.0
 
 - **F10's Defaults resets only the page you're on.** On Graphics it resets the graphics settings, on Controls the controls, and so on; the other pages keep your settings. Before, it reset every page at once. The aspect ratio is still kept, as before.

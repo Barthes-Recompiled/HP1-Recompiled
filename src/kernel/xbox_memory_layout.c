@@ -1799,6 +1799,33 @@ volatile uint32_t g_icall_trace[16] = {0};
 volatile uint32_t g_icall_trace_idx = 0;
 volatile uint64_t g_icall_count = 0;
 
+#ifdef _WIN32
+static int layout_reserve_free(uintptr_t at, size_t size)
+{
+    LPVOID r = VirtualAlloc((LPVOID)at, size, MEM_RESERVE, PAGE_NOACCESS);
+    if (!r) return 0;
+    VirtualFree(r, 0, MEM_RELEASE);
+    return (uintptr_t)r == at;
+}
+
+/* Whether the host ranges the layout puts above a base are free: the RAM mirrors (base + 64 MB on, as many as the
+ * mirror loop maps), the contiguous window (guest 0x80000000) and the tiled aperture (guest 0xF0000000). Each is
+ * reserved and handed back at once; one already taken (error 487) rules the base out. */
+static int layout_fits(uintptr_t base)
+{
+    uint64_t tiled_lo = XBOX_TILED_BASE, tiled_hi = tiled_lo + XBOX_CONTIG_SIZE;
+    for (int m = 0; m < XBOX_NUM_MIRRORS; m++) {
+        uint64_t lo = (uint64_t)(m + 1) * g_memory_size, hi = lo + g_memory_size;
+        if (lo < tiled_hi && tiled_lo < hi) continue;  /* skipped by the mirror loop as well */
+        if (!layout_reserve_free(base + (uintptr_t)lo, g_memory_size)) return 0;
+    }
+    return layout_reserve_free(base + XBOX_CONTIG_BASE, XBOX_CONTIG_SIZE) &&
+           layout_reserve_free(base + (uintptr_t)XBOX_TILED_BASE, XBOX_CONTIG_SIZE);
+}
+#else
+static int layout_fits(uintptr_t base) { (void)base; return 1; }
+#endif
+
 BOOL xbox_MemoryLayoutInit(const void *xbe_data, size_t xbe_size)
 {
     g_force_return = getenv("RECOMP_FORCE_RETURN") != NULL;
@@ -1912,6 +1939,16 @@ BOOL xbox_MemoryLayoutInit(const void *xbe_data, size_t xbe_size)
             if (g_memory_base) {
                 if (try_bases[i] != 0 && (uintptr_t)g_memory_base != try_bases[i]) {
                     /* OS gave us a different address, retry */
+                    UnmapViewOfFile(g_memory_base);
+                    g_memory_base = NULL;
+                    continue;
+                }
+                if (try_bases[i] != 0 && !layout_fits((uintptr_t)g_memory_base)) {
+                    /* the base is free but what has to follow it is not: Wine 11 holds ranges above 0x10000000
+                     * (mirrors 26-27 at 0x78000000 and the tiled aperture at 0x100000000 failed with error 487,
+                     * and Philosopher's Stone's intro video then wrote through the missing aperture) */
+                    fprintf(stderr, "  base %p: free, but the mirrors or apertures above it are taken; next\n",
+                            g_memory_base);
                     UnmapViewOfFile(g_memory_base);
                     g_memory_base = NULL;
                     continue;

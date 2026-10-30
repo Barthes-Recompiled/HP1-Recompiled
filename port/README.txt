@@ -30,6 +30,9 @@ INSTALLING
        licenses\
        shadercache\base_shaders.bin
 2. Copy the game files from your disc or the .xiso file into a folder named "game" in the same folder with the executables.
+   The launcher then checks every game file against the disc's once (a few
+   seconds, longer on a hard drive) and names any that are damaged or
+   missing; "Verify game files" on its page checks them again.
 
 Updating from an earlier version: replace the files above and keep your
 hpps.toml, saves\ and shadercache\ (your settings, saved games and the
@@ -134,6 +137,12 @@ Graphics
   Picture
     Brightness, Contrast 50 leaves the picture as the game draws it
     FPS counter          shows the frame rate
+  Post-processing
+    Bloom, Bloom strength  a glow around bright parts of the 3D scene (not
+                         the HUD), off by default
+    Sharpening           contrast-adaptive sharpening, off by default
+    Field of view (experimental)
+                         80 to 130 % of the game's; 100 is the game's own
 
 Controls
   Keyboard and mouse
@@ -168,16 +177,29 @@ Accessibility
                          colours you confuse toward ones you can tell apart
     Strength %
 
+Enhancements
+  Bertie Bott's beans
+    Announce bean flavours on pickup
+                         off: the flavour is no longer said aloud when Harry
+                         picks up a bean (on by default)
+
 Debug
   Logs
     Write debug logs     writes hpps_run.log and xbox_kernel.log beside the
                          game from the next start. Off by default; turn it on
                          to report a problem, and send both files with your
-                         report.
+                         report. With it off, a crash still leaves
+                         hpps_crash.log beside the game with the crash report.
 
 
 TROUBLESHOOTING
 ---------------
+
+The launcher says game files are damaged or missing
+    Copy those files again from your disc or game dump, or put the disc
+    image (.iso / .xiso) in the game folder and press "Repair" on the
+    launcher's page. A damaged file can crash the game or lose sound or
+    pictures where it is used.
 
 "Failed to load default.xbe"
     The game files are missing: check that game\default.xbe exists beside
