@@ -31,6 +31,8 @@ namespace app {
 namespace {
 
 std::atomic<bool> g_open{false};
+// xboxrecomp: the Archipelago travel window, F10 > Debug (the game's own is the pause menu's Travel page)
+std::atomic<bool> g_travel{false};
 std::atomic<bool> g_start{false};  // xboxrecomp: the start menu is up, the title waits for it
 std::atomic<bool> g_ui{false};  // ImGui is set up
 
@@ -465,6 +467,12 @@ void DrawPanel(bool start) {
     // xboxrecomp: the logs are opened as the game starts (the launcher's hpps_run.log, the kernel's xbox_kernel.log)
     if (tabs && ImGui::BeginTabItem("Debug")) {
         page = "Debug";
+        Row("Archipelago");
+        if (ImGui::Button("Travel window")) {
+            g_travel = true;
+            g_open = false;
+        }
+        ImGui::TextDisabled("The pause menu's Hogwarts Travel page as a PC window (both triggers + Back opens the page).");
         Row("Logs");
         if (ImGui::Checkbox("Write debug logs", &s.debug_logs)) Changed();
         ImGui::TextDisabled("hpps_run.log and xbox_kernel.log beside the game, for reporting a problem.");
@@ -551,8 +559,6 @@ int MsgHook(void* hwnd, unsigned msg, uintptr_t wp, intptr_t lp) {
 
 }  // namespace
 
-// xboxrecomp: the Archipelago travel window (hle_ap.c opens it: both triggers + Back)
-std::atomic<bool> g_travel{false};
 bool MenuOpen() { return g_open || g_start || g_travel; }
 
 void ToggleMenu() { g_open = !g_open; }

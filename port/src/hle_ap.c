@@ -387,9 +387,10 @@ void hpps_ApFrame(void)
     beans_last = beans;
 }
 
-/* the travel window (scda/app/menu.cpp): opened with both triggers held and Back pressed; its choice is carried out here,
+/* travel (the pause menu's Travel page, hle_frontend.c; the F10 > Debug window, scda/app/menu.cpp): opened with both
+ * triggers held and Back pressed; the choice is carried out here,
  * on the title's thread, by the trainer's warp (through the hub) and, for a set piece inside a hub, its entry script */
-extern void app_TravelToggle(void);
+extern void hpps_FrontendOpenTravel(void);  /* hle_frontend.c: the pause menu's Travel page */
 extern void hpps_TrainerTravel(uint32_t level, const char *script);
 static volatile LONG g_travel_pick = -1;
 
@@ -402,9 +403,9 @@ void hpps_ApPad(XBOX_GAMEPAD *g)
     if (!hpps_ap_enabled()) return;
     int back = (g->wButtons & 0x0020) != 0, triggers = g->bAnalogButtons[6] > 128 && g->bAnalogButtons[7] > 128;
     if (back && !back_was && triggers) {
+        hpps_FrontendOpenTravel();
         fired = GetTickCount();
         fprintf(stderr, "[AP] travel window (triggers %u/%u, Back)\n", g->bAnalogButtons[6], g->bAnalogButtons[7]);
-        app_TravelToggle();
     }
     back_was = back;
     /* the combo's Back is not the Remembrall's: kept from the game while the triggers are held and for half a second

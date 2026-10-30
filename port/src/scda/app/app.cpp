@@ -500,3 +500,56 @@ extern "C" void hpps_SettingsInit(void) {
 }
 
 // hle_video.c: the gameplay cameras' field of view
+
+// xboxrecomp: the in-game options page (hle_frontend.c draws it in the pause menu): a few settings, the same ones the
+// F10 panel changes, stepped left / right and saved to hpps.toml as F10 does
+namespace {
+struct InGameOption {
+    const char* label;
+    bool app::Settings::*flag;      // a toggle, or
+    uint32_t app::Settings::*value; // a value stepped through
+    int kind;                       // 0 toggle, 1 frame rate (kFpsChoices), 2 percent (0..100 by 10)
+};
+const InGameOption kInGame[] = {
+    {"Cutscene fast-forward", &app::Settings::cutscene_skip, nullptr, 0},
+    {"Skip start-up logos", &app::Settings::intro_skip, nullptr, 0},
+    {"Frame rate", nullptr, &app::Settings::fps_limit, 1},
+    {"Vsync", &app::Settings::vsync, nullptr, 0},
+    {"Brightness", nullptr, &app::Settings::brightness, 2},
+    {"Cutscene bars (16:9)", &app::Settings::cutscene_bars, nullptr, 0},
+    {"Vibration", &app::Settings::vibration, nullptr, 0},
+    {"Invert camera X", &app::Settings::invert_x, nullptr, 0},
+    {"Invert camera Y", &app::Settings::invert_y, nullptr, 0},
+    {"FPS counter", &app::Settings::fps_counter, nullptr, 0},
+};
+}  // namespace
+
+extern "C" int app_InGameOptionCount(void) { return int(std::size(kInGame)); }
+extern "C" const char* app_InGameOptionLabel(int i) {
+    return i >= 0 && i < int(std::size(kInGame)) ? kInGame[i].label : "";
+}
+extern "C" const char* app_InGameOptionValue(int i) {
+    static char buf[32];
+    if (i < 0 || i >= int(std::size(kInGame))) return "";
+    const InGameOption& o = kInGame[i];
+    const app::Settings& s = app::Get();
+    if (o.flag) return s.*o.flag ? "On" : "Off";
+    if (o.kind == 1) return app::kFpsChoiceNames[app::FpsChoice(s.*o.value)];
+    std::snprintf(buf, sizeof buf, "%u", unsigned(s.*o.value));
+    return buf;
+}
+extern "C" void app_InGameOptionStep(int i, int dir) {
+    if (i < 0 || i >= int(std::size(kInGame)) || !dir) return;
+    const InGameOption& o = kInGame[i];
+    app::Settings& s = app::Get();
+    if (o.flag) {
+        s.*o.flag = !(s.*o.flag);
+    } else if (o.kind == 1) {
+        int n = int(app::kFpsChoiceCount), c = (app::FpsChoice(s.*o.value) + dir + n) % n;
+        s.*o.value = app::kFpsChoices[c];
+    } else {
+        int v = int(s.*o.value) + 10 * dir;
+        s.*o.value = uint32_t(v < 0 ? 0 : v > 100 ? 100 : v);
+    }
+    app::Save();
+}

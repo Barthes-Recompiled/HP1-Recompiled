@@ -79,7 +79,9 @@ static float g_ask_col[2][4] = {{0.2f, 0.64f, 0.99f, 0.95f}, {0.2f, 0.64f, 0.99f
 static int g_pause_draw;            /* the pause menu is drawing */
 static int g_pause_ask;             /* the pause menu's box is up for row 10 */
 static int g_pause_hint;            /* the pause menu's hint is drawing its button */
-static float g_pcol[4] = {0.2f, 0.64f, 0.99f, 0.95f}, g_pscale = 1.0f;  /* row 10's easing colour / scale */
+static float g_pcol[3][4] = {{0.2f, 0.64f, 0.99f, 0.95f}, {0.2f, 0.64f, 0.99f, 0.95f}, {0.2f, 0.64f, 0.99f, 0.95f}},
+             g_pscale[3] = {1, 1, 1};  /* the port's rows' easing colours / scales */
+static int g_page_draw;             /* a page is up: the title's rows and hint are not drawn */
 static float g_last_x, g_last_y;    /* the last text position the game set, as it set it */
 
 static int enabled(void)
@@ -276,6 +278,10 @@ void sub_00030510(void)
 /* a 2D sprite (x0, y0, x1, y1, ...): the pause hint's button goes down to its text at 430 */
 void sub_00169F70(void)
 {
+    if (g_page_draw && g_pause_hint) {
+        g_esp += 4;  /* the title's hint button, under a page: the page draws its own */
+        return;
+    }
     if (g_pause_hint) {
         ARG(1) = fb(bf(ARG(1)) + 14.0f);
         ARG(3) = fb(bf(ARG(3)) + 14.0f);
@@ -284,17 +290,22 @@ void sub_00169F70(void)
 }
 
 static void pause_row(void);
+static float pause_step(void);
 
 /* text draw (format, ...) */
 void sub_00169A40(void)
 {
+    if (g_page_draw) {
+        g_esp += 4;  /* a page is up: the title's row text gives way (its ret, undrawn) */
+        return;
+    }
     if (g_in_menu && g_ask && !(g_last_x == 320.0f && g_last_y == 423.0f)) {
         g_esp += 4;  /* the rows give way to the question: their ret, undrawn */
         return;
     }
     if (g_pause_draw && g_pause_ask && g_last_x == 320.0f && g_last_y == 200.0f)
         ARG(0) = ask_text();  /* the box's title (GUI_SUREQUIT) */
-    if (g_pause_draw && MEM32(kPState) == kPList && g_last_y == 90.0f + 30.0f * (kPRows - 1) &&
+    if (g_pause_draw && MEM32(kPState) == kPList && g_last_y == 90.0f + pause_step() * (kPRows - 1) &&
         (g_last_x == 90.0f || g_last_x == 128.0f)) {
         float x = g_last_x;
         uint32_t s_esp = g_esp;
@@ -367,6 +378,243 @@ void sub_0001C380(void)
     g_esp = ret_esp;
 }
 
+/* ── the pause menu's own rows and pages ──────────────────────────────────────────────────────────────────────────
+ * Below the title's ten rows (GUI_QUIT the last) come rows of the port's own, in the rows' style: "Hogwarts Travel"
+ * (with an Archipelago slot set), "Settings" and "Quit To Desktop". Travel and Settings open a page: a pause state of
+ * its own (kPPage) in which the title's drawing runs as for its row list (the panel behind, its rows and hint left
+ * undrawn) and the page's rows are drawn in their place with the same text call, colours, scale and hint, scrolling
+ * when longer than the screen; the pad as the title's menus read it (up / down, left / right, A, B) and the title's
+ * menu sounds. Settings lists Gameplay, Graphics and Controls; Gameplay's rows are app_InGameOption* (app.cpp), the
+ * same settings the F10 panel changes. The travel window's both-triggers + Back shortcut (hle_ap.c) opens the pause
+ * menu on the Travel page. */
+
+enum { kPPage = 0x20, kStartBtn = 0x356CB0, kLeft = 0x356CA4, kRight = 0x356C18, kStickX = 0x356C6C };
+enum { kXTravel, kXSettings, kXQuit };
+enum { kPageTravel, kPageSettings, kPageGameplay, kPageGraphics, kPageControls };
+
+extern int hpps_ap_enabled(void);
+extern int hpps_ap_travel_entry(int i, const char **name, int *level, const char **script, int *dungeon,
+                                int *unlocked);
+extern void hpps_ApTravelRequest(int entry);
+extern int app_InGameOptionCount(void);
+extern const char *app_InGameOptionLabel(int i);
+extern const char *app_InGameOptionValue(int i);
+extern void app_InGameOptionStep(int i, int dir);
+extern void sub_001684D0(void);
+
+static int extras(int kind[3])
+{
+    int n = 0;
+    if (hpps_ap_enabled()) kind[n++] = kXTravel;
+    kind[n++] = kXSettings;
+    kind[n++] = kXQuit;
+    return n;
+}
+
+static uint32_t extra_text(int kind)
+{
+    static uint32_t va[3];
+    static const char *const kText[3] = {"Hogwarts Travel", "Settings", "Quit To Desktop"};
+    return guest_text(kText[kind], &va[kind]);
+}
+
+/* the row step while the pause menu draws: the ten rows and the extras above the hint at 430 */
+static float pause_step(void)
+{
+    int kind[3];
+    return extras(kind) > 2 ? 26.0f : 28.0f;
+}
+
+/* ── pages ── */
+#define PAGE_ROWS_SHOWN 9
+#define PAGE_TOP        100.0f
+#define PAGE_STEP       30.0f
+typedef struct { char text[96]; int enabled, indent; } PageRow;
+static struct { int page, sel, top, open_travel; float col[64][4], scale[64]; } g_pg;
+
+static int page_rows(int page, PageRow *rows, int max)
+{
+    int n = 0;
+    if (page == kPageTravel) {
+        const char *name, *script;
+        int level, dungeon, unlocked;
+        for (int i = 0; n < max && hpps_ap_travel_entry(i, &name, &level, &script, &dungeon, &unlocked); i++, n++) {
+            snprintf(rows[n].text, sizeof rows[n].text, "%s%s", name, unlocked ? "" : "  (locked)");
+            rows[n].enabled = unlocked, rows[n].indent = dungeon;
+        }
+    } else if (page == kPageSettings) {
+        static const char *const kSub[3] = {"Gameplay", "Graphics", "Controls"};
+        for (; n < 3; n++) {
+            snprintf(rows[n].text, sizeof rows[n].text, "%s", kSub[n]);
+            rows[n].enabled = n == 0, rows[n].indent = 0;  /* Graphics and Controls: next */
+        }
+    } else if (page == kPageGameplay) {
+        for (int i = 0; n < max && i < app_InGameOptionCount(); i++, n++) {
+            snprintf(rows[n].text, sizeof rows[n].text, "%s:  %s", app_InGameOptionLabel(i), app_InGameOptionValue(i));
+            rows[n].enabled = 1, rows[n].indent = 0;
+        }
+    }
+    return n;
+}
+
+static const char *page_title(int page)
+{
+    switch (page) {
+    case kPageTravel: return "Hogwarts Travel";
+    case kPageSettings: return "Settings";
+    case kPageGameplay: return "Gameplay";
+    case kPageGraphics: return "Graphics";
+    default: return "Controls";
+    }
+}
+
+static void page_open(int page)
+{
+    PageRow rows[64];
+    int n = page_rows(page, rows, 64);
+    g_pg.page = page, g_pg.sel = -1, g_pg.top = 0;
+    for (int i = 0; i < n && g_pg.sel < 0; i++)
+        if (rows[i].enabled) g_pg.sel = i;
+    for (int i = 0; i < 64; i++) {
+        g_pg.col[i][0] = 0.2f, g_pg.col[i][1] = 0.64f, g_pg.col[i][2] = 0.99f, g_pg.col[i][3] = 0.95f;
+        g_pg.scale[i] = 1.0f;
+    }
+    MEM32(kPState) = kPPage;
+}
+
+/* back out of a page: a sub-page to Settings, a page to the pause menu's row list */
+static void page_back(void)
+{
+    if (g_pg.page == kPageGameplay || g_pg.page == kPageGraphics || g_pg.page == kPageControls) {
+        int from = g_pg.page;
+        page_open(kPageSettings);
+        g_pg.sel = from - kPageGameplay;
+        return;
+    }
+    MEM32(kPState) = kPList;
+}
+
+/* leave the pause menu as its resume row does (0x3097B): state 1, the menu's two sounds stopped */
+static void pause_resume(void)
+{
+    MEM32(kPState) = 1;
+    uint32_t a[2] = {MEM32(0x32E800), 0};
+    call_guest(sub_001684D0, 2, a);
+    a[0] = MEM32(0x32E858);
+    call_guest(sub_001684D0, 2, a);
+    MEM32(0x338A94) = MEM32(0x1FAA0C);
+}
+
+static void page_input(void)
+{
+    PageRow rows[64];
+    int n = page_rows(g_pg.page, rows, 64);
+    int down = pressed_down(), up = pressed_up(), a = pad(kConfirmA) != 0, b = pad(kBack) != 0;  /* B: the menus' back */
+    int left = pad(kLeft) != 0 || pad(kStickX) == -1, right = pad(kRight) != 0 || pad(kStickX) == 1;
+    if (b) {
+        sound(kSndBack);
+        page_back();
+        return;
+    }
+    if ((down || up) && n) {
+        int dir = down ? 1 : -1, c = g_pg.sel;
+        for (int k = 0; k < n; k++) {
+            c = (c + dir + n) % n;
+            if (rows[c].enabled) break;
+        }
+        if (c != g_pg.sel && rows[c].enabled) {
+            g_pg.sel = c;
+            sound(kSndMove);
+        }
+    }
+    if (g_pg.sel >= 0 && g_pg.sel < n) {
+        if (g_pg.sel < g_pg.top) g_pg.top = g_pg.sel;
+        if (g_pg.sel >= g_pg.top + PAGE_ROWS_SHOWN) g_pg.top = g_pg.sel - PAGE_ROWS_SHOWN + 1;
+    }
+    if (g_pg.page == kPageGameplay && (left || right || a) && g_pg.sel >= 0) {
+        app_InGameOptionStep(g_pg.sel, left ? -1 : 1);
+        sound(kSndMove);
+        return;
+    }
+    if (!a || g_pg.sel < 0 || g_pg.sel >= n || !rows[g_pg.sel].enabled) return;
+    sound(kSndConfirm);
+    if (g_pg.page == kPageTravel) {
+        hpps_ApTravelRequest(g_pg.sel);
+        pause_resume();
+    } else if (g_pg.page == kPageSettings) {
+        page_open(kPageGameplay + g_pg.sel);
+    }
+}
+
+/* the page in the rows' place, drawn after the title's (its own rows and hint undrawn: g_page_draw) */
+static void page_draw(void)
+{
+    PageRow rows[64];
+    int n = page_rows(g_pg.page, rows, 64);
+    float dt = bf(MEM32(kPDt));
+    if (dt == 0.0f) dt = 1.0f / 30.0f;
+    float top = call_guest(sub_0002A7C0, 0, NULL) == 11 ? 1.2f : 1.4f;
+    uint32_t sh[2] = {4, 5};
+    static const float title_col[4] = {1.0f, 0.86f, 0.45f, 1.0f};
+    static uint32_t title_va[5];
+    set_align(1, 0);
+    call_guest(sub_00168DF0, 2, sh);
+    draw_text(title_col, 1.3f, 320.0f, 60.0f, guest_text(page_title(g_pg.page), &title_va[g_pg.page]));
+    for (int r = 0; r < PAGE_ROWS_SHOWN && g_pg.top + r < n; r++) {
+        int i = g_pg.top + r, lit = i == g_pg.sel;
+        float d = (float)(i > g_pg.sel ? i - g_pg.sel : g_pg.sel - i);
+        float target[4] = {0.2f - d / 60.0f, 0.64f - d * 0.05f, 0.99f - d * 0.04f, 0.95f - d * 0.05f};
+        if (!rows[i].enabled) target[0] = target[1] = target[2] = 0.45f, target[3] = 0.6f;
+        float *col = i < 64 ? g_pg.col[i] : g_pg.col[63], *sc = i < 64 ? &g_pg.scale[i] : &g_pg.scale[63];
+        for (int k = 0; k < 4; k++) col[k] = ease(col[k], lit ? 1.0f : target[k]);
+        *sc += lit ? dt * 4.0f : -dt * 4.0f;
+        if (*sc > top) *sc = top;
+        if (*sc < 1.0f) *sc = 1.0f;
+        /* the text goes through a guest buffer per shown row (the game's printf reads it as its format) */
+        static uint32_t row_va[PAGE_ROWS_SHOWN];
+        if (!row_va[r]) row_va[r] = xbox_HeapAlloc(96, 16);
+        if (!row_va[r]) continue;
+        char *dst = (char *)XBOX_PTR(row_va[r]);
+        size_t k = 0;
+        for (const char *c = rows[i].text; *c && k < 94; c++) {
+            if (*c == '%') dst[k++] = '%';  /* a literal % for the printf */
+            dst[k++] = *c;
+        }
+        dst[k] = 0;
+        set_align(0, 1);
+        call_guest(sub_00168DF0, 2, sh);
+        draw_text(col, *sc, rows[i].indent ? 158.0f : 128.0f, PAGE_TOP + PAGE_STEP * r, row_va[r]);
+    }
+    if (n > PAGE_ROWS_SHOWN) {  /* more above / below */
+        static uint32_t up_va, down_va;
+        static const float more[4] = {0.6f, 0.75f, 0.95f, 0.9f};
+        set_align(1, 0);
+        if (g_pg.top > 0) draw_text(more, 0.9f, 540.0f, 60.0f, guest_text("...", &up_va));  /* by the title, clear of the rows */
+        if (g_pg.top + PAGE_ROWS_SHOWN < n)
+            draw_text(more, 0.9f, 320.0f, PAGE_TOP + PAGE_STEP * PAGE_ROWS_SHOWN - 8.0f, guest_text("...", &down_va));
+    }
+    /* the hint the pause menu's rows have: the A button and "select" */
+    static const float hint[4] = {0.183f, 0.596f, 0.85f, 1.0f};
+    set_align(0, 1);
+    uint32_t c[4] = {fb(hint[0]), fb(hint[1]), fb(hint[2]), fb(hint[3])};
+    call_guest(sub_00168D90, 4, c);
+    uint32_t sc1[1] = {fb(1.0f)};
+    call_guest(sub_00168E60, 1, sc1);
+    g_pause_hint = 1;
+    call_guest(sub_00030510_gen, 0, NULL);
+    g_pause_hint = 0;
+    uint32_t pos[2] = {fb(320.0f), fb(430.0f)};
+    call_guest(sub_00168D70_gen, 2, pos);
+    uint32_t t[1] = {game_text(kKeySelect)};
+    if (t[0]) call_guest(sub_00169A40_gen, 1, t);
+    /* the port everything here stands on */
+    static uint32_t thanks_va;
+    static const float thanks_col[4] = {0.55f, 0.65f, 0.8f, 0.85f};
+    set_align(1, 0);
+    draw_text(thanks_col, 0.6f, 320.0f, 458.0f,
+              guest_text("Huge thanks to MiddleDucky, whose wonderful port makes all of this possible", &thanks_va));
+}
+
 /* the pause menu's input step */
 void sub_000307F0(void)
 {
@@ -375,6 +623,23 @@ void sub_000307F0(void)
         return;
     }
     uint32_t state = MEM32(kPState);
+    /* the travel shortcut while playing: the game's own Start opens the pause menu, then the page */
+    if (g_pg.open_travel && state == 0) {
+        uint32_t tbl = MEM32(MEM32(kPadState) + 0x10);
+        MEM16(tbl + MEM32(kStartBtn) * 24 + 0x10) = 1;
+        sub_000307F0_gen();
+        if (MEM32(kPState) != 0) {
+            g_pg.open_travel = 0;
+            page_open(kPageTravel);
+        }
+        return;
+    }
+    if (state == kPPage) {
+        page_input();
+        g_esp += 4;  /* the step's ret */
+        return;
+    }
+    int kind[3], nx = extras(kind), last = kPRows + nx - 1;
     int row = (int32_t)MEM32(kPRow);
     if (state != kPSure) g_pause_ask = 0;
     int confirm = pad(kConfirmA) != 0, down = pressed_down(), up = pressed_up();
@@ -386,21 +651,28 @@ void sub_000307F0(void)
     sub_000307F0_gen();
     if (state != kPList || MEM32(kPState) != kPList) return;
     int after = (int32_t)MEM32(kPRow);
-    if (row == kPQuitRow) {
+    if (row >= kPRows) {
         if (confirm) {
-            /* as GUI_QUIT opens the box (0x30BA7), No lit; the step has clicked */
-            MEM32(kPYes) = 0;
-            MEM32(kPState) = kPSure;
-            g_pause_ask = 1;
-        } else if (after == kPQuitRow + 1) {
-            MEM32(kPRow) = 0;  /* down from it wraps to the first row */
+            int k = kind[row - kPRows < nx ? row - kPRows : nx - 1];
+            if (k == kXQuit) {
+                /* as GUI_QUIT opens the box (0x30BA7), No lit; the step has clicked */
+                MEM32(kPYes) = 0;
+                MEM32(kPState) = kPSure;
+                g_pause_ask = 1;
+            } else {
+                page_open(k == kXTravel ? kPageTravel : kPageSettings);
+            }
+            MEM32(kPRow) = (uint32_t)row;
+        } else if (after > last) {
+            MEM32(kPRow) = 0;  /* down from the last wraps to the first row */
         }
     } else if (!confirm && ((up && row == 0 && after == kPRows - 1) || (down && !up && row == kPRows - 1 && after == 0))) {
-        MEM32(kPRow) = kPQuitRow;  /* the step wrapped past the last or first row: row 10 comes in between */
+        /* the step wrapped past the title's last or first row: the port's rows come in between */
+        MEM32(kPRow) = (uint32_t)(up && row == 0 ? last : kPRows);
     }
 }
 
-/* the pause menu's drawing: rows 30 apart while it runs */
+/* the pause menu's drawing: the rows closer together while it runs; on a page, the panel without the title's rows */
 void sub_00030F00(void)
 {
     if (!enabled()) {
@@ -408,37 +680,53 @@ void sub_00030F00(void)
         return;
     }
     uint32_t step = MEM32(kPStep);
-    MEM32(kPStep) = fb(30.0f);
+    MEM32(kPStep) = fb(pause_step());
     g_pause_draw = 1;
-    sub_00030F00_gen();
+    if (MEM32(kPState) == kPPage) {
+        MEM32(kPState) = kPList;
+        g_page_draw = 1;
+        sub_00030F00_gen();
+        g_page_draw = 0;
+        MEM32(kPState) = kPPage;
+        page_draw();
+    } else {
+        sub_00030F00_gen();
+    }
     g_pause_draw = 0;
     MEM32(kPStep) = step;
 }
 
-/* row 10 under GUI_QUIT, drawn as the pause menu's loop draws its rows (0x310F7), and the hint when it is lit */
+/* the port's rows under GUI_QUIT, drawn as the pause menu's loop draws its rows (0x310F7), and the hint when one is
+ * lit */
 static void pause_row(void)
 {
-    int sel = (int32_t)MEM32(kPRow), lit = sel == kPQuitRow;
-    float d = (float)(sel > kPQuitRow ? sel - kPQuitRow : kPQuitRow - sel);
-    float target[4] = {0.2f - d / 60.0f, 0.64f - d * 0.05f, 0.99f - d * 0.04f, 0.95f - d * 0.05f};
-    for (int k = 0; k < 4; k++) {
-        float t = lit ? 1.0f : target[k];
-        if (g_pcol[k] < t) g_pcol[k] = g_pcol[k] + 0.04f > t ? t : g_pcol[k] + 0.04f;
-        else if (g_pcol[k] > t) g_pcol[k] = g_pcol[k] - 0.04f < t ? t : g_pcol[k] - 0.04f;
-    }
+    int kind[3], nx = extras(kind);
+    int sel = (int32_t)MEM32(kPRow);
     float dt = bf(MEM32(kPDt));
     if (dt == 0.0f) dt = 1.0f / 30.0f;
-    float top = call_guest(sub_0002A7C0, 0, NULL) == 11 ? 1.2f : 1.4f;
-    g_pscale += lit ? dt * 4.0f : -dt * 4.0f;
-    if (g_pscale > top) g_pscale = top;
-    if (g_pscale < 1.0f) g_pscale = 1.0f;
-    uint32_t text = quit_text();
-    if (!text) return;
-    set_align(0, 1);
-    uint32_t sh[2] = {4, 5};
-    call_guest(sub_00168DF0, 2, sh);
-    draw_text(g_pcol, g_pscale, g_last_x, 90.0f + 30.0f * kPQuitRow, text);
-    if (lit) {
+    float top = call_guest(sub_0002A7C0, 0, NULL) == 11 ? 1.2f : 1.4f, step = pause_step();
+    int any_lit = 0;
+    for (int x = 0; x < nx; x++) {
+        int row = kPRows + x, lit = sel == row;
+        float d = (float)(sel > row ? sel - row : row - sel);
+        float target[4] = {0.2f - d / 60.0f, 0.64f - d * 0.05f, 0.99f - d * 0.04f, 0.95f - d * 0.05f};
+        for (int k = 0; k < 4; k++) {
+            float t = lit ? 1.0f : target[k];
+            if (g_pcol[x][k] < t) g_pcol[x][k] = g_pcol[x][k] + 0.04f > t ? t : g_pcol[x][k] + 0.04f;
+            else if (g_pcol[x][k] > t) g_pcol[x][k] = g_pcol[x][k] - 0.04f < t ? t : g_pcol[x][k] - 0.04f;
+        }
+        g_pscale[x] += lit ? dt * 4.0f : -dt * 4.0f;
+        if (g_pscale[x] > top) g_pscale[x] = top;
+        if (g_pscale[x] < 1.0f) g_pscale[x] = 1.0f;
+        uint32_t text = extra_text(kind[x]);
+        if (!text) continue;
+        set_align(0, 1);
+        uint32_t sh[2] = {4, 5};
+        call_guest(sub_00168DF0, 2, sh);
+        draw_text(g_pcol[x], g_pscale[x], g_last_x, 90.0f + step * row, text);
+        any_lit |= lit;
+    }
+    if (any_lit) {
         /* the hint the loop's end gives rows 0..5 and 9 (0x319FC) */
         static const float hint[4] = {0.183f, 0.596f, 0.85f, 1.0f};
         set_align(0, 1);
@@ -453,3 +741,6 @@ static void pause_row(void)
         if (t[0]) call_guest(sub_00169A40_gen, 1, t);
     }
 }
+
+/* hle_ap.c's travel shortcut (both triggers + Back): the pause menu opens on the Travel page */
+void hpps_FrontendOpenTravel(void) { g_pg.open_travel = 1; }
