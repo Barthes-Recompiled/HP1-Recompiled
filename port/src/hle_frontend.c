@@ -85,8 +85,14 @@ static float g_pcol[3][4] = {{0.2f, 0.64f, 0.99f, 0.95f}, {0.2f, 0.64f, 0.99f, 0
              g_pscale[3] = {1, 1, 1};  /* the port's rows' easing colours / scales */
 static int g_page_draw;             /* a page is up: the title's rows and hint are not drawn */
 /* the settings / travel pages (below): which is up and where (0 none, 1 over the title, 2 in the pause menu) */
-enum { kPageTravel, kPageSettings, kPageGameplay, kPageGraphics, kPageControls };
-static struct { int page, sel, top, open_travel, where; float col[64][4], scale[64]; } g_pg;
+enum { kPageTravel, kPageSettings, kPageGameplay, kPageGraphics, kPageControls, kPageButtons };
+/* the Button mapping page's mode: its rows, waiting for a pad button (input.cpp), or asking whether to swap */
+enum { kMapRows, kMapWait, kMapAsk };
+static struct {
+    int page, sel, top, open_travel, where;
+    int map_mode, map_game, map_button, map_other;  /* the game button asked for, the pad button got, its owner */
+    float col[64][4], scale[64];
+} g_pg;
 static void page_input(void);
 static void page_draw(void);
 static void page_open_at(int page, int where);
@@ -426,7 +432,9 @@ void sub_0001C380(void)
  * undrawn) and the page's rows are drawn in their place with the same text call, colours, scale and hint, scrolling
  * when longer than the screen; the pad as the title's menus read it (up / down, left / right, A, B) and the title's
  * menu sounds. Settings lists Gameplay, Graphics and Controls; Gameplay's rows are app_InGameOption* (app.cpp), the
- * same settings the F10 panel changes. The travel window's both-triggers + Back shortcut (hle_ap.c) opens the pause
+ * same settings the F10 panel changes. Controls opens with Button Mapping: each game button and the pad button it
+ * reads (hpps.toml pad_*); A waits for a pad button (input.cpp, the game sees the pad at rest meanwhile), one already
+ * in use asks whether to swap the two, and holding B, Escape or ten idle seconds cancel. The travel window's both-triggers + Back shortcut (hle_ap.c) opens the pause
  * menu on the Travel page. */
 
 enum { kPPage = 0x20, kStartBtn = 0x356CB0, kLeft = 0x356CA4, kRight = 0x356C18, kStickX = 0x356C6C };
@@ -440,6 +448,13 @@ extern int app_PageOptionCount(int page);  /* scda/app/app.cpp: 0 Gameplay, 1 Gr
 extern const char *app_PageOptionLabel(int page, int i);
 extern const char *app_PageOptionValue(int page, int i);
 extern void app_PageOptionStep(int page, int i, int dir);
+extern void app_PadCaptureStart(void);  /* scda/app/input.cpp: the Button mapping page's wait and the remapping */
+extern int app_PadCaptureResult(int *button);
+extern const char *app_PadInputLabel(int i);
+extern int app_PadInputCount(void);
+extern int app_PadMapGet(int game);
+extern void app_PadMapSet(int game, int button, int swap);
+extern void app_PadMapReset(void);
 extern void sub_001684D0(void);
 
 static int extras(int kind[3])
@@ -511,8 +526,34 @@ static int page_rows(int page, PageRow *rows, int max)
             snprintf(rows[n].text, sizeof rows[n].text, "%s", kSub[n]);
             rows[n].enabled = 1, rows[n].indent = 0;
         }
+    } else if (page == kPageButtons && g_pg.map_mode == kMapAsk) {
+        /* the pad button got already plays another game button: swap the two, or leave both */
+        snprintf(rows[0].text, sizeof rows[0].text, "%s is used by %s", app_PadInputLabel(g_pg.map_button),
+                 app_PadInputLabel(g_pg.map_other));
+        snprintf(rows[1].text, sizeof rows[1].text, "Swap (%s gets %s)", app_PadInputLabel(g_pg.map_other),
+                 app_PadInputLabel(app_PadMapGet(g_pg.map_game)));
+        snprintf(rows[2].text, sizeof rows[2].text, "Cancel");
+        rows[0].enabled = 0, rows[1].enabled = rows[2].enabled = 1;
+        rows[0].indent = rows[1].indent = rows[2].indent = 0;
+        n = 3;
+    } else if (page == kPageButtons) {
+        /* each game button and the pad button it reads, then the defaults */
+        for (int i = 0; n < max && i < app_PadInputCount(); i++, n++) {
+            int wait = g_pg.map_mode == kMapWait && i == g_pg.map_game;
+            snprintf(rows[n].text, sizeof rows[n].text, "%s:  %s", app_PadInputLabel(i),
+                     wait ? "press a button" : app_PadInputLabel(app_PadMapGet(i)));
+            rows[n].enabled = 1, rows[n].indent = 0;
+        }
+        if (n < max) {
+            snprintf(rows[n].text, sizeof rows[n].text, "Reset to defaults");
+            rows[n].enabled = 1, rows[n].indent = 0, n++;
+        }
     } else {
         int opts = page - kPageGameplay;
+        if (page == kPageControls && n < max) {  /* Controls opens with the Button mapping page */
+            snprintf(rows[n].text, sizeof rows[n].text, "Button mapping");
+            rows[n].enabled = 1, rows[n].indent = 0, n++;
+        }
         for (int i = 0; n < max && i < app_PageOptionCount(opts); i++, n++) {
             snprintf(rows[n].text, sizeof rows[n].text, "%s:  %s", app_PageOptionLabel(opts, i),
                      app_PageOptionValue(opts, i));
@@ -529,6 +570,7 @@ static const char *page_title(int page)
     case kPageSettings: return "Settings";
     case kPageGameplay: return "Gameplay";
     case kPageGraphics: return "Graphics";
+    case kPageButtons: return "Button Mapping";
     default: return "Controls";
     }
 }
@@ -536,6 +578,7 @@ static const char *page_title(int page)
 static void page_open_at(int page, int where)
 {
     PageRow rows[64];
+    g_pg.map_mode = kMapRows;
     int n = page_rows(page, rows, 64);
     g_pg.page = page, g_pg.sel = -1, g_pg.top = 0;
     for (int i = 0; i < n && g_pg.sel < 0; i++)
@@ -553,6 +596,15 @@ static void page_open(int page) { page_open_at(page, 2); }
 /* back out of a page: a sub-page to Settings, a page to the pause menu's row list */
 static void page_back(void)
 {
+    if (g_pg.page == kPageButtons) {
+        if (g_pg.map_mode == kMapAsk) {  /* the swap question's B: as Cancel */
+            g_pg.map_mode = kMapRows, g_pg.sel = g_pg.map_game;
+            return;
+        }
+        page_open_at(kPageControls, g_pg.where);
+        g_pg.sel = 0;
+        return;
+    }
     if (g_pg.page == kPageGameplay || g_pg.page == kPageGraphics || g_pg.page == kPageControls) {
         int from = g_pg.page;
         page_open_at(kPageSettings, g_pg.where);
@@ -574,8 +626,34 @@ static void pause_resume(void)
     MEM32(0x338A94) = MEM32(0x1FAA0C);
 }
 
+/* the Button mapping page's answer from the pad (input.cpp): a free button is taken, one in use asks to swap */
+static void map_wait(void)
+{
+    int button, r = app_PadCaptureResult(&button);
+    if (!r) return;
+    g_pg.map_mode = kMapRows;
+    if (r < 0) {
+        sound(kSndBack);
+        return;
+    }
+    g_pg.map_other = -1;
+    for (int j = 0; j < app_PadInputCount(); j++)
+        if (j != g_pg.map_game && app_PadMapGet(j) == button) g_pg.map_other = j;
+    if (g_pg.map_other < 0 || app_PadMapGet(g_pg.map_game) == button) {
+        app_PadMapSet(g_pg.map_game, button, 0);
+        sound(kSndConfirm);
+        return;
+    }
+    g_pg.map_button = button, g_pg.map_mode = kMapAsk, g_pg.sel = 2, g_pg.top = 0;  /* Cancel lit */
+    sound(kSndMove);
+}
+
 static void page_input(void)
 {
+    if (g_pg.page == kPageButtons && g_pg.map_mode == kMapWait) {  /* the game sees the pad at rest meanwhile */
+        map_wait();
+        return;
+    }
     PageRow rows[64];
     int n = page_rows(g_pg.page, rows, 64);
     int down = pressed_down(), up = pressed_up(), a = pad(kConfirmA) != 0, b = pad(kBack) != 0;  /* B: the menus' back */
@@ -600,8 +678,31 @@ static void page_input(void)
         if (g_pg.sel < g_pg.top) g_pg.top = g_pg.sel;
         if (g_pg.sel >= g_pg.top + PAGE_ROWS_SHOWN) g_pg.top = g_pg.sel - PAGE_ROWS_SHOWN + 1;
     }
+    if (g_pg.page == kPageButtons) {
+        if (!a || g_pg.sel < 0 || g_pg.sel >= n || !rows[g_pg.sel].enabled) return;
+        if (g_pg.map_mode == kMapAsk) {
+            if (g_pg.sel == 1) app_PadMapSet(g_pg.map_game, g_pg.map_button, 1);
+            sound(g_pg.sel == 1 ? kSndConfirm : kSndBack);
+            g_pg.map_mode = kMapRows, g_pg.sel = g_pg.map_game;
+        } else if (g_pg.sel == app_PadInputCount()) {
+            app_PadMapReset();
+            sound(kSndConfirm);
+        } else {
+            g_pg.map_game = g_pg.sel, g_pg.map_mode = kMapWait;
+            app_PadCaptureStart();
+            sound(kSndConfirm);
+        }
+        return;
+    }
+    if (g_pg.page == kPageControls && g_pg.sel == 0) {
+        if (!a) return;
+        sound(kSndConfirm);
+        page_open_at(kPageButtons, g_pg.where);
+        return;
+    }
     if (g_pg.page >= kPageGameplay && (left || right || a) && g_pg.sel >= 0) {
-        app_PageOptionStep(g_pg.page - kPageGameplay, g_pg.sel, left ? -1 : 1);
+        app_PageOptionStep(g_pg.page - kPageGameplay, g_pg.page == kPageControls ? g_pg.sel - 1 : g_pg.sel,
+                           left ? -1 : 1);
         sound(kSndMove);
         return;
     }
@@ -626,7 +727,7 @@ static void page_draw(void)
     float top = PAGE_LIT_SCALE;
     uint32_t sh[2] = {4, 5};
     static const float title_col[4] = {1.0f, 0.86f, 0.45f, 1.0f};
-    static uint32_t title_va[5];
+    static uint32_t title_va[6];
     /* a still, dark backdrop: over the title it covers the menu's moving background; in the pause menu it darkens the
      * game behind */
     static const float backdrop[4] = {0.02f, 0.025f, 0.07f, 1.0f}, dim[4] = {0.0f, 0.0f, 0.02f, 0.82f};
@@ -674,6 +775,13 @@ static void page_draw(void)
         if (g_pg.top + PAGE_ROWS_SHOWN < n)
             draw_text(more, 0.9f, 320.0f, row0 + PAGE_STEP * (float)(shown - 1) + 26.0f,
                       guest_text("...", &down_va));
+    }
+    if (g_pg.page == kPageButtons && g_pg.map_mode == kMapWait) {
+        static uint32_t wait_va;
+        static const float wait_col[4] = {1.0f, 0.86f, 0.45f, 1.0f};
+        set_align(1, 0);
+        draw_text(wait_col, 0.9f, 320.0f, 392.0f,
+                  guest_text("Press a button for it. Hold B or press Esc to cancel", &wait_va));
     }
     /* the hint the pause menu's rows have: the A button and "select" */
     static const float hint[4] = {0.183f, 0.596f, 0.85f, 1.0f};
