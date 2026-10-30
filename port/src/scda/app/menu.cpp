@@ -223,10 +223,14 @@ static void ResetPage(Settings& s, const char* page) {
     if (!std::strcmp(page, "Graphics")) {
         std::memcpy(&s.aniso, &d.aniso, sizeof(s.aniso));
         std::memcpy(&s.brightness, &d.brightness, sizeof(s.brightness));
+        std::memcpy(&s.bloom, &d.bloom, sizeof(s.bloom));
+        std::memcpy(&s.bloom_strength, &d.bloom_strength, sizeof(s.bloom_strength));
+        std::memcpy(&s.sharpen, &d.sharpen, sizeof(s.sharpen));
         std::memcpy(&s.contrast, &d.contrast, sizeof(s.contrast));
         std::memcpy(&s.cutscene_bars, &d.cutscene_bars, sizeof(s.cutscene_bars));
         std::memcpy(&s.display_mode, &d.display_mode, sizeof(s.display_mode));
         std::memcpy(&s.fps_counter, &d.fps_counter, sizeof(s.fps_counter));
+        std::memcpy(&s.fov, &d.fov, sizeof(s.fov));
         std::memcpy(&s.fps_limit, &d.fps_limit, sizeof(s.fps_limit));
         std::memcpy(&s.height, &d.height, sizeof(s.height));
         std::memcpy(&s.internal_height, &d.internal_height, sizeof(s.internal_height));
@@ -267,6 +271,9 @@ static void ResetPage(Settings& s, const char* page) {
     if (!std::strcmp(page, "Accessibility")) {
         std::memcpy(&s.colorblind, &d.colorblind, sizeof(s.colorblind));
         std::memcpy(&s.colorblind_strength, &d.colorblind_strength, sizeof(s.colorblind_strength));
+    }
+    if (!std::strcmp(page, "Enhancements")) {
+        std::memcpy(&s.bean_names, &d.bean_names, sizeof(s.bean_names));
     }
     if (!std::strcmp(page, "Debug")) {
         std::memcpy(&s.debug_logs, &d.debug_logs, sizeof(s.debug_logs));
@@ -383,6 +390,22 @@ void DrawPanel(bool start) {
     if (ImGui::SliderInt("Contrast", &co, 0, 100)) s.contrast = uint32_t(co);
     if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
     if (ImGui::Checkbox("FPS counter", &s.fps_counter)) Changed();
+    int fv = int(std::clamp(s.fov, 80u, 130u));
+    if (ImGui::SliderInt("Field of view (experimental)", &fv, 80, 130, fv == 100 ? "as the game" : "%d %%")) s.fov = uint32_t(fv);
+    if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
+    // xboxrecomp (from hpcos): post-processing, off by default
+    Row("Post-processing");
+    if (ImGui::Checkbox("Bloom", &s.bloom)) Changed();
+    ImGui::SameLine();
+    ImGui::TextDisabled("a glow round the 3D scene's bright parts, under the HUD");
+    if (!s.bloom) ImGui::BeginDisabled();
+    int bs = int(s.bloom_strength);
+    if (ImGui::SliderInt("Bloom strength", &bs, 0, 100)) s.bloom_strength = uint32_t(bs);
+    if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
+    if (!s.bloom) ImGui::EndDisabled();
+    int sh = int(s.sharpen);
+    if (ImGui::SliderInt("Sharpening", &sh, 0, 100, sh == 0 ? "off" : "%d")) s.sharpen = uint32_t(sh);
+    if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
         ImGui::EndTabItem();
     }
     if (tabs && ImGui::BeginTabItem("Audio")) {
@@ -429,6 +452,14 @@ void DrawPanel(bool start) {
         if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
         ImGui::EndDisabled();
         ImGui::TextDisabled("Shifts the colours a colour-blind player confuses toward ones they can tell apart.");
+        ImGui::EndTabItem();
+    }
+    if (tabs && ImGui::BeginTabItem("Enhancements")) {
+        // xboxrecomp: changes to how the game plays that go beyond the console's (moved from Accessibility, 2026-10-30)
+        page = "Enhancements";
+        Row("Bertie Bott's beans");
+        if (ImGui::Checkbox("Announce bean flavours on pickup", &s.bean_names)) Changed();
+        ImGui::TextDisabled("Off: the flavour is no longer said aloud when Harry picks up a bean.");
         ImGui::EndTabItem();
     }
     // xboxrecomp: the logs are opened as the game starts (the launcher's hpps_run.log, the kernel's xbox_kernel.log)

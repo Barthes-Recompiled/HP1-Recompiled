@@ -328,6 +328,80 @@ static void prof_start(void)
     CloseHandle(CreateThread(NULL, 0, prof_thread, arg, 0, NULL));
 }
 
+/* The [CRASH] report: from the exception handler as before (stderr, the run log when debug logs are on), and from
+ * crash_filter into hpps_crash.log when they are off. */
+static void print_crash(PEXCEPTION_POINTERS ep)
+{
+    uintptr_t fault_addr = ep->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION
+                               ? ep->ExceptionRecord->ExceptionInformation[1] : 0;
+    if (ep->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION) {
+        fprintf(stderr, "[CRASH] Exception 0x%08lX at RIP=0x%llX\n", (unsigned long)ep->ExceptionRecord->ExceptionCode,
+                (unsigned long long)ep->ContextRecord->Rip);
+    } else {
+        fprintf(stderr, "[CRASH] Access violation at RIP=0x%llX, fault addr=0x%llX (%s)\n",
+            (unsigned long long)ep->ContextRecord->Rip,
+            (unsigned long long)fault_addr,
+            ep->ExceptionRecord->ExceptionInformation[0] ? "write" : "read");
+    }
+    fprintf(stderr, "  Xbox regs: eax=0x%08X ecx=0x%08X edx=0x%08X esp=0x%08X\n",
+        g_eax, g_ecx, g_edx, g_esp);
+    fprintf(stderr, "  Xbox regs: ebx=0x%08X esi=0x%08X edi=0x%08X\n",
+        g_ebx, g_esi, g_edi);
+    fprintf(stderr, "  Xbox VA of fault: 0x%08X\n",
+        (uint32_t)(fault_addr - (uintptr_t)g_xbox_mem_offset));
+    print_guest_context((void *)ep->ContextRecord->Rip);
+
+    /*
+     * TODO: Add game-specific diagnostics here. Examples:
+     *
+     * Dump CRT heap handle:
+     *   uint32_t heap = *(uint32_t *)((uint8_t *)g_xbox_mem_offset + HEAP_HANDLE_VA);
+     *   fprintf(stderr, "  CRT heap handle: 0x%08X\n", heap);
+     *
+     * Dump game state:
+     *   uint32_t state = *(uint32_t *)((uint8_t *)g_xbox_mem_offset + GAME_STATE_VA);
+     *   fprintf(stderr, "  Game state: %u\n", state);
+     */
+
+    /* Print native stack return addresses for debugging */
+    {
+        uintptr_t *sp = (uintptr_t *)ep->ContextRecord->Rsp;
+        fprintf(stderr, "  Native stack (first 8 return addrs):\n");
+        for (int i = 0; i < 64 && sp[i]; i++) {
+            if (sp[i] >= 0x140000000ULL && sp[i] < 0x150000000ULL) {
+                fprintf(stderr, "    [%d] 0x%llX\n", i, (unsigned long long)sp[i]);
+            }
+        }
+    }
+    fflush(stderr);
+}
+
+/* xboxrecomp: a crash leaves a log even with the debug logs off (F10 > Debug > Write debug logs): then the launcher
+ * hands the game no log file and its output went nowhere, so a crash left nothing to report (2026-10-29). Only for a
+ * crash nothing handles, after the exception handler above: first-chance faults that Windows or Wine handle themselves
+ * (probes in system DLLs) pass through that handler too and must not leave a file. With the logs on, the report is
+ * already in hpps_run.log. */
+static LONG WINAPI crash_filter(PEXCEPTION_POINTERS ep)
+{
+    HANDLE err = GetStdHandle(STD_ERROR_HANDLE);
+    if (err && err != INVALID_HANDLE_VALUE && GetFileType(err) == FILE_TYPE_DISK) {
+        fprintf(stderr, "[CRASH] the game stops here (exception 0x%08lX not handled)\n",
+                (unsigned long)ep->ExceptionRecord->ExceptionCode);
+        fflush(stderr);
+        return EXCEPTION_CONTINUE_SEARCH;
+    }
+    if (freopen("hpps_crash.log", "w", stderr)) {
+        SYSTEMTIME t;
+        GetLocalTime(&t);
+        fprintf(stderr, "hpps.exe crashed on %04u-%02u-%02u at %02u:%02u:%02u. The debug logs were off, so this file holds\n"
+                        "only the crash report; turn on F10 > Debug > Write debug logs for the whole log next time.\n\n",
+                t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond);
+        print_crash(ep);
+        fclose(stderr);
+    }
+    return EXCEPTION_CONTINUE_SEARCH;
+}
+
 static LONG CALLBACK veh_handler(PEXCEPTION_POINTERS ep)
 {
     if (g_watch_va && ep->ExceptionRecord->ExceptionCode == EXCEPTION_SINGLE_STEP
@@ -379,47 +453,109 @@ static LONG CALLBACK veh_handler(PEXCEPTION_POINTERS ep)
                 return EXCEPTION_CONTINUE_EXECUTION;
         }
 
-        fprintf(stderr, "[CRASH] Access violation at RIP=0x%llX, fault addr=0x%llX (%s)\n",
-            (unsigned long long)ep->ContextRecord->Rip,
-            (unsigned long long)fault_addr,
-            ep->ExceptionRecord->ExceptionInformation[0] ? "write" : "read");
-        fprintf(stderr, "  Xbox regs: eax=0x%08X ecx=0x%08X edx=0x%08X esp=0x%08X\n",
-            g_eax, g_ecx, g_edx, g_esp);
-        fprintf(stderr, "  Xbox regs: ebx=0x%08X esi=0x%08X edi=0x%08X\n",
-            g_ebx, g_esi, g_edi);
-        fprintf(stderr, "  Xbox VA of fault: 0x%08X\n",
-            (uint32_t)(fault_addr - (uintptr_t)g_xbox_mem_offset));
-        print_guest_context((void *)ep->ContextRecord->Rip);
-
-        /*
-         * TODO: Add game-specific diagnostics here. Examples:
-         *
-         * Dump CRT heap handle:
-         *   uint32_t heap = *(uint32_t *)((uint8_t *)g_xbox_mem_offset + HEAP_HANDLE_VA);
-         *   fprintf(stderr, "  CRT heap handle: 0x%08X\n", heap);
-         *
-         * Dump game state:
-         *   uint32_t state = *(uint32_t *)((uint8_t *)g_xbox_mem_offset + GAME_STATE_VA);
-         *   fprintf(stderr, "  Game state: %u\n", state);
-         */
-
-        /* Print native stack return addresses for debugging */
-        {
-            uintptr_t *sp = (uintptr_t *)ep->ContextRecord->Rsp;
-            fprintf(stderr, "  Native stack (first 8 return addrs):\n");
-            for (int i = 0; i < 64 && sp[i]; i++) {
-                if (sp[i] >= 0x140000000ULL && sp[i] < 0x150000000ULL) {
-                    fprintf(stderr, "    [%d] 0x%llX\n", i, (unsigned long long)sp[i]);
-                }
-            }
-        }
-        fflush(stderr);
+        print_crash(ep);
     }
 
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
 /* ── WinMain ───────────────────────────────────────────────── */
+
+
+/* (upstream's check, the canonical build's fallback for an XBE whose SHA-1 is no profile's) The game edition this recompile was made from: its XBE's title ID, entry point, section count and code section
+ * (.text). Another edition (another region, a multi-language release) lays its code out differently, and the
+ * recompiled code would run it as garbage and stop at once; it is turned away with a message naming the edition.
+ * Header-only changes (a region-free patch) keep these and pass. */
+static int xbe_is_canonical_edition(const uint8_t *x, size_t n)
+{
+    const uint32_t want_tid = 0x45410037u, want_entry = 0x00154331u, want_sections = 13u;
+    const uint32_t want_text_va = 0x00011000u, want_text_size = 1570580u;
+    uint32_t tid = 0, entry = 0, sections = 0, text_va = 0, text_size = 0;
+#define XBE32(o) (*(const uint32_t *)(x + (o)))
+    if (n >= 0x180 && XBE32(0) == 0x48454258u) {  /* "XBEH" */
+        uint32_t base = XBE32(0x104), cert = XBE32(0x118) - base, sh = XBE32(0x120) - base;
+        sections = XBE32(0x11C);
+        entry = XBE32(0x128) ^ 0xA8FC57ABu;  /* retail key */
+        if (entry != want_entry && (XBE32(0x128) ^ 0x94859D4Bu) == want_entry) entry = want_entry;  /* debug key */
+        if ((size_t)cert + 12 <= n) tid = XBE32(cert + 8);
+        if ((size_t)sh + 12 <= n) text_va = XBE32(sh + 4), text_size = XBE32(sh + 8);
+    }
+#undef XBE32
+    if (tid == want_tid && entry == want_entry && sections == want_sections && text_va == want_text_va &&
+        text_size == want_text_size)
+        return 1;
+    printf("XBE edition mismatch: title ID %08X entry %08X, %u sections, code %08X %u bytes, %zu bytes in all; "
+           "expected title ID %08X entry %08X, %u sections, code %08X %u bytes (3264512 bytes)\n",
+           tid, entry, sections, text_va, text_size, n, want_tid, want_entry, want_sections, want_text_va, want_text_size);
+    char msg[640];
+    snprintf(msg, sizeof msg,
+             "This recompile is made from the PAL (Europe) release of Harry Potter and the Philosopher's Stone.\n\n"
+             "The default.xbe in the 'game' folder is a different edition (title ID %08X, %zu bytes, %u sections),\n"
+             "whose code does not match, so it cannot run.\n\n"
+             "Please use the PAL (Europe) release (default.xbe: title ID %08X, 3264512 bytes).",
+             tid, n, sections, want_tid);
+    MessageBoxA(NULL, msg, "Unsupported game version", MB_ICONERROR);
+    return 0;
+}
+
+/* xboxrecomp fork: the regional XBEs (port/region/*.json, tools/region/README.md). A build is made for one of them
+ * (REGION_SHA1, from region.cmake); REGION_KNOWN lists every supported one as "name=sha1,...". The XBE's SHA-1 picks:
+ * this build's disc passes; another supported disc is turned away naming the build it needs (the recompiled code is
+ * laid out for one disc); an XBE no profile knows (a header-patched copy) gets upstream's structural check on the
+ * canonical build, and runs with a warning on another region's build. */
+static const char *edition_label(const char *profile)
+{
+    if (strstr(profile, "usa")) return "NTSC-US (USA)";
+    if (strstr(profile, "eur")) return "PAL (Europe)";
+    return profile;
+}
+
+/* the profile name REGION_KNOWN gives a SHA-1 into name (empty when none) */
+static void edition_name(const char *sha, char *name, size_t cap)
+{
+    const char *p = REGION_KNOWN;
+    name[0] = 0;
+    while (*p) {
+        const char *eq = strchr(p, '='), *end = strchr(p, ',');
+        if (!end) end = p + strlen(p);
+        if (eq && eq < end && (size_t)(end - eq - 1) == strlen(sha) && !strncmp(eq + 1, sha, strlen(sha))) {
+            snprintf(name, cap, "%.*s", (int)(eq - p), p);
+            return;
+        }
+        p = *end ? end + 1 : end;
+    }
+}
+
+static int xbe_is_expected_edition(const uint8_t *x, size_t n)
+{
+    XBOX_SHA_CONTEXT c;  /* the kernel's SHA-1 (kernel_crypto.c) */
+    UCHAR d[20];
+    char sha[41], have[64], want[64];
+    xbox_XcSHAInit(&c);
+    xbox_XcSHAUpdate(&c, x, (ULONG)n);
+    xbox_XcSHAFinal(&c, d);
+    for (int i = 0; i < 20; i++) snprintf(sha + 2 * i, 3, "%02x", d[i]);
+    edition_name(sha, have, sizeof have);
+    edition_name(REGION_SHA1, want, sizeof want);
+    printf("XBE sha1 %s (%s); this build is for %s\n", sha, have[0] ? have : "no profile", want);
+    if (!strcmp(sha, REGION_SHA1)) return 1;
+    if (have[0]) {
+        char msg[640];
+        snprintf(msg, sizeof msg,
+                 "This build of Harry Potter and the Philosopher's Stone is made for the %s disc.\n\n"
+                 "The default.xbe in the 'game' folder is from the %s disc, which this build cannot run.\n\n"
+                 "Please use the %s build, or the %s disc's files.",
+                 edition_label(want), edition_label(have), edition_label(have), edition_label(want));
+        MessageBoxA(NULL, msg, "Different game version", MB_ICONERROR);
+        return 0;
+    }
+#ifdef REGION_RETARGETED
+    printf("XBE edition: no profile has this SHA-1 (a patched header?); running it as %s\n", want);
+    return 1;
+#else
+    return xbe_is_canonical_edition(x, n);
+#endif
+}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    LPSTR lpCmdLine, int nCmdShow)
@@ -492,6 +628,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     SymSetOptions(SYMOPT_DEFERRED_LOADS | SYMOPT_UNDNAME);
     SymInitialize(GetCurrentProcess(), NULL, TRUE);
     AddVectoredExceptionHandler(1, veh_handler);
+    SetUnhandledExceptionFilter(crash_filter);
 
     /* Step 1: Load XBE */
     if (!load_xbe(YOUR_GAME_XBE_PATH, &xbe_data, &xbe_size)) {
@@ -501,6 +638,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         return 1;
     }
     printf("XBE loaded: %zu bytes\n", xbe_size);
+    if (!xbe_is_expected_edition(xbe_data, xbe_size)) {
+        free(xbe_data);
+        return 1;
+    }
 
     /* Step 2: Initialize Xbox memory layout */
     printf("Initializing Xbox memory layout...\n");
@@ -514,6 +655,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     g_xbox_mem_offset = xbox_GetMemoryOffset();
     printf("Xbox memory mapped. Offset: 0x%llX\n", (unsigned long long)g_xbox_mem_offset);
+
+    /* Camera judder. The game steps at 0x21B7B8 (25) Hz and its timer (made at 0x14949E)
+     * counts 0x21BB68 ticks a second, 250 on the PAL disc. Rendering interpolates between steps
+     * by (ticks*25 % 250)/250, so a frame only sees ten positions per step, unevenly spaced at
+     * 60 fps. Every use is a ratio of the two, so 3000 (a player's XBE patch, file offset
+     * 0x20BC68) keeps the speed and gives 120 positions; the frame counter resets per level, so
+     * (frame+10)*3000 stays in 32 bits for ~16 hours. RECOMP_TIMER_FIX=0 keeps the disc value. */
+    {
+        uint32_t *rate = (uint32_t *)((uint8_t *)g_xbox_mem_offset + 0x0021BB68u);
+        const char *e = getenv("RECOMP_TIMER_FIX");
+        if (*rate == 250 && !(e && *e == '0')) {
+            *rate = 3000;
+            fprintf(stderr, "[BOOT] game timer 250 -> 3000 ticks/s\n");
+        }
+    }
 
     /* Bring up the emulated APU.
      *
