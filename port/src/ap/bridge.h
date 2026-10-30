@@ -16,6 +16,8 @@ int hpps_ap_enabled(void);
 void hpps_ap_frame(void);
 /* a location's catalog key happened (unknown keys are ignored); safe to repeat */
 void hpps_ap_location(const char *key);
+/* 1 if the catalog has that location key (whether or not it is checked yet) */
+int hpps_ap_known(const char *key);
 /* the goal is done */
 void hpps_ap_goal(void);
 /* the next received item to give in the game: its catalog kind ("card", "spell", "beans", ...) and value (card

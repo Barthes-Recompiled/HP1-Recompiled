@@ -281,6 +281,9 @@ extern "C" int hpps_ap_enabled(void) {
   }
   return on;
 }
+extern "C" int hpps_ap_known(const char* key) {
+  return key && hpps_ap_enabled() && Cat().location_by_key.count(key) != 0;
+}
 extern "C" void hpps_ap_location(const char* key) {
   if (key && hpps_ap_enabled()) B().Location(key);
 }

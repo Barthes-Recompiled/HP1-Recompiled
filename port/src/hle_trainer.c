@@ -288,6 +288,7 @@ static struct {
     uint32_t ent, hp, level;
     float last;
     int is_int;
+    int was_alive;  /* for the Archipelago bridge: health above 0 when last looked at */
 } g_watch[kMaxWatched];
 static int g_nwatch;
 static SRWLOCK g_watch_lock = SRWLOCK_INIT;  /* the lookup also runs on the loading thread */
@@ -323,6 +324,7 @@ static void watch_add(uint32_t e, uint32_t hp)
         if (g_watch[i].hp == hp) {
             g_watch[i].ent = e, g_watch[i].level = MEM32(kLevelNow);
             g_watch[i].last = health_value(hp, &g_watch[i].is_int);
+            g_watch[i].was_alive = g_watch[i].last > 0;
             return;
         }
     if (g_nwatch == kMaxWatched) return;
@@ -330,6 +332,7 @@ static void watch_add(uint32_t e, uint32_t hp)
     g_watch[g_nwatch].level = MEM32(kLevelNow);
     g_watch[g_nwatch].hp = hp;
     g_watch[g_nwatch].last = health_value(hp, &g_watch[g_nwatch].is_int);
+    g_watch[g_nwatch].was_alive = g_watch[g_nwatch].last > 0;
     g_nwatch++;
 }
 
@@ -338,6 +341,26 @@ static int watch_valid(int i)
 {
     uint32_t e = g_watch[i].ent, hp = g_watch[i].hp, inst = MEM32(e + 0x20);
     return g_watch[i].level == MEM32(kLevelNow) && MEM32(e + 8) == e && hp >= inst && hp < inst + 0x4000;
+}
+
+extern void hpps_ApEnemyDown(uint32_t ent);  /* hle_ap.c: an Archipelago check */
+
+/* every frame: a watched enemy whose health went from above 0 to 0 was defeated (the Archipelago bridge's check) */
+static void enemy_deaths(void)
+{
+    AcquireSRWLockExclusive(&g_watch_lock);
+    for (int i = 0; i < g_nwatch; i++) {
+        if (!watch_valid(i)) continue;
+        int is_int;
+        float v = health_value(g_watch[i].hp, &is_int);
+        if (v > 0) {
+            g_watch[i].was_alive = 1;
+        } else if (g_watch[i].was_alive) {
+            g_watch[i].was_alive = 0;
+            hpps_ApEnemyDown(g_watch[i].ent);
+        }
+    }
+    ReleaseSRWLockExclusive(&g_watch_lock);
 }
 
 static void instakill(void)
@@ -718,6 +741,7 @@ void sub_00095370(void)
         load_level_via_hub(t->warp_level);
     }
     if (t->instakill) instakill();
+    enemy_deaths();
     quidditch_start(level);
     autoplay(t, level, obj);
 

@@ -25,6 +25,7 @@
 #endif
 #include <windows.h>
 
+#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -81,6 +82,38 @@ static int scene_script(const char *name)
     return 0;
 }
 
+/* enemies the level's scripts set up (name -> type), for their defeat's key */
+static struct { uint32_t level; char name[64], type[40]; } g_enemy[256];
+static int g_nenemy;
+
+static void enemy_remember(uint32_t level, const char *name, const char *type)
+{
+    for (int i = 0; i < g_nenemy; i++)
+        if (g_enemy[i].level == level && !_stricmp(g_enemy[i].name, name)) return;
+    if (g_nenemy == 256) g_nenemy = 0;
+    g_enemy[g_nenemy].level = level;
+    snprintf(g_enemy[g_nenemy].name, sizeof g_enemy[0].name, "%s", name);
+    snprintf(g_enemy[g_nenemy].type, sizeof g_enemy[0].type, "%s", type);
+    g_nenemy++;
+}
+
+/* hle_trainer.c: a watched enemy's CurrentHealth reached 0 */
+void hpps_ApEnemyDown(uint32_t ent)
+{
+    if (!hpps_ap_enabled()) return;
+    const char *name = guest_str(MEM32(ent + 0x0C));
+    uint32_t level = MEM32(LEVEL_NOW);
+    char key[200];
+    for (int i = 0; i < g_nenemy; i++)
+        if (g_enemy[i].level == level && !_stricmp(g_enemy[i].name, name)) {
+            snprintf(key, sizeof key, "enemy:%u:%s:%s", level, g_enemy[i].type, g_enemy[i].name);
+            hpps_ap_location(key);
+            snprintf(key, sizeof key, "enemytype:%s", g_enemy[i].type);
+            hpps_ap_location(key);
+            return;
+        }
+}
+
 void hpps_ApScript(uint32_t entry, uint32_t argv)
 {
     static int told;
@@ -123,6 +156,11 @@ void hpps_ApScript(uint32_t entry, uint32_t argv)
         snprintf(key, sizeof key, "scene:%u:%s", level, script);
         hpps_ap_location(key);
     }
+    /* an enemy set up (SetAI<type>(name, ...)): its key, for when it is defeated (hpps_ApEnemyDown) */
+    if (!strncmp(cmd, "SetAI", 5) && argc && cmd[5]) {
+        snprintf(key, sizeof key, "enemy:%u:%s:%s", level, cmd + 5, a[0]);
+        if (hpps_ap_known(key)) enemy_remember(level, a[0], cmd + 5);
+    }
     /* the goal: Quirrell defeated (level 29's VoldemortDeadScript, which goes on to day 6) */
     if (level == 29 && !strcmp(script, "VoldemortDeadScript")) hpps_ap_goal();
 }
@@ -141,6 +179,133 @@ static void call_guest(void (*fn)(void), int n, const uint32_t *args)
     g_esp = sp;
     fn();
     g_esp = s_esp, g_ebx = s_ebx, g_esi = s_esi, g_edi = s_edi, g_ebp = s_ebp;
+}
+
+/* the bridge's own gives (hpps_ApFrame) pass the reward swap below */
+static int g_giving;
+
+/* a search's result: sub_000942E0 (Harry's search of a jar, bookcase or chest) gives it with the searched object at
+ * [esi + 0x25D0] (its +0x0C name, "group.WizF2_Jar3"); the key drops the group and is lower case, as the catalog */
+#define SEARCH_FIRST 0x000942E0u
+#define SEARCH_END   0x00095370u
+static void search_check(uint32_t ret)
+{
+    if (ret < SEARCH_FIRST || ret >= SEARCH_END || !guest_ptr(g_esi)) return;
+    uint32_t spot = MEM32(g_esi + 0x25D0);
+    const char *name = guest_ptr(spot) ? guest_str(MEM32(spot + 0x0C)) : "";
+    const char *dot = strchr(name, '.');
+    char low[96], key[160];
+    size_t i;
+    if (dot) name = dot + 1;
+    for (i = 0; name[i] && i < sizeof low - 1; i++) low[i] = (char)(name[i] >= 'A' && name[i] <= 'Z' ? name[i] + 32 : name[i]);
+    low[i] = 0;
+    if (!low[0]) return;
+    snprintf(key, sizeof key, "search:%s", low);
+    hpps_ap_location(key);
+    snprintf(key, sizeof key, "search:%u:%s", MEM32(LEVEL_NOW), low);
+    hpps_ap_location(key);
+}
+
+/* while a slot is bound the multiworld hands out cards, spells and quest items: the title's own gives of them (a
+ * check's vanilla reward) are left out, the check made; beans and the rest stay the title's */
+static int swapped(uint32_t item)
+{
+    static const uint8_t kOwn[] = {1, 2, 5, 8, 10, 12, 20, 21, 38, 39, 40, 41, 42, 43};  /* spells, quest items */
+    if (g_giving || !hpps_ap_active()) return 0;
+    if (item >= 101 && item <= 201) return 1;
+    for (size_t i = 0; i < sizeof kOwn; i++)
+        if (item == kOwn[i]) return 1;
+    return 0;
+}
+
+/* sub_0003E9A0(card 1..101), cdecl: one wizard card */
+extern void sub_0003E9A0_gen(void);
+void sub_0003E9A0(void)
+{
+    uint32_t ret = MEM32(g_esp), card = MEM32(g_esp + 4);
+    if (hpps_ap_enabled()) search_check(ret);
+    if (hpps_ap_enabled() && swapped(card + 100)) {
+        fprintf(stderr, "[AP] wizard card %u from the game left out (the multiworld's instead)\n", card);
+        g_esp += 4;
+        return;
+    }
+    sub_0003E9A0_gen();
+}
+
+/* sub_00041D20(item), cdecl: an inventory item (101..201 the cards, through sub_0003E9A0) */
+extern void sub_00041D20_gen(void);
+void sub_00041D20(void)
+{
+    uint32_t ret = MEM32(g_esp), item = MEM32(g_esp + 4) & 0xFFFF;
+    if (hpps_ap_enabled()) search_check(ret);
+    if (hpps_ap_enabled() && !(item >= 101 && item <= 201) && swapped(item)) {
+        fprintf(stderr, "[AP] item %u from the game left out (the multiworld's instead)\n", item);
+        g_eax = 0;
+        g_esp += 4;
+        return;
+    }
+    sub_00041D20_gen();
+}
+
+/* placed pickups (beans, cards, frogs, sweets in the catalog as object:<level>:<name>): the entities near Harry (the
+ * ring through +0 from the player's entity) are followed; one that leaves the ring, or stops being an entity, while
+ * Harry was close to it is taken as picked up */
+#define PLAYER       0x3565B0u
+#define PICKUP_NEAR  300.0f
+static struct { uint32_t ent; float dist; int seen; char key[96]; } g_pick[128];
+static int g_npick;
+
+static int entity_pos(uint32_t e, float p[3])
+{
+    uint32_t obj = MEM32(e + 0x28);
+    if (!guest_ptr(obj)) return 0;
+    uint32_t m = obj + 0x40 + 0x40 * (MEM32(obj + 0x2C) & 1);
+    p[0] = MEMF(m + 0x30), p[1] = MEMF(m + 0x34), p[2] = MEMF(m + 0x38);
+    return 1;
+}
+
+static void pickups(void)
+{
+    static uint32_t last_level;
+    uint32_t harry = MEM32(PLAYER), level = MEM32(LEVEL_NOW);
+    float hp[3];
+    if (level != last_level) {  /* a new level: everything leaves the ring at once, nothing was picked up */
+        last_level = level;
+        g_npick = 0;
+    }
+    if (!guest_ptr(harry) || !entity_pos(harry, hp)) return;
+    for (int i = 0; i < g_npick; i++) g_pick[i].seen = 0;
+    uint32_t e = MEM32(harry);
+    for (int n = 0; n < 4096 && guest_ptr(e) && e != harry; n++, e = MEM32(e)) {
+        if (MEM32(e + 8) != e) break;
+        const char *name = guest_str(MEM32(e + 0x0C));
+        if (!*name || strchr(name, '.')) continue;
+        int k;
+        for (k = 0; k < g_npick && g_pick[k].ent != e; k++) {}
+        if (k == g_npick) {
+            char key[96];
+            snprintf(key, sizeof key, "object:%u:%s", level, name);
+            if (!hpps_ap_known(key) || g_npick == 128) continue;
+            g_pick[k].ent = e;
+            snprintf(g_pick[k].key, sizeof g_pick[k].key, "%s", key);
+            g_npick++;
+        }
+        float p[3];
+        if (entity_pos(e, p)) {
+            float dx = p[0] - hp[0], dy = p[1] - hp[1], dz = p[2] - hp[2];
+            g_pick[k].dist = sqrtf(dx * dx + dy * dy + dz * dz);
+        }
+        g_pick[k].seen = 1;
+    }
+    int n = 0;
+    for (int i = 0; i < g_npick; i++) {
+        if (!g_pick[i].seen) {
+            if (g_pick[i].dist < PICKUP_NEAR) hpps_ap_location(g_pick[i].key);
+            continue;  /* gone: dropped from the list */
+        }
+        g_pick[n++] = g_pick[i];
+    }
+    g_npick = n;
 }
 
 static int give(const char *kind, int value)
@@ -186,9 +351,12 @@ void hpps_ApFrame(void)
     const char *kind;
     int value;
     for (int n = 0; n < 4 && hpps_ap_next_item(&kind, &value); n++) {
+        g_giving = 1;
         give(kind, value);
+        g_giving = 0;
         hpps_ap_item_given();
     }
+    pickups();
     /* counters */
     static int cards_seen, beans_last = -1, beans_total;
     int owned = 0;

@@ -24,6 +24,7 @@ python3 -m tools.recomp game/default.xbe --all --split 1000 --gen-dir port/src/r
     --exclude-manual "$(src src/hle_trainer.c)" \
     --exclude-manual "$(src src/hle_frontend.c)" \
     --exclude-manual "$(src src/hle_world.c)" \
+    --exclude-manual "$(src src/hle_ap.c)" \
     --exclude-manual "$(src src/hle_skip.c)" \
     --exclude-manual "$(src src/scda/xdk/hle_d3d8.cpp)"
 # hooks inside generated functions (debug traces) that an override file can't express
