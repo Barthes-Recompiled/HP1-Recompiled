@@ -395,11 +395,19 @@ void hpps_ApTravelRequest(int entry) { InterlockedExchange(&g_travel_pick, entry
 void hpps_ApPad(XBOX_GAMEPAD *g)
 {
     static int back_was;
+    static DWORD fired;
     if (!hpps_ap_enabled()) return;
     int back = (g->wButtons & 0x0020) != 0, triggers = g->bAnalogButtons[6] > 128 && g->bAnalogButtons[7] > 128;
-    if (back && !back_was && triggers) app_TravelToggle();
+    if (back && !back_was && triggers) {
+        fired = GetTickCount();
+        fprintf(stderr, "[AP] travel window (triggers %u/%u, Back)\n", g->bAnalogButtons[6], g->bAnalogButtons[7]);
+        app_TravelToggle();
+    }
     back_was = back;
-    if (triggers) g->wButtons &= (uint16_t)~0x0020;  /* the combo's Back is not the Remembrall's */
+    /* the combo's Back is not the Remembrall's: kept from the game while the triggers are held and for half a second
+     * after the combo (a Back let go after the triggers) */
+    if (g->bAnalogButtons[6] > 64 || g->bAnalogButtons[7] > 64 || GetTickCount() - fired < 500)
+        g->wButtons &= (uint16_t)~0x0020;
 }
 
 static void travel(void)

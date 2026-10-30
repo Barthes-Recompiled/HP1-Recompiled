@@ -287,6 +287,16 @@ static void stick_compensate(SHORT *x, SHORT *y)
 /* the pad as the game last read it: the debug trainer's noclip flies Harry with it (hle_trainer.c) */
 XBOX_GAMEPAD hpps_last_pad;
 
+/* the pad as the game last read it while a panel is up: only the trainer's injected input is in it then (the PC's
+ * pads are held at rest for the game and reach the panel through ImGui's own XInput), so the travel window can be
+ * driven by injected input in tests */
+void hpps_MenuPadInjected(uint16_t *buttons, uint8_t *a, uint8_t *b)
+{
+    *buttons = hpps_last_pad.wButtons;
+    *a = hpps_last_pad.bAnalogButtons[0];
+    *b = hpps_last_pad.bAnalogButtons[1];
+}
+
 static void get_state_direct(void)
 {
     uint32_t st = ARG(1);

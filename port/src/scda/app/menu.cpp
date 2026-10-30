@@ -567,6 +567,7 @@ extern "C" {
 int hpps_ap_active(void);
 int hpps_ap_travel_entry(int i, const char** name, int* level, const char** script, int* dungeon, int* unlocked);
 void hpps_ApTravelRequest(int entry);
+void hpps_MenuPadInjected(uint16_t* buttons, uint8_t* a, uint8_t* b);
 void app_TravelToggle(void) { app::g_travel = !app::g_travel; }
 }
 
@@ -576,39 +577,80 @@ namespace app {
 // there, B (or Close) shuts the window
 void DrawTravel() {
     ImGuiIO& io = ImGui::GetIO();
+    // injected test input (hle_input.c: the pad the game last read, only the trainer's input while a panel is up)
+    // drives a cursor of its own: the d-pad moves it over the open entries, A goes, B closes. A PC controller works
+    // through ImGui's own gamepad navigation as in the F10 panel.
+    static int cursor = -1;
+    static bool was[4];
+    bool edge[4] = {};
+    {
+        uint16_t buttons;
+        uint8_t a, b;
+        hpps_MenuPadInjected(&buttons, &a, &b);
+        const bool now[4] = {(buttons & 0x1) != 0, (buttons & 0x2) != 0, a > 128, b > 128};
+        for (int k = 0; k < 4; k++) edge[k] = now[k] && !was[k], was[k] = now[k];
+    }
+    struct Row { std::string label; bool dungeon, unlocked; };
+    std::vector<Row> rows;
+    {
+        const char *name, *script;
+        int level, dungeon, unlocked;
+        for (int i = 0; hpps_ap_travel_entry(i, &name, &level, &script, &dungeon, &unlocked); i++)
+            rows.push_back({unlocked ? std::string(name) : std::string(name) + "  (locked)", dungeon != 0,
+                            unlocked != 0});
+    }
+    auto step = [&](int dir) {
+        for (int k = 0, c = cursor; k < int(rows.size()); k++) {
+            c = (c + dir + int(rows.size())) % int(rows.size());
+            if (rows[size_t(c)].unlocked) {
+                cursor = c;
+                return;
+            }
+        }
+    };
+    if (edge[0]) step(-1);
+    if (edge[1]) step(+1);
+
     ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_Always,
                             ImVec2(0.5f, 0.5f));
     ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x * 0.42f, io.DisplaySize.y * 0.75f), ImGuiCond_Always);
     bool open = true;
+    static bool shown;
+    if (!shown) ImGui::SetNextWindowFocus();  // a PC controller's d-pad and A go to the window as it opens
+    shown = true;
     if (ImGui::Begin("Hogwarts Travel", &open, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
                                                     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings)) {
         if (!hpps_ap_active()) {
             ImGui::TextWrapped("Not connected to an Archipelago slot: days and set pieces open as their unlocks "
                                "arrive.");
         }
-        const char *name, *script;
-        int level, dungeon, unlocked;
-        for (int i = 0; hpps_ap_travel_entry(i, &name, &level, &script, &dungeon, &unlocked); i++) {
+        for (int i = 0; i < int(rows.size()); i++) {
             ImGui::PushID(i);
-            if (dungeon) ImGui::Indent(ImGui::GetFontSize() * 1.5f);
-            ImGui::BeginDisabled(!unlocked);
-            std::string label = unlocked ? std::string(name) : std::string(name) + "  (locked)";
-            if (ImGui::Selectable(label.c_str(), false, 0, ImVec2(0, 0))) {
+            if (rows[size_t(i)].dungeon) ImGui::Indent(ImGui::GetFontSize() * 1.5f);
+            ImGui::BeginDisabled(!rows[size_t(i)].unlocked);
+            if (ImGui::Selectable(rows[size_t(i)].label.c_str(), i == cursor) ||
+                (edge[2] && i == cursor && rows[size_t(i)].unlocked)) {
                 hpps_ApTravelRequest(i);
                 open = false;
             }
             ImGui::EndDisabled();
-            if (dungeon) ImGui::Unindent(ImGui::GetFontSize() * 1.5f);
+            if (rows[size_t(i)].dungeon) ImGui::Unindent(ImGui::GetFontSize() * 1.5f);
             ImGui::PopID();
         }
         ImGui::Separator();
-        if (ImGui::Button("Close") || ImGui::IsKeyPressed(ImGuiKey_GamepadFaceRight)) open = false;
+        if (ImGui::Button("Close") || ImGui::IsKeyPressed(ImGuiKey_GamepadFaceRight) || edge[3]) open = false;
         // xboxrecomp: the port everything here stands on
-        ImGui::TextDisabled("Huge thanks to MiddleDucky, whose wonderful Philosopher's Stone port makes all of this "
-                            "possible.");
+        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+        ImGui::TextWrapped("Huge thanks to MiddleDucky, whose wonderful Philosopher's Stone port makes all of this "
+                           "possible.");
+        ImGui::PopStyleColor();
     }
     ImGui::End();
-    if (!open) g_travel = false;
+    if (!open) {
+        g_travel = false;
+        shown = false;
+        cursor = -1;
+    }
 }
 
 void InitUi() {
