@@ -53,6 +53,7 @@ extern int app_KbmOn(void);  /* scda/app/input.cpp: keyboard and mouse play as c
 extern void app_InputPad0Present(int present);
 void hpps_TrainerInject(XBOX_GAMEPAD *g);  /* hle_trainer.c: input a tool asks for, added to port 0 */
 void hpps_SkipPad(const XBOX_GAMEPAD *g);  /* hle_skip.c: holding Start/Back fast-forwards a cutscene */
+void hpps_ApPad(XBOX_GAMEPAD *g);    /* hle_ap.c: both triggers + Back open the Archipelago travel window */
 
 /* scda/app/input.cpp's sneak toggle: Harry's pace as the game last picked it, [[0x3565B0] + 0xDC] + 0x2574 (0 stand,
  * 1 sneak, 2 walk, 3 run, set by the movement code at 0x8567A from the stick's push); -1 when there is no Harry */
@@ -287,6 +288,16 @@ static void stick_compensate(SHORT *x, SHORT *y)
 /* the pad as the game last read it: the debug trainer's noclip flies Harry with it (hle_trainer.c) */
 XBOX_GAMEPAD hpps_last_pad;
 
+/* the pad as the game last read it while a panel is up: only the trainer's injected input is in it then (the PC's
+ * pads are held at rest for the game and reach the panel through ImGui's own XInput), so the travel window can be
+ * driven by injected input in tests */
+void hpps_MenuPadInjected(uint16_t *buttons, uint8_t *a, uint8_t *b)
+{
+    *buttons = hpps_last_pad.wButtons;
+    *a = hpps_last_pad.bAnalogButtons[0];
+    *b = hpps_last_pad.bAnalogButtons[1];
+}
+
 static void get_state_direct(void)
 {
     uint32_t st = ARG(1);
@@ -307,6 +318,7 @@ static void get_state_direct(void)
         if (g_h[h].port == 0) {
             hpps_TrainerInject(&s.Gamepad);
             hpps_SkipPad(&s.Gamepad);
+            hpps_ApPad(&s.Gamepad);
             hpps_TrainerInject(&as_given);
             if (app_PadCaptureFeed(&as_given)) memset(&s.Gamepad, 0, sizeof(s.Gamepad));  /* waiting: at rest */
         }

@@ -861,6 +861,12 @@ void sub_000307F0(void)
         }
         return;
     }
+    if (g_pg.open_travel && state != kPPage) {  /* the pause menu the combo's Start opened */
+        g_pg.open_travel = 0;
+        page_open(kPageTravel);
+        g_esp += 4;  /* the step's ret */
+        return;
+    }
     if (state == kPPage) {
         page_input();
         g_esp += 4;  /* the step's ret */

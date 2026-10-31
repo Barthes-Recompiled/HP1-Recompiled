@@ -368,10 +368,13 @@ static void speech_command(const char *name, uint32_t entry, uint32_t ctx, uint3
     fprintf(stderr, "[SPEECH] %9.2f s %s\n", GetTickCount() / 1000.0, line);
 }
 
+extern void hpps_ApScript(uint32_t entry, uint32_t argv);  /* hle_ap.c: Archipelago checks */
+
 void hpps_ScriptCommand(uint32_t entry, uint32_t ctx, uint32_t argv)
 {
     static int lines;
     if (!crab_ptr(entry)) return;
+    hpps_ApScript(entry, argv);
     const char *name = (const char *)XBOX_PTR(entry);
     /* the difftest build sweeps each cutscene by itself (StartCutScene repeats for a few frames: once a minute) */
     if (hpps_DiffCutscene && !strcmp(name, "StartCutScene")) {
