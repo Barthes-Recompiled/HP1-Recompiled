@@ -38,6 +38,9 @@
 
 static void travel(void);
 static void tutorial_skip(void);
+static int give(const char *kind, int value);
+static void call_guest(void (*fn)(void), int n, const uint32_t *args);
+static int g_giving;
 extern void hpps_TrainerTravel(uint32_t level, const char *script);  /* hle_trainer.c */
 static int g_day6_by_travel;  /* Travel to day 6 runs Quirrell's end script, which is not the goal then */
 
@@ -219,11 +222,13 @@ void sub_000CEC60(void)
 }
 
 /* An AP new game skips the tutorial (Austin, 2026-10-30): the first level Harry is seen in is Day 0 as a new game
- * (IsSavedGame's 0x322D50 clear; Continue sets it), so once the slot's option is known (bound, or 8 s offline) and no
- * cutscene is up, Travel takes him to Day 1, which starts at its last save point, the dormitory. Day 0 stays on
- * Travel (always open). Flipendo comes from the pool, as the other spells. */
+ * (IsSavedGame's 0x322D50 clear; Continue sets it), so once the slot's option is known (bound, or 3 s offline) Travel
+ * takes him to Day 1, which starts at its last save point, the dormitory. That is during the intro cutscenes, on
+ * purpose: the first hint box after them holds the title's logic (no update runs under it), and a level load tears a
+ * cutscene down as any Travel does. Day 0 stays on Travel (always open); Flipendo comes from the pool. */
 #define SAVED_GAME_FLAG 0x322D50u
-#define CUTSCENE_FLAG   0x331161u
+#define LETTERBOX_STATE 0x0032E1FCu  /* hle_skip.c: 2 sliding in, 1 down, 3 sliding out, 0 none */
+extern int hpps_FastForward(void);     /* hle_skip.c: the cutscene fast-forward's speed, 1 when none */
 static void tutorial_skip(void)
 {
     static uint32_t first_level;
@@ -231,6 +236,13 @@ static void tutorial_skip(void)
     static int done;
     uint32_t level = MEM32(LEVEL_NOW);
     if (done) return;
+    static DWORD last_log;
+    if (GetTickCount() - last_log > 5000) {  /* while undecided: why not yet */
+        last_log = GetTickCount();
+        fprintf(stderr, "[AP] tutorial: level %u first %u saved-game %u letterbox %u fast %d bound %d option %d\n",
+                level, first_level, MEM8(SAVED_GAME_FLAG), MEM32(LETTERBOX_STATE), hpps_FastForward(),
+                hpps_ap_active(), hpps_ap_tutorial_skip());
+    }
     if (!first_level && level >= 6) first_level = level, since = GetTickCount();
     if (!first_level) return;
     if (first_level != 6) {
@@ -241,16 +253,24 @@ static void tutorial_skip(void)
         if (level >= 6) done = 1;
         return;
     }
-    if (!hpps_ap_active() && GetTickCount() - since < 8000) return;
+    if (!hpps_ap_active() && GetTickCount() - since < 3000) return;  /* offline: the option is the default */
     if (!hpps_ap_tutorial_skip() || MEM8(SAVED_GAME_FLAG)) {
         fprintf(stderr, "[AP] tutorial kept (option %d, saved-game flag %u)\n", hpps_ap_tutorial_skip(),
                 MEM8(SAVED_GAME_FLAG));
         done = 1;
         return;
     }
-    if (MEM8(CUTSCENE_FLAG)) return;
+    /* during the intro cutscenes, on purpose: the first hint box after them holds the title's logic (no update
+     * runs under it), and a level load tears a cutscene down as any Travel does */
     done = 1;
     fprintf(stderr, "[AP] tutorial skipped: Day 1\n");
+    /* what the tutorial hands out besides Flipendo: the Folio (24) and the spell book (47); Day 1's own Startup gives
+     * the wand (23). Then the abilities are refreshed from the inventory, as a spell give does. */
+    g_giving = 1;
+    give("quest", 24);
+    give("quest", 47);
+    g_giving = 0;
+    call_guest(sub_000342E0, 0, NULL);
     hpps_TrainerTravel(8, "");
 }
 
