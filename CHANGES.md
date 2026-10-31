@@ -1,5 +1,34 @@
 # Changes
 
+## 1.0.0 (2026-10-31): Barthes Recompiled, built on MiddleDucky's v0.3.0
+
+This is the first Barthes Recompiled release of the port. Everything that makes the game run on the PC is
+**MiddleDucky's** work ([HP-PS-Xbox-Recomp](https://github.com/MiddleDucky/HP-PS-Xbox-Recomp)), and this release
+carries all of their v0.3.0 below. Thank you, MiddleDucky, enormously, for making this port and sharing it.
+
+### New
+- **Settings inside the game.** "Settings" in the title menu and the pause menu opens Gameplay, Graphics and Controls
+  pages drawn in the game's own font and colours. They change the same settings as F10 and save to `hpps.toml`.
+- **Button Mapping** (Settings > Controls): press the action, then the controller button for it.
+- **Quit To Desktop** in the title and pause menus.
+- **Both discs.** The North American (Sorcerer's Stone) disc now works as well as the European one. Each disc has its
+  own download; the Barthes Launcher picks the right one for your disc.
+- **Cutscene fast-forward:** hold Start or Back to run a cutscene to its end quickly (on by default).
+- **Start-up logos skipped** (on by default; F10 > Gameplay or Settings > Gameplay to turn it off).
+- **Frame-rate caps of 120, 144, 165 and 240,** paced by a high-resolution timer. The game's own logic still steps at
+  its console rate; higher caps draw more frames.
+- **Controller in background** (Settings > Controls, F10, launcher): turn it off and the game ignores the controller
+  while another window has the focus.
+
+### Fixes
+- The settings pages fit a 4:3 screen: label and value columns, room for the highlighted row, and the "press a
+  button" prompt in the hint's place.
+
+### Known issues
+- Button prompts are always Xbox's; PlayStation and Switch pads work through Steam Input or DS4Windows.
+- The troll's walk animation and footsteps, the squared ground-fog tiles and some pop-in in the forest are as in
+  v0.3.0.
+
 ## v0.3.0 (2026-10-30), compared with v0.2.1
 
 ### New options
