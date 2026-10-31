@@ -73,7 +73,7 @@ done
 
 # every DLL either exe imports must come with Windows 10/11 itself (the C/C++ runtimes are linked in statically);
 # anything else would have to be shipped in the folder
-builtin='^(api-ms-win-crt-.*|kernel32|user32|gdi32|shell32|ole32|winmm|dwmapi|dbghelp|d3d11|d3d12|dxgi|d3dcompiler_47|xaudio2_8|xinput1_4|mfplat|mfreadwrite|windowscodecs|imm32|comctl32|advapi32)\.dll$'
+builtin='^(api-ms-win-crt-.*|kernel32|user32|gdi32|shell32|ole32|winmm|dwmapi|dbghelp|d3d11|d3d12|dxgi|d3dcompiler_47|xaudio2_8|xinput1_4|mfplat|mfreadwrite|windowscodecs|imm32|comctl32|advapi32|winhttp)\.dll$'
 for exe in "$dist"/*.exe; do
     "$objdump" -p "$exe" | sed -n 's/^\s*DLL Name: //p' | tr 'A-Z' 'a-z' | sort -u | while read -r dll; do
         grep -Eq "$builtin" <<< "$dll" || { echo "$(basename "$exe") needs $dll, which Windows does not ship" >&2; exit 1; }
