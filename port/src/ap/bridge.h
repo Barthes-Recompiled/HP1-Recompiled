@@ -28,6 +28,8 @@ void hpps_ap_item_given(void);
 /* 1 while a slot is bound (connected or offline with a session), for the cards goal and the travel menu */
 int hpps_ap_active(void);
 int hpps_ap_cards_goal(void);
+/* the slot's tutorial_skip option (true offline): an AP new game starts on Day 1 */
+int hpps_ap_tutorial_skip(void);
 /* 1 if the slot owns that item (a pass, by catalog name) */
 int hpps_ap_has(const char *item_name);
 /* the travel window's list: the days and nights in order, each followed by its set pieces (a set piece with a level of

@@ -37,6 +37,8 @@
 #include "input/xinput_xbox.h"
 
 static void travel(void);
+static void tutorial_skip(void);
+extern void hpps_TrainerTravel(uint32_t level, const char *script);  /* hle_trainer.c */
 static int g_day6_by_travel;  /* Travel to day 6 runs Quirrell's end script, which is not the goal then */
 
 extern void sub_0003E9A0(void);
@@ -214,6 +216,42 @@ void sub_000CEC60(void)
         hpps_ap_location(key);
     }
     sub_000CEC60_gen();
+}
+
+/* An AP new game skips the tutorial (Austin, 2026-10-30): the first level Harry is seen in is Day 0 as a new game
+ * (IsSavedGame's 0x322D50 clear; Continue sets it), so once the slot's option is known (bound, or 8 s offline) and no
+ * cutscene is up, Travel takes him to Day 1, which starts at its last save point, the dormitory. Day 0 stays on
+ * Travel (always open). Flipendo comes from the pool, as the other spells. */
+#define SAVED_GAME_FLAG 0x322D50u
+#define CUTSCENE_FLAG   0x331161u
+static void tutorial_skip(void)
+{
+    static uint32_t first_level;
+    static DWORD since;
+    static int done;
+    uint32_t level = MEM32(LEVEL_NOW);
+    if (done) return;
+    if (!first_level && level >= 6) first_level = level, since = GetTickCount();
+    if (!first_level) return;
+    if (first_level != 6) {
+        done = 1;
+        return;
+    }
+    if (level != 6) {  /* a load in progress shows another number for a moment */
+        if (level >= 6) done = 1;
+        return;
+    }
+    if (!hpps_ap_active() && GetTickCount() - since < 8000) return;
+    if (!hpps_ap_tutorial_skip() || MEM8(SAVED_GAME_FLAG)) {
+        fprintf(stderr, "[AP] tutorial kept (option %d, saved-game flag %u)\n", hpps_ap_tutorial_skip(),
+                MEM8(SAVED_GAME_FLAG));
+        done = 1;
+        return;
+    }
+    if (MEM8(CUTSCENE_FLAG)) return;
+    done = 1;
+    fprintf(stderr, "[AP] tutorial skipped: Day 1\n");
+    hpps_TrainerTravel(8, "");
 }
 
 /* runs a recompiled function on this guest thread, the arguments pushed right to left and a return address */
@@ -400,6 +438,7 @@ void hpps_ApFrame(void)
     if (!hpps_ap_enabled()) return;
     hpps_ap_frame();
     travel();  /* before the connection check: the entries are gated by the passes held */
+    tutorial_skip();
     pickups();  /* checks made offline wait in pending_<slot>.json */
     if (!hpps_ap_active()) return;
     const char *kind;
