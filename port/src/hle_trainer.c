@@ -467,6 +467,9 @@ static int g_resume_set;
 static uint8_t g_resume_was_flag;
 static uint32_t g_resume_was_cont;
 
+/* hle_ap.c: the level in play was reached by Travel as a saved game, and Harry isn't settled in it yet */
+int hpps_TrainerRevisit(void) { return g_resume_set; }
+
 static uint32_t last_save_point(uint32_t level)
 {
     static const uint8_t last[HPPS_LEVEL_LAST + 1] = {

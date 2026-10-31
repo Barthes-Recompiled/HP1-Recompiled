@@ -40,6 +40,7 @@ static void travel(void);
 static int g_day6_by_travel;  /* Travel to day 6 runs Quirrell's end script, which is not the goal then */
 
 extern void sub_0003E9A0(void);
+int hpps_TrainerRevisit(void);  /* hle_trainer.c */
 extern void sub_00152160(void);
 extern void sub_0014FEB0(void);
 extern void sub_00041D20(void);
@@ -144,6 +145,29 @@ void hpps_ApScript(uint32_t entry, uint32_t argv)
         clean_arg(guest_str(MEM32(args + 4 * i)), a[i], sizeof a[i]);
         if (i) strncat(joined, "|", sizeof joined - strlen(joined) - 1);
         strncat(joined, a[i], sizeof joined - strlen(joined) - 1);
+    }
+    /* a day revisited by Travel: the doors its story shuts stay open (Austin's call, 2026-10-30), except the set
+     * pieces' own, which have Travel entries: the library, the Forbidden Corridor and Fluffy, the troll's bathroom,
+     * the duel. The instruction's third argument ("1") is pointed at a "0" of the level's own (the first seen). */
+    static uint32_t zero_arg, zero_level;
+    if (zero_level != level) zero_level = level, zero_arg = 0;
+    for (uint32_t i = 0; !zero_arg && i < argc && i < 8; i++)
+        if (!strcmp(a[i], "0")) zero_arg = MEM32(args + 4 * i);
+    if (!strcmp(cmd, "LockDoor") && argc == 3 && !strcmp(a[2], "1") && zero_arg && hpps_TrainerRevisit()) {
+        static const char *const keep[] = {"libcor", "liblink", "libpot", "libstealth", "forbiddencorridor",
+                                           "fluffyroom", "looroom01", "dracoduel"};
+        int set_piece = 0;
+        char lo[2][96];
+        for (int r = 0; r < 2; r++) {
+            size_t i;
+            for (i = 0; a[r][i] && i < sizeof lo[r] - 1; i++) lo[r][i] = (char)tolower((unsigned char)a[r][i]);
+            lo[r][i] = 0;
+            for (size_t k = 0; k < sizeof keep / sizeof *keep; k++) set_piece |= strstr(lo[r], keep[k]) != NULL;
+        }
+        if (!set_piece) {
+            MEM32(args + 8) = zero_arg;
+            fprintf(stderr, "[AP] revisit: %s left open (%s)\n", joined, script);
+        }
     }
     if (!strcmp(cmd, "AddTask") && argc) {
         snprintf(key, sizeof key, "task:%s:added", a[0]);
