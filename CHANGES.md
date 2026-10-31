@@ -11,7 +11,7 @@ carries all of their v0.3.0 below. Thank you, MiddleDucky, enormously, for makin
   multiworld: tick "Play this game in an Archipelago multiworld" on the game's Archipelago tab in the Barthes
   Launcher, enter the room's server, your slot name and the password, and press Play. The pause menu gains a
   **Hogwarts Travel** page for going back to any day or set piece you have unlocked. The room's host needs
-  `hpps.apworld`, attached to this release.
+  `hpps.apworld`, attached to this release. Tested on the PAL disc.
 - **Settings inside the game.** "Settings" in the title menu and the pause menu opens Gameplay, Graphics and Controls
   pages drawn in the game's own font and colours. They change the same settings as F10 and save to `hpps.toml`.
 - **Button Mapping** (Settings > Controls): press the action, then the controller button for it.
