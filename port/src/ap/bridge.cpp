@@ -323,6 +323,10 @@ extern "C" void hpps_ap_item_given(void) {
   }
 }
 extern "C" int hpps_ap_active(void) { return B().bound; }
+extern "C" int hpps_ap_tutorial_skip(void) {
+  Bridge& b = B();
+  return !b.bound || b.slot_data.value("tutorial_skip", true);
+}
 extern "C" int hpps_ap_cards_goal(void) {
   Bridge& b = B();
   return b.bound && b.slot_data.value("goal", "") == "wizard_cards" ? b.slot_data.value("cards_goal", 0) : 0;
