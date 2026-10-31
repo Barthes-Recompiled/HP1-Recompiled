@@ -5,6 +5,8 @@
  "include_dirs": ["src", "src/recomp", "src/scda"],
  "numbers": [
   {"values": ["0x00011000"], "files": ["src/main.c"], "why": "the canonical XBE's .text address in upstream's edition check, compared as a number (compiled out of retargeted builds)"},
+  {"values": ["0x00011000"], "files": ["src/hle_ap.c"],
+   "why": "lower bound of the guest memory a pointer may be in (0x11000..0x4000000), not a code address"},
   {"values": ["0x00011000"], "files": ["src/hle_debug.c"],
    "why": "lower bound of the guest memory a pointer may be in (0x11000..0x4000000), not a code address"},
   {"values": ["0x20000", "0x30000", "0x40000", "0x50000", "0x70000"],
@@ -15,6 +17,8 @@
  ],
  "addresses": [
   {"values": ["0x00191D00", "0x00192C00", "0x00193400", "0x00193500", "0x00195300", "0x00195500", "0x00195F00"],
-   "files": ["src/difftest_hle.h"], "why": "the D3D functions difftest runs as HLE (a table of entry points)"}
+   "files": ["src/difftest_hle.h"], "why": "the D3D functions difftest runs as HLE (a table of entry points)"},
+  {"values": ["0x32E800"], "files": ["src/hle_frontend.c"],
+   "why": "the pause menu's first sound handle (pause_resume stops it as the resume row does), a data address"}
  ]
 }
