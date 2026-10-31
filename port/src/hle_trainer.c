@@ -288,6 +288,7 @@ static struct {
     uint32_t ent, hp, level;
     float last;
     int is_int;
+    int was_alive;  /* for the Archipelago bridge: health above 0 when last looked at */
 } g_watch[kMaxWatched];
 static int g_nwatch;
 static SRWLOCK g_watch_lock = SRWLOCK_INIT;  /* the lookup also runs on the loading thread */
@@ -323,6 +324,7 @@ static void watch_add(uint32_t e, uint32_t hp)
         if (g_watch[i].hp == hp) {
             g_watch[i].ent = e, g_watch[i].level = MEM32(kLevelNow);
             g_watch[i].last = health_value(hp, &g_watch[i].is_int);
+            g_watch[i].was_alive = g_watch[i].last > 0;
             return;
         }
     if (g_nwatch == kMaxWatched) return;
@@ -330,6 +332,7 @@ static void watch_add(uint32_t e, uint32_t hp)
     g_watch[g_nwatch].level = MEM32(kLevelNow);
     g_watch[g_nwatch].hp = hp;
     g_watch[g_nwatch].last = health_value(hp, &g_watch[g_nwatch].is_int);
+    g_watch[g_nwatch].was_alive = g_watch[g_nwatch].last > 0;
     g_nwatch++;
 }
 
@@ -338,6 +341,26 @@ static int watch_valid(int i)
 {
     uint32_t e = g_watch[i].ent, hp = g_watch[i].hp, inst = MEM32(e + 0x20);
     return g_watch[i].level == MEM32(kLevelNow) && MEM32(e + 8) == e && hp >= inst && hp < inst + 0x4000;
+}
+
+extern void hpps_ApEnemyDown(uint32_t ent);  /* hle_ap.c: an Archipelago check */
+
+/* every frame: a watched enemy whose health went from above 0 to 0 was defeated (the Archipelago bridge's check) */
+static void enemy_deaths(void)
+{
+    AcquireSRWLockExclusive(&g_watch_lock);
+    for (int i = 0; i < g_nwatch; i++) {
+        if (!watch_valid(i)) continue;
+        int is_int;
+        float v = health_value(g_watch[i].hp, &is_int);
+        if (v > 0) {
+            g_watch[i].was_alive = 1;
+        } else if (g_watch[i].was_alive) {
+            g_watch[i].was_alive = 0;
+            hpps_ApEnemyDown(g_watch[i].ent);
+        }
+    }
+    ReleaseSRWLockExclusive(&g_watch_lock);
 }
 
 static void instakill(void)
@@ -381,7 +404,7 @@ static uint32_t hub_of(uint32_t level)
     static const uint8_t hub[HPPS_LEVEL_LAST + 1] = {
         [6] = 6, [7] = 7, [8] = 8, [9] = 8, [10] = 10, [11] = 11, [12] = 11, [13] = 13, [14] = 13, [15] = 15,
         [16] = 15, [17] = 17, [18] = 17, [19] = 19, [20] = 19, [21] = 21, [22] = 21, [23] = 23, [24] = 23,
-        [25] = 25, [26] = 25, [27] = 25, [28] = 25, [29] = 25, [30] = 25,
+        [25] = 25, [26] = 25, [27] = 25, [28] = 25, [29] = 25, [30] = 25, [31] = 31,
     };
     return level <= HPPS_LEVEL_LAST ? hub[level] : 0;
 }
@@ -424,6 +447,65 @@ static void start_script(const char *name)
     fprintf(stderr, "[TRAINER] %s started (script %08X)\n", name, script);
 }
 
+/* the Archipelago travel window (hle_ap.c): a level to go to, through its hub, and a script of it to start once Harry has
+ * had a second there (a set piece inside a hub: TrollIntro, LibraryStealthSection, ...) */
+static void load_level_via_hub(uint32_t level);
+static uint32_t g_travel_level;
+static char g_travel_script[64];
+
+/* A hub reached by Travel starts as from a saved game at the day's last save point: the hub's Startup takes its
+ * IsSavedGame branch (no opening, Harry at that save, the SaveN script putting the day's story where that save left
+ * it, so its doors are as open as the day gets). IsSavedGame reads 0x322D50 (sub_0001C370), GetSavePosition
+ * 0x329DD0 (sub_00024A60), and a level load may refill 0x329DD0 from 0x322DAC (sub_000246D0); the title sets all three
+ * this way when a save is continued (sub_000234B0). Put back once Harry is in, so the day's own StartLevel later is
+ * a new day again. Save points per hub from the script census (Startup's SpawnScript SaveN). Found by DeepSeek. */
+#define SAVED_GAME   0x322D50u
+#define SAVE_CONT    0x322DACu
+#define SAVE_POS     0x329DD0u
+static uint32_t g_resume_pos;
+static int g_resume_set;
+static uint8_t g_resume_was_flag;
+static uint32_t g_resume_was_cont;
+
+/* hle_ap.c: the level in play was reached by Travel as a saved game, and Harry isn't settled in it yet */
+int hpps_TrainerRevisit(void) { return g_resume_set; }
+
+static uint32_t last_save_point(uint32_t level)
+{
+    static const uint8_t last[HPPS_LEVEL_LAST + 1] = {
+        [6] = 6, [7] = 3, [8] = 7, [10] = 5, [11] = 5, [13] = 5, [15] = 6, [17] = 9, [19] = 4, [21] = 4, [23] = 5, [25] = 1,
+    };
+    return level <= HPPS_LEVEL_LAST ? last[level] : 0;
+}
+
+void hpps_TrainerTravel(uint32_t level, const char *script)
+{
+    g_travel_level = level;
+    snprintf(g_travel_script, sizeof g_travel_script, "%s", script ? script : "");
+    g_resume_pos = g_travel_script[0] ? 0 : last_save_point(level);
+    fprintf(stderr, "[TRAINER] travel to level %u%s%s\n", level, *g_travel_script ? ", then " : "", g_travel_script);
+    load_level_via_hub(level);
+}
+
+static void travel_step(uint32_t level)
+{
+    static ULONGLONG since;
+    if (!g_travel_level || level != g_travel_level || g_pending) {
+        since = 0;
+        return;
+    }
+    if (!since) since = GetTickCount64();
+    if (GetTickCount64() - since < 1000) return;
+    if (g_resume_set) {  /* Harry is in: the day's own way on is a new day again */
+        MEM8(SAVED_GAME) = g_resume_was_flag;
+        MEM32(SAVE_CONT) = g_resume_was_cont;
+        g_resume_set = 0;
+    }
+    if (g_travel_script[0]) start_script(g_travel_script);
+    g_travel_level = 0;
+    since = 0;
+}
+
 /* in day5 with the match asked for: HPE53Script once Harry has had a second in the level (its Startup is done) */
 static void quidditch_start(uint32_t level)
 {
@@ -461,7 +543,16 @@ static void load_level(uint32_t level)
     if (level < HPPS_LEVEL_FIRST || level > HPPS_LEVEL_LAST) return;
     /* the level in play again: 5, as StartLevel (sub_00048FB0) asks for it; its own id loads it over itself and
      * the load crashes */
+    uint32_t asked = level;
     if (level == MEM32(kLevelNow)) level = 5;
+    if (g_resume_pos && asked == g_travel_level) {
+        if (!g_resume_set) g_resume_was_flag = MEM8(SAVED_GAME), g_resume_was_cont = MEM32(SAVE_CONT);
+        MEM8(SAVED_GAME) = 1;
+        MEM32(SAVE_CONT) = g_resume_pos;
+        MEM32(SAVE_POS) = g_resume_pos;
+        g_resume_set = 1;
+        fprintf(stderr, "[TRAINER] level %u as a saved game at save point %u\n", asked, g_resume_pos);
+    }
     uint32_t a[1] = {level};
     call_guest(sub_00146110, 1, a);
     fprintf(stderr, "[TRAINER] loading level %u\n", level);
@@ -659,10 +750,13 @@ static void autoplay(HppsTrainerShm *t, uint32_t level, uint32_t obj)
 }
 
 extern void sub_00095370_gen(void);
+extern void hpps_ApFrame(void);  /* hle_ap.c: the Archipelago bridge, once a frame Harry is updated */
+
 void sub_00095370(void)
 {
     HppsTrainerShm *t = shm();
     uint32_t ent = ARG(0);
+    if (ent && ent == MEM32(kPlayer)) hpps_ApFrame();
     if (!t || ent != MEM32(kPlayer) || !ent) {
         sub_00095370_gen();
         return;
@@ -715,7 +809,9 @@ void sub_00095370(void)
         load_level_via_hub(t->warp_level);
     }
     if (t->instakill) instakill();
+    enemy_deaths();
     quidditch_start(level);
+    travel_step(level);
     autoplay(t, level, obj);
 
     if (t->god && MEMF(kHealthMax) > 0) MEMF(kHealth) = MEMF(kHealthMax);

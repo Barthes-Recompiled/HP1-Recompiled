@@ -23,9 +23,9 @@ enum { kSpellNone = 0, kSpellFlipendo = 1, kSpellLumos = 2, kSpellDiffindo = 5, 
 #define HPPS_PROGRESS_SIZE 0x4AE4u
 
 /* levels: [0x356CC4] is the one in play, an id = 6 + its index in the title's name table at 0x21BB70
- * (6 day0.lvl .. 30 day6.lvl are the story) */
+ * (6 day0.lvl .. 31 day6.lvl are the story; 30 is night5avoldemort.lvl) */
 #define HPPS_LEVEL_FIRST 6u
-#define HPPS_LEVEL_LAST  30u
+#define HPPS_LEVEL_LAST  31u
 
 typedef struct HppsTrainerShm {
     uint32_t magic, version;
