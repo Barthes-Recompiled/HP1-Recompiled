@@ -23,15 +23,14 @@ artwork. You need your own copy of the Xbox disc; the pipeline regenerates every
                           and the Python pipeline (xbe_parser, disasm, func_id, abi_analysis, recomp)
   cmake/ include/ docs/ tests/ LICENSES/   toolkit
   port/
-    CMakeLists.txt        the game: hpps.exe, hpps_launcher.exe, hpps_trainer.exe
+    CMakeLists.txt        the game: hpps.exe, hpps_trainer.exe
     regen.sh              XBE -> port/src/recomp/gen/*.c (generated, ignored by git)
     icall_seeds.json      indirect-call targets the disassembler can't find by itself (regen.sh input)
     src/                  hand-written code
-      main.c              startup: single instance / launcher check, debug.env, settings, XBE load, kernel
+      main.c              startup: single instance, working folder + run log, debug.env, settings, XBE load, kernel
       hle_*.c             overrides of recompiled game/XDK functions (see 6.2)
       scda/               renderer (gpu/d3d12.cpp, shaders.cpp, pipeline_cache.cpp), XDK D3D8 HLE
                           (xdk/hle_d3d8.cpp), settings + F10 panel + input (app/)
-      launcher/           hpps_launcher.exe (Dear ImGui over D3D11)
       trainer/            hpps_trainer.exe, the debug trainer
       recomp/             recomp_types.h etc.; gen/ is generated
       difftest.c          Unicorn-based original-vs-lifted comparison (HPPS_DIFFTEST builds)
@@ -124,21 +123,17 @@ cmake -S . -B build-win -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build-win -j$(nproc)
 ```
 
-Outputs in `port/build-win/`: `hpps.exe`, `hpps_launcher.exe`, `hpps_trainer.exe`.
+Outputs in `port/build-win/`: `hpps.exe`, `hpps_trainer.exe`.
 
-* The exe icon is made at configure time from `game/default.xbe`'s title image (`$$XTIMAGE`) by
-  `tools/xbx_to_ico.py`. Without the XBE, and always in release builds (`HPPS_NO_ART`), the port's own icon
-  `res/app.ico` is used instead: a wand and sparkle drawn from shapes by `tools/make_icon.py`, original artwork.
-  `-DHPPS_GAME_XBE=<path>` points at another XBE.
-* The launcher shows no game art in any build: the title as text (Windows' Georgia) over a black backdrop. The
-  picture it used to load (`launcher_bg.png`, made from the title's textures) was removed on 2026-10-29.
+* The exe's icon is Barthes Recompiled's own `res/app.ico` in every build: volume I from the Barthes Launcher's
+  shelf, drawn from shapes by `tools/make_icon.py hp1` (Pillow; the same script is in the launcher's repo). No game
+  art goes into the exe.
 * Generated code is compiled at **-O2** on purpose: GCC 16 at -O3 hoisted the address of a thread-local array
   out of a loop, reading the TLS template instead of the thread's copy. The post-build step
   `tools/check_tls_refs.py` fails the build on any such access ("58 thread local variables, no global address
   reads" is the good result).
 * CMake options: `HPPS_RELEASE` (players' build: hardening, SSE4.1, no debug keys), `HPPS_NO_ART` (no game
-  artwork inside the exes: no icon, no launcher picture, the launcher shows the title as text in Windows' Georgia;
-  package_release.sh always sets it, so nothing of Warner Bros.' is in a release), `HPPS_DIFFTEST` (see 7.4),
+  artwork inside the exes, now always the case; package_release.sh still sets it, so nothing of Warner Bros.' is in a release), `HPPS_DIFFTEST` (see 7.4),
   `HPPS_CALL_PROFILE` (per-target call counts, F7 dumps).
 
 
@@ -154,16 +149,18 @@ copy port\build-win\*.exe port\run\
 It creates `hpps.toml` (settings), `saves\` (Xbox UDATA/TDATA, one folder per game, beside the exe) and
 `shadercache\` there.
 
-**Starting.** `hpps.exe` only runs when started by `hpps_launcher.exe` (which sets `HPPS_LAUNCHER=1` and the
-`RECOMP_*` defaults the game expects, see `StartGame` in launcher.cpp). For scripted test runs set
-`HPPS_LAUNCHER=1` yourself. Only one copy runs at a time (named mutex, `src/single_instance.h`); a second start
+**Starting.** `hpps.exe` starts directly (Explorer, a shortcut, Quiver or the Barthes Launcher). It makes its
+own folder the working folder, writes its console output to `hpps_run.log` when none was handed down, and sets
+the `RECOMP_*` defaults the game expects unless they are already set (`start_alone` / `set_default_env` in
+main.c). The upstream launcher (`hpps_launcher.exe`) is gone.
+Only one copy runs at a time (named mutex, `src/single_instance.h`); a second start
 brings the running one forward. Alt+F4 ends the process at once (`fb_present.c`).
 
 **debug.env** beside the exe: `KEY=VALUE` lines set as environment variables however the game is started (an
 existing variable wins, `#` comments). This is how trace switches are turned on.
 
 **Logs.** Only with F10 > Debug > "Write debug logs" (`debug_logs = true` in hpps.toml, from the next start):
-`hpps_run.log` (the game's console output, written by the launcher) and `xbox_kernel.log` (kernel layer).
+`hpps_run.log` (the game's console output, written by the game itself or the Barthes Launcher) and `xbox_kernel.log` (kernel layer).
 Crash reports (`[CRASH]` with symbolised guest functions; hpps.exe keeps its symbol table) land in hpps_run.log.
 
 **Shader cache.** Shaders are generated HLSL keyed by a hash of their source, compiled with D3DCompile and kept in
@@ -176,7 +173,7 @@ building are skipped (`async_shaders`), and such a frame is not shown: the last 
 stale entries are harmless but useless.
 
 **Release.** `bash port/tools/package_release.sh` (MSYS2) configures `build-release` with `HPPS_RELEASE=ON`,
-builds, and fills `port/dist/hpps-<date>/` with hpps_launcher.exe, hpps.exe, README.txt and
+builds, and fills `port/dist/hpps-<date>/` with hpps.exe, README.txt and
 `shadercache/base_shaders.bin`. It checks ASLR/NX/high-entropy, the stack protector, and that every imported DLL
 ships with Windows 10/11 (C/C++ runtimes are static; XInput is `xinput1_4`). **It never deletes the folder**
 (testers drop game files into it): only its own files are overwritten. Keep it that way.

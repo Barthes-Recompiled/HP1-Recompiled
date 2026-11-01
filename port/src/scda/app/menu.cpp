@@ -220,8 +220,6 @@ void DrawPanel(bool start) {
     } else {
         if (ImGui::Button("Close")) open = false;
         ImGui::SameLine();
-        if (ImGui::Checkbox("Show the launcher at startup", &s.show_launcher)) Changed();
-        ImGui::SameLine();
         ImGui::TextDisabled("Saved to hpps.toml");
     }
     ImGui::End();

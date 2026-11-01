@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # The build players get: configures build-release (HPPS_RELEASE=ON: buffer-overflow hardening on the hand-written
-# code, SSE4.1, no debug keys), builds the game and the launcher, and puts in dist/hpps-<date>/:
-#   hpps_launcher.exe             setup: 4:3 / 16:9, graphics, controls; starts the game
+# code, SSE4.1, no debug keys), builds the game, and puts in dist/hpps-<date>/:
 #   hpps.exe                      the game
 #   shadercache\base_shaders.bin  shaders compiled ahead (read only; the player's own go in shaders.bin)
 #   README.txt                    requirements, installing, controls, the F10 options
@@ -25,15 +24,15 @@ fi
 # release hardening, 2026-10-25); the stack canaries stay
 cmake -S . -B build-release "${cross[@]}" -DCMAKE_BUILD_TYPE=Release -DHPPS_RELEASE=ON -DHPPS_NO_ART=ON -DHPPS_FORTIFY=OFF -DHPPS_VERSION="${VERSION:-0.3.0}" \
       > logs/build-release-config.log
-nice -n 10 cmake --build build-release -j"$(nproc)" --target hpps hpps_launcher > logs/build-release.log 2>&1 ||
+nice -n 10 cmake --build build-release -j"$(nproc)" --target hpps > logs/build-release.log 2>&1 ||
     { tail -30 logs/build-release.log; exit 1; }
 
 dist="$port/dist/hpps-$(date +%Y%m%d)"
-# Never delete the folder: players (and testers) drop game/, settings and saves into it. Only the two executables
-# are replaced; anything else found there is left alone. (2026-10-20 an rm -rf of this folder destroyed a game/
+# Never delete the folder: players (and testers) drop game/, settings and saves into it. Only the executable
+# is replaced; anything else found there is left alone. (2026-10-20 an rm -rf of this folder destroyed a game/
 # folder that had been moved into it for a test.)
 mkdir -p "$dist"
-cp -f build-release/hpps.exe build-release/hpps_launcher.exe "$dist/"
+cp -f build-release/hpps.exe "$dist/"
 # players' readme: requirements, installing, controls, the F10 options; and what changed since the last release
 cp -f README.txt "$dist/"
 cp -f "$port/../CHANGES.md" "$dist/CHANGES.txt"
@@ -47,8 +46,6 @@ cp -f "$port/../LICENSES/LGPL-2.1.txt" "$dist/licenses/LGPL-2.1.txt"
 # the MIT code built into the executables keeps its notices too: SCDA's renderer and Dear ImGui
 cp -f "$port/src/scda/LICENSE.SCDA" "$dist/licenses/SCDA-XBERecomp.txt"
 cp -f "$port/third_party/imgui/LICENSE.txt" "$dist/licenses/DearImGui.txt"
-# the launcher title's font, Magic School One (FontMesa): its own terms, from its download
-cp -f "$port/src/launcher/font/MagicSchool-licensing.txt" "$dist/licenses/MagicSchool-font.txt"
 
 # res/base_shaders.bin ships as shadercache\base_shaders.bin: a player's first visit to a level then needs no shader
 # compiler, only pipelines; one their driver refuses is compiled on their PC instead. Shader keys are the generated
