@@ -160,8 +160,9 @@ Graphics
     Resolution           the window's size, or the fullscreen mode; Desktop
                          uses the monitor's own
     Vsync                waits for the monitor's refresh (no tearing)
-    Frame rate           the game's rate (60 fps), 30 fps, or Unlocked
-                         (experimental: the game was made for 60, some timing
+    Frame rate           the game's rate (60 fps), 30 fps, a cap of 120, 144,
+                         165 or 240 fps, or Unlocked (above 60 is
+                         experimental: the game was made for 60, some timing
                          may misbehave)
   Resolution
     Internal resolution  the lines the 3D is drawn at: 480 is the Xbox's own;
@@ -232,8 +233,8 @@ Debug
     Write debug logs     writes hpps_run.log and xbox_kernel.log beside the
                          game from the next start. Off by default; turn it on
                          to report a problem, and send both files with your
-                         report. With it off, a crash still leaves
-                         hpps_crash.log beside the game with the crash report.
+                         report. With it off, a crash still leaves its crash
+                         report in hpps_run.log beside the game.
 
 
 TROUBLESHOOTING

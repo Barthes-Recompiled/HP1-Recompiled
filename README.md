@@ -21,10 +21,10 @@ Xbox disc. The build regenerates the recompiled code from your `default.xbe`.
 
 ## Quick start
 
-1. Download **`barthes_launcher.exe`** from the
-   [Barthes Launcher releases](https://github.com/Barthes-Recompiled/Barthes-Launcher/releases/latest) and put it in
-   a folder of its own, for example `C:\Games\Barthes`.
-2. Start it, pick **Philosopher's Stone** on the shelf and press **Install**.
+1. Download **`BarthesLauncher-windows-<version>.zip`** from the
+   [Barthes Launcher releases](https://github.com/Barthes-Recompiled/Barthes-Launcher/releases/latest) and unzip it
+   somewhere of its own, for example `C:\Games` (it makes a `BarthesLauncher` folder).
+2. Start `barthes_launcher.exe`, pick **Philosopher's Stone** on the shelf and press **Install**.
 3. Press **Add disc image or folder...** and choose your `.iso` / `.xiso`, or the `default.xbe` of a disc you
    already extracted. The launcher checks that it is this game's disc, unpacks it, checks every file and installs
    the build for your disc (PAL or USA).
@@ -102,7 +102,7 @@ Without the launcher, set `RECOMP_AP_SERVER` (server:port) and `RECOMP_AP_SLOT` 
 | "Failed to load default.xbe" | The disc files are missing: check that `game\default.xbe` exists beside `hpps.exe`. |
 | The game says it is the wrong disc | Download the other build (`PAL` or `USA`), or let the Barthes Launcher pick it. |
 | Crashes, missing sound or pictures in one place | A disc file may be damaged: **Verify files** on the game's page in the Barthes Launcher names it; add your disc again to repair. |
-| The game won't start or closes at once | Update your graphics driver (DirectX 12 is required). Every start writes `hpps_run.log` beside `hpps.exe`; send it with your report. For more detail turn on F10 > Debug > *Write debug logs* and start again. A crash always leaves `hpps_crash.log`. |
+| The game won't start or closes at once | Update your graphics driver (DirectX 12 is required). Every start writes `hpps_run.log` beside `hpps.exe`; send it with your report. For more detail turn on F10 > Debug > *Write debug logs* and start again. A crash leaves its report in `hpps_run.log` too. |
 | A short pause the first time you enter an area | Shaders are being built for your card, once per area; later starts prepare them ahead in the menus. |
 | Keyboard doesn't move Harry while a pad is plugged in | Turn off F10 > Controls > *Use controller*. |
 | Archipelago won't connect | Check the server address and port, the slot name's spelling and the password; the room must use the `hpps.apworld` from the same release. |
